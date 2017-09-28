@@ -13,9 +13,11 @@ public class UploaderApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
         GridPane root = new GridPane();
         Scene mainScene = new Scene(root, 800, 600);
         primaryStage.setScene(mainScene);
         primaryStage.show();
+
     }
 }
