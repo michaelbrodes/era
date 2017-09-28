@@ -15,7 +15,8 @@ public class Course {
     private String semester;                                /* Semester of Course */
     private String courseNumber;                            /* Number of Course */
     private String sectionNumber;                           /* Number for the Course Section */
-    public Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
+    private Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
+    private Set<Assignment> assignments;
 
     /* Constructor */
     public Course(String department, String name, String semester, String courseNumber, String sectionNumber) {
@@ -83,5 +84,9 @@ public class Course {
             }
         }
         return null;
+    }
+
+    public Set<Assignment> getAssignments() {
+        return assignments;
     }
 }

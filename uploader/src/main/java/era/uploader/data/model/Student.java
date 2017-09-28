@@ -1,6 +1,7 @@
 package era.uploader.data.model;
 
-/* Class that will represent each individual student and provide a means to
+/**
+ * Class that will represent each individual student and provide a means to
  * create QR codes, and match the information inside of each code to its
  * respective student.
  */

@@ -2,12 +2,14 @@ package era.uploader.data.database;
 
 import era.uploader.data.CourseDAO;
 import era.uploader.data.model.Course;
+import era.uploader.data.model.Grader;
+import era.uploader.data.model.Student;
 import java.util.Set;
 import java.util.HashSet;
 
 /**
  * Provides CRUD functionality for {@link Course} objects stored in the
- * database
+ * database. A course has many {@link Student}s and many {@link Grader}s.
  */
 public class CourseDAOImpl implements CourseDAO {
     private Set<Course> courses = new HashSet<>(); /* A set of Courses to act as the database table */
