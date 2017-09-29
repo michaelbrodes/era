@@ -128,5 +128,3 @@ xcuserdata/
 gradlew 
 gradlew.bat
 gradle/
-
-*.iml
