@@ -79,6 +79,21 @@ public class Page {
         this.assignment = assignment;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Page)) return false;
+
+        Page page = (Page) o;
+
+        return uuid.equals(page.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid.hashCode();
+    }
+
     @ParametersAreNonnullByDefault
     public static class Builder {
         private Student student;
