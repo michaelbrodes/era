@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import era.uploader.creation.QRCreator;
-import era.uploader.creation.QRErrorBus;
 import era.uploader.creation.QRErrorEvent;
 import era.uploader.creation.QRErrorStatus;
 import era.uploader.data.PageDAO;

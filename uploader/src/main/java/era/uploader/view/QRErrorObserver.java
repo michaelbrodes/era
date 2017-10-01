@@ -5,6 +5,5 @@ import era.uploader.creation.QRErrorEvent;
 /**
  * An observer of the {@link QRErrorEvent}
  */
-public interface QRErrorObserver {
-    void onError(QRErrorEvent event);
+public interface QRErrorObserver extends MessageObserver<QRErrorEvent> {
 }

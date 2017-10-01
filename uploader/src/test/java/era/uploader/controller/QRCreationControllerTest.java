@@ -3,7 +3,6 @@ package era.uploader.controller;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import era.uploader.creation.QRErrorBus;
 import era.uploader.data.PageDAO;
 import era.uploader.data.database.PageDAOImpl;
 import era.uploader.data.model.Page;
@@ -18,20 +17,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class QRCreationControllerTest {
     private QRCreationController ctrl;
-    private Set<Page> db;
-    private PageDAO pageDAO;
 
     @Before
     public void setUp() {
-        db = Sets.newHashSet();
-        pageDAO = mock(PageDAOImpl.class);
+        Set<Page> db = Sets.newHashSet();
+        PageDAO pageDAO = mock(PageDAOImpl.class);
         when(pageDAO.getDb()).thenReturn(db);
         ctrl = new QRCreationController(pageDAO);
     }

@@ -1,5 +1,6 @@
 package era.uploader.creation;
 
+import era.uploader.controller.QRErrorBus;
 import era.uploader.data.model.Page;
 import era.uploader.data.model.Student;
 import org.junit.Test;
@@ -36,7 +37,7 @@ public class QRCreatorTest {
      */
     @Test(expected = NullPointerException.class)
     public void call_NullStudent() throws Exception {
-        QRCreator creator = new QRCreator(null, 0);
+        new QRCreator(null, 0);
     }
 
 }
