@@ -36,38 +36,61 @@ public class QRCreationView extends Application {
 
         //Initializing Button
         Button createQRButton = new Button("Create");
+        Button createClassButton = new Button("Add Class");
 
         //Initializing Temporary Text Fields Right Now
         TextField firstName = new TextField();
         TextField lastName = new TextField();
         TextField eID = new TextField();
+        TextField classFileName = new TextField();
+        TextField className = new TextField();
+        TextField sectionNumber = new TextField();
+        TextField studentNumber = new TextField();
 
 
         //Initializing Labels
+        Label studentSectionLabel = new Label("Single Student QR Code Generation");
         Label fNameLabel = new Label("First Name: ");
         Label lNameLabel = new Label("Last Name: ");
         Label eIDLabel = new Label("e-ID: ");
+        Label classNameLabel = new Label("Class Name");
+        Label sectionNumberLabel = new Label("Section Number");
+
+        Label orLabel = new Label("Or");
+        Label classFileNameLabel = new Label("Class File Name: ");
 
 
         //Initializing the GridPane (Easy for organizing objects on a screen)
         GridPane gridPane = new GridPane();
 
         gridPane.setMinSize(800, 600);
-
         gridPane.setPadding(new Insets(10,10,10,10));
 
         gridPane.setVgap(10);
         gridPane.setHgap(10);
 
-        gridPane.add(fNameLabel, 4, 5);
-        gridPane.add(firstName, 5, 5);
-        gridPane.add(lNameLabel, 4, 7);
-        gridPane.add(lastName, 5, 7);
-        gridPane.add(eIDLabel, 4, 9);
-        gridPane.add(eID, 5, 9);
-        gridPane.add(createQRButton, 5, 11);
+        gridPane.add(studentSectionLabel, 4, 3);
+        gridPane.add(firstName, 4, 5);
+        gridPane.add(lastName, 4, 7);
+        gridPane.add(eID, 4, 9);
+        gridPane.add(studentNumber, 4, 11);
+        gridPane.add(className, 4, 13);
+        gridPane.add(sectionNumber, 4, 15);
+        gridPane.add(createQRButton, 4, 17);
 
+        firstName.setPromptText("First Name");
+        lastName.setPromptText("Last Name");
+        eID.setPromptText("eID");
+        studentNumber.setPromptText("800 Number");
+        className.setPromptText("Course Number");
+        sectionNumber.setPromptText("Section Number");
+        classFileName.setPromptText("Class Roster File Name");
 
+        gridPane.add(orLabel, 4, 19);
+        gridPane.add(classFileName, 4, 21);
+        gridPane.add(createClassButton, 4, 23);
+
+        createQRButton.requestFocus();
 
         Scene scene = new Scene(gridPane);
 
