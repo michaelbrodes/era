@@ -5,7 +5,9 @@ import era.uploader.data.model.Page;
 import era.uploader.data.model.Student;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class QRCreatorTest {
     /**
@@ -14,9 +16,11 @@ public class QRCreatorTest {
      */
     @Test
     public void call_NotNullStudent() throws Exception {
-        Student robMcGuy = new Student();
-        robMcGuy.setSchoolId("rmcguy");
-        robMcGuy.setName("Rob McGuy");
+        Student robMcGuy = Student.create()
+                .withSchoolId("rmcguy")
+                .withFirstName("McGuy")
+                .withFirstName("Rob")
+                .build();
         int sequenceNumber = 1;
         QRCreator creator = new QRCreator(robMcGuy, sequenceNumber);
         QRErrorBus bus = QRErrorBus.instance();

@@ -19,12 +19,29 @@ public class Course {
     private Set<Assignment> assignments;
 
     /* Constructor */
-    public Course(String department, String name, String semester, String courseNumber, String sectionNumber) {
+    public Course(
+            String department,
+            String name,
+            String semester,
+            String courseNumber,
+            String sectionNumber,
+            Set<Assignment> assignments
+    ) {
         this.department = department;
         this.name = name;
         this.semester = semester;
         this.courseNumber = courseNumber;
         this.sectionNumber = sectionNumber;
+        this.assignments = assignments;
+    }
+
+    public Course(Builder builder) {
+        this.department = builder.department;
+        this.name = builder.name;
+        this.semester = builder.semester;
+        this.courseNumber = builder.courseNumber;
+        this.sectionNumber = builder.sectionNumber;
+        this.assignments = builder.assignments;
     }
 
     /* Getters and Setters */
@@ -76,6 +93,10 @@ public class Course {
     public void removeStudent(Student student) {
         studentsEnrolled.remove(student);
     }
+
+    public Set<Student> getStudentsEnrolled() {
+        return studentsEnrolled;
+    }
     public Student getStudent(Student student) {
         for (Student otherStudent :
                 studentsEnrolled) {
@@ -88,5 +109,58 @@ public class Course {
 
     public Set<Assignment> getAssignments() {
         return assignments;
+    }
+
+    public static Builder create() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String department;                              /* Department where the course is held */
+        private String name;                                    /* Name of Course */
+        private String semester;                                /* Semester of Course */
+        private String courseNumber;                            /* Number of Course */
+        private String sectionNumber;                           /* Number for the Course Section */
+        private Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
+        private Set<Assignment> assignments;
+
+        public Builder forDepartment(String department) {
+            this.department = department;
+            return this;
+        }
+
+        public Builder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder forSemester(String semester) {
+            this.semester = semester;
+            return this;
+        }
+
+        public Builder withCourseNumber(String courseNumber) {
+            this.courseNumber = courseNumber;
+            return this;
+        }
+
+        public Builder withSectionNumber(String sectionNumber) {
+            this.sectionNumber = sectionNumber;
+            return this;
+        }
+
+        public Builder havingStudentsEnrolled(Set<Student> studentsEnrolled) {
+            this.studentsEnrolled = studentsEnrolled;
+            return this;
+        }
+
+        public Builder havingAssignments(Set<Assignment> assignments) {
+            this.assignments = assignments;
+            return this;
+        }
+
+        public Course build() {
+            return new Course(this);
+        }
     }
 }

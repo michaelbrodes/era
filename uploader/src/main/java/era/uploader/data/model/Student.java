@@ -1,5 +1,7 @@
 package era.uploader.data.model;
 
+import java.util.Set;
+
 /**
  * Class that will represent each individual student and provide a means to
  * create QR codes, and match the information inside of each code to its
@@ -11,14 +13,39 @@ public class Student {
     private String firstName; /* Student's first name */
     private String lastName;  /* Student's last name */
     private String schoolId;  /* Identifier for each student provided by the school */
+    private String userName;
     private int uniqueId;     /* Identifier that we generate to uniquely identify each student inside the QR code */
+    // every course that the student belongs to
+    private Set<Course> courses;
 
     /* Constructor */
-    public Student(String firstName, String lastName, String schoolId, int uniqueId) {
+    public Student(
+            String firstName,
+            String lastName,
+            String schoolId,
+            String userName,
+            int uniqueId,
+            Set<Course> courses
+    ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.schoolId = schoolId;
+        this.userName = userName;
         this.uniqueId = uniqueId;
+        this.courses = courses;
+    }
+
+    public Student(Builder builder) {
+        this.courses = builder.courses;
+        this.firstName = builder.firstName;
+        this.schoolId = builder.schoolId;
+        this.lastName = builder.lastName;
+        this.uniqueId = builder.uniqueId;
+        this.userName = builder.userName;
+    }
+
+    public static Builder create() {
+        return new Builder();
     }
 
     /* Getters and Setters */
@@ -69,4 +96,67 @@ public class Student {
         return uniqueId;
     }
 
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public static class Builder {
+        private String firstName; /* Student's first name */
+        private String lastName;  /* Student's last name */
+        private String schoolId;  /* Identifier for each student provided by the school */
+        private String userName;
+        private int uniqueId;     /* Identifier that we generate to uniquely identify each student inside the QR code */
+        // every course that the student belongs to
+        private Set<Course> courses;
+
+        public Builder() {
+
+        }
+
+        public Builder withFirstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public Builder withLastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public Builder withUserName(String userName) {
+            this.userName = userName;
+            return this;
+        }
+
+        public Builder withSchoolId(String schoolId) {
+            this.schoolId = schoolId;
+            return this;
+        }
+
+        public Builder withUniqueId(int uniqueId) {
+            this.uniqueId = uniqueId;
+            return this;
+        }
+
+        public Builder takingCourses(Set<Course> courses) {
+            this.courses = courses;
+            return this;
+        }
+
+        public Student build() {
+            return new Student(this);
+        }
+    }
 }

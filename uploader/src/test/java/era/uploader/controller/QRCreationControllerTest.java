@@ -3,7 +3,9 @@ package era.uploader.controller;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import era.uploader.data.CourseDAO;
 import era.uploader.data.PageDAO;
+import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.PageDAOImpl;
 import era.uploader.data.model.Page;
 import era.uploader.data.model.Student;
@@ -27,15 +29,19 @@ public class QRCreationControllerTest {
     public void setUp() {
         Set<Page> db = Sets.newHashSet();
         PageDAO pageDAO = mock(PageDAOImpl.class);
+        CourseDAO courseDAO = mock(CourseDAOImpl.class);
         when(pageDAO.getDb()).thenReturn(db);
-        ctrl = new QRCreationController(pageDAO);
+        ctrl = new QRCreationController(pageDAO, courseDAO);
     }
 
     @Test
     public void createQRs_SingletonSet() throws Exception {
-        Student robMcGuy = new Student();
+        Student robMcGuy = Student.create()
+                .withFirstName("Rob")
+                .withLastName("Mcguy")
+                .withSchoolId("rmcguy")
+                .build();
         robMcGuy.setSchoolId("rmcguy");
-        robMcGuy.setName("Rob McGuy");
         int numberOfAssignments = 2;
         ImmutableSet<Student> students = ImmutableSet.of(robMcGuy);
         QRErrorBus bus = QRErrorBus.instance();

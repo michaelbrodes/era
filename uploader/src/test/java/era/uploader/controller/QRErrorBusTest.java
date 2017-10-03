@@ -21,9 +21,11 @@ public class QRErrorBusTest {
      */
     @Test
     public void fire_TwoEventsInQueue() throws Exception {
-        Student timmy = new Student();
-        timmy.setName("timmy");
-        timmy.setSchoolId("tdude");
+        Student timmy = Student.create()
+                .withFirstName("timmy")
+                .withLastName("dude")
+                .withSchoolId("tdude")
+                .build();
 
         QRErrorEvent generation = new QRErrorEvent(QRErrorStatus.GENERATION_ERROR, timmy);
         QRErrorEvent timeout = new QRErrorEvent(QRErrorStatus.TIMEOUT_ERROR);

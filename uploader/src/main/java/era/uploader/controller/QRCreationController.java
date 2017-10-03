@@ -3,13 +3,14 @@ package era.uploader.controller;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import era.uploader.creation.QRCreator;
 import era.uploader.creation.QRErrorEvent;
 import era.uploader.creation.QRErrorStatus;
+import era.uploader.data.CourseDAO;
 import era.uploader.data.PageDAO;
+import era.uploader.data.model.Course;
 import era.uploader.data.model.Page;
 import era.uploader.data.model.Student;
 
@@ -17,15 +18,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collector;
 
 
 /**
@@ -53,11 +53,14 @@ public class QRCreationController {
     private static final int REFERENCE_NBR = 3;
 
     private final PageDAO pageDAO;
+    private final CourseDAO courseDAO;
 
 
-    public QRCreationController(PageDAO pageDAO) {
+    public QRCreationController(PageDAO pageDAO, CourseDAO courseDAO) {
         Preconditions.checkNotNull(pageDAO);
+        Preconditions.checkNotNull(courseDAO);
         this.pageDAO = pageDAO;
+        this.courseDAO = courseDAO;
     }
 
     /**
@@ -66,20 +69,11 @@ public class QRCreationController {
      * codes will be a hash of the students schoolId with a sequence number
      * for the page.
      *
-     * @param studentRoster A set of students that are partaking in a course.
-     * @param numberOfQRs   the number of qr codes we should generate for each
-     *                      student
+     * @param students    A set of students that are partaking in a course.
+     * @param numberOfQRs the number of qr codes we should generate for each
+     *                    student
      */
-    public Multimap<Student, Page> createQRs(String studentRoster, int numberOfQRs) {
-        Preconditions.checkNotNull(studentRoster);
-        Set<Student> students = null;
-        try {
-            students = generateStudents(studentRoster);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ImmutableMultimap.of();
-        }
-
+    public Multimap<Student, Page> createQRs(Collection<Student> students, int numberOfQRs) {
         int processors = Runtime.getRuntime().availableProcessors();
         ExecutorService threads = Executors.newFixedThreadPool(processors);
         List<Future<Page>> futures =
@@ -132,14 +126,17 @@ public class QRCreationController {
      * Course ID, *. Anything after Child Course ID is ignored.
      *
      * @param inputFile Path to the CSV file we are grabbing the students form
-     * @return A set of students that are contained in that CSV file
+     * @return a map of courses to students.
      * @throws IOException We couldn't find the file you inputted.
      */
     @VisibleForTesting
-    Set<Student> generateStudents(String inputFile) throws IOException {
+    Multimap<Course, Student> generateStudents(String inputFile) throws IOException {
         Preconditions.checkNotNull(inputFile);
-        return Files.readAllLines(Paths.get(inputFile))
+        // ignore the title record
+        final int firstRecord = 1;
+        ImmutableMultimap<Course, Student> courseToStudents = Files.readAllLines(Paths.get(inputFile))
                 .stream()
+                .skip(firstRecord)
                 .map((inputStudent) -> inputStudent.split(","))
                 .map((studentRecord) -> {
                     if (studentRecord.length < STUDENT_RECORD_SIZE) {
@@ -152,16 +149,39 @@ public class QRCreationController {
                         BUS.fire(event);
                         return null;
                     } else {
-                        return new Student();
+                        String[] courseRecord = studentRecord[COURSE_ID].split("-");
+                        if (courseRecord.length < COURSE_ID_SIZE) {
+                            String erroredLine = String.join(",", studentRecord);
+                            QRErrorEvent event = new QRErrorEvent(
+                                    QRErrorStatus.COURSE_PARSE_ERROR,
+                                    null,
+                                    erroredLine
+                            );
+                            BUS.fire(event);
+                            return null;
+                        } else {
+                            ImmutableMultimap.Builder<Course, Student> map = new ImmutableMultimap.Builder<>();
+                            map.put(
+                                    Course.create()
+                                            .forDepartment(courseRecord[DEPARTMENT])
+                                            .withCourseNumber(courseRecord[COURSE_NBR])
+                                            .withSectionNumber(courseRecord[SECTION_NBR])
+                                            .build(),
+                                    Student.create()
+                                            .withLastName(studentRecord[LAST_NAME])
+                                            .withFirstName(studentRecord[FIRST_NAME])
+                                            .withUserName(studentRecord[USER_NAME])
+                                            .withSchoolId(studentRecord[SCHOOL_ID])
+                                            .build()
+                            );
+                            return map;
+                        }
                     }
                 })
                 .filter(Objects::nonNull)
-                .collect(Collector.of(
-                        ImmutableSet.Builder::new,
-                        ImmutableSet.Builder::add,
-                        (l, r) -> l.addAll(r.build()),
-                        ImmutableSet.Builder<Student>::build,
-                        Collector.Characteristics.UNORDERED
-                ));
+                .reduce(new ImmutableMultimap.Builder<>(), (l, r) -> l.putAll(r.build()))
+                .build();
+        courseDAO.insertCourseAndStudents(courseToStudents);
+        return courseToStudents;
     }
 }
