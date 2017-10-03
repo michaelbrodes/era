@@ -10,14 +10,16 @@ import java.util.HashSet;
 
 public class Course {
     /* Class Fields */
-    private String name;                             /* Name of Course */
-    private String semester;                         /* Semester of Course */
-    private int courseNumber;                        /* Number of Course */
-    private int sectionNumber;                       /* Number for the Course Section */
+    private String department;                              /* Department where the course is held */
+    private String name;                                    /* Name of Course */
+    private String semester;                                /* Semester of Course */
+    private String courseNumber;                            /* Number of Course */
+    private String sectionNumber;                           /* Number for the Course Section */
     public Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
 
     /* Constructor */
-    public Course(String name, String semester, int courseNumber, int sectionNumber) {
+    public Course(String department, String name, String semester, String courseNumber, String sectionNumber) {
+        this.department = department;
         this.name = name;
         this.semester = semester;
         this.courseNumber = courseNumber;
@@ -25,6 +27,14 @@ public class Course {
     }
 
     /* Getters and Setters */
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
     public String getName() {
         return name;
     }
@@ -41,19 +51,19 @@ public class Course {
         this.semester = semester;
     }
 
-    public int getCourseNumber() {
+    public String getCourseNumber() {
         return courseNumber;
     }
 
-    public void setCourseNumber(int courseNumber) {
+    public void setCourseNumber(String courseNumber) {
         this.courseNumber = courseNumber;
     }
 
-    public int getSectionNumber() {
+    public String getSectionNumber() {
         return sectionNumber;
     }
 
-    public void setSectionNumber(int sectionNumber) {
+    public void setSectionNumber(String sectionNumber) {
         this.sectionNumber = sectionNumber;
     }
 
