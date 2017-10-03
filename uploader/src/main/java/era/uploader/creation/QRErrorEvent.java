@@ -13,20 +13,33 @@ import javax.annotation.Nullable;
  */
 public class QRErrorEvent {
     private final Student erroredStudent;
+    private final String erroredLine;
     private final QRErrorStatus status;
 
     public QRErrorEvent(@Nonnull QRErrorStatus status) {
         Preconditions.checkNotNull(status);
         this.status = status;
         this.erroredStudent = null;
+        this.erroredLine = null;
     }
 
     public QRErrorEvent(@Nonnull QRErrorStatus status, @Nullable Student erroredStudent) {
         Preconditions.checkNotNull(status);
         this.erroredStudent = erroredStudent;
         this.status = status;
+        this.erroredLine = null;
     }
 
+    public QRErrorEvent(
+            @Nonnull QRErrorStatus status,
+            @Nullable Student erroredStudent,
+            @Nullable String erroredLine
+    ) {
+        Preconditions.checkNotNull(status);
+        this.erroredStudent = erroredStudent;
+        this.status = status;
+        this.erroredLine = erroredLine;
+    }
 
     @Nullable
     public Student getErroredStudent() {
@@ -36,5 +49,10 @@ public class QRErrorEvent {
     @Nonnull
     public QRErrorStatus getStatus() {
         return status;
+    }
+
+    @Nullable
+    public String getErroredLine() {
+        return erroredLine;
     }
 }
