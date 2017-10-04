@@ -3,20 +3,23 @@ package era.uploader.data.database;
 import com.google.common.collect.Multimap;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.model.Course;
-import era.uploader.data.model.Grader;
 import era.uploader.data.model.Student;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
+
 
 /**
- * Provides CRUD functionality for {@link Course} objects stored in the
- * database. A course has many {@link Student}s and many {@link Grader}s.
+ * This class is mock of {@link CourseDAOImpl} to make unit testing methods
+ * using CRUD functionality easier - you don't have to generate a new SQLite
+ * database per each test. <strong>This is not a unit test for
+ * {@link CourseDAOImpl}</strong>. You should test the that DAO against the
+ * real database using a corresponding integration test.
  */
-public class CourseDAOImpl implements CourseDAO {
-    private Set<Course> courses = new HashSet<>(); /* A set of Courses to act as the database table */
+public class MockCourseDAOImpl implements CourseDAO, MockDAO<Course> {
+    private Set<Course> courses = new HashSet<>();
 
     /* Create and Insert a new Course object into the database */
     @Override
@@ -57,5 +60,10 @@ public class CourseDAOImpl implements CourseDAO {
     @Override
     public void delete(Course course) {
         courses.remove(course);
+    }
+
+    @Override
+    public Set<Course> getDb() {
+        return courses;
     }
 }

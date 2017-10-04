@@ -1,0 +1,49 @@
+-------------------------------------------------------------------------------
+NOTICES FOR ZXING
+-------------------------------------------------------------------------------
+
+This software contains code from the ZXing library that was developed by
+Google(TM) Inc. and licensed under Apache License Version 2.0
+
+The license can be found at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------
+NOTICES FOR GUAVA
+-------------------------------------------------------------------------------
+
+This software contains code from the Guava library that was developed by
+Google(TM) Inc. and licensed under Apache License Version 2.0
+
+The license can be found at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------
+NOTICES FOR GSON
+-------------------------------------------------------------------------------
+
+This software contains code from the GSON library that was developed by
+Google(TM) Inc. and licensed under Apache License Version 2.0
+
+The license can be found at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------
+NOTICES FOR SQLITE
+-------------------------------------------------------------------------------
+This software contains code from the SQLite JDBC library that was developed by
+Taro L. Saito and licensed under Apache License Version 2.0
+
+The license can be found at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------
+NOTICES FOR JOOQ
+-------------------------------------------------------------------------------
+
+This software contains code from the JOOQ library that was developed by Data
+Geekery(TM) GmbH and licensed under Apache License Version 2.0
+
+The license can be found at:
+https://www.apache.org/licenses/LICENSE-2.0
+

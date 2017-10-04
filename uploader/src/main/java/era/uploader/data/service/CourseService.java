@@ -20,7 +20,7 @@ public class CourseService implements CourseDAO {
     }
 
     @Override
-    public Course read(Course course) {
+    public Course read(long id) {
         return null;
     }
 

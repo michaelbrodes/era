@@ -1,36 +1,33 @@
 package era.uploader.controller;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import era.uploader.data.CourseDAO;
-import era.uploader.data.PageDAO;
-import era.uploader.data.database.CourseDAOImpl;
-import era.uploader.data.database.PageDAOImpl;
+import era.uploader.data.database.MockCourseDAOImpl;
+import era.uploader.data.database.MockPageDAOImpl;
+import era.uploader.data.model.Course;
 import era.uploader.data.model.Page;
 import era.uploader.data.model.Student;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class QRCreationControllerTest {
     private QRCreationController ctrl;
 
     @Before
     public void setUp() {
-        Set<Page> db = Sets.newHashSet();
-        PageDAO pageDAO = mock(PageDAOImpl.class);
-        CourseDAO courseDAO = mock(CourseDAOImpl.class);
-        when(pageDAO.getDb()).thenReturn(db);
+        MockPageDAOImpl pageDAO = new MockPageDAOImpl();
+        MockCourseDAOImpl courseDAO = new MockCourseDAOImpl();
         ctrl = new QRCreationController(pageDAO, courseDAO);
     }
 
@@ -69,5 +66,64 @@ public class QRCreationControllerTest {
         Multimap<Student, Page> qRs = ctrl.createQRs(students, numberOfAssignments);
 
         assertEquals(0, qRs.size());
+    }
+
+    @Test
+    public void generateStudents_MyronsFile() throws Exception {
+        String roster = "src/test/resources/mockRoll.csv";
+        List<String> sections = ImmutableList.of(
+                "004",
+                "018",
+                "002",
+                "018"
+        );
+        List<String> firstNames = ImmutableList.of(
+                "Archer",
+                "Pam",
+                "Lana",
+                "Dr"
+        );
+        List<String> studentIds = ImmutableList.of(
+                "800000000",
+                "811111111",
+                "822222222",
+                "833333333"
+        );
+        Course eighteen = Course.create()
+                .forDepartment("CHEM")
+                .withCourseNumber("131")
+                .withSectionNumber("018")
+                .build();
+        Course two = Course.create()
+                .forDepartment("CHEM")
+                .withCourseNumber("131")
+                .withSectionNumber("002")
+                .build();
+        Course notExist = Course.create()
+                .forDepartment("Spooky spooky ghosts")
+                .withCourseNumber("101")
+                .withSectionNumber("001")
+                .build();
+
+        Multimap<Course, Student> coursesToStudents = ctrl.generateStudents(roster);
+
+        Map<Course, Collection<Student>> coursesToStudentsMap = coursesToStudents.asMap();
+        // 002 and 018 each have one member while 018 has two
+        assertTrue(coursesToStudents.size() == 4);
+        assertTrue(coursesToStudents.get(eighteen).size() == 2);
+        assertTrue(coursesToStudents.get(two).size() == 1);
+        assertTrue(coursesToStudents.get(notExist).isEmpty());
+        for (Map.Entry<Course, Collection<Student>> courseToStudents :
+                coursesToStudentsMap.entrySet()) {
+            Course course = courseToStudents.getKey();
+            assertEquals("CHEM", course.getDepartment());
+            assertEquals("131", course.getCourseNumber());
+            assertTrue(sections.contains(course.getSectionNumber()));
+            Collection<Student> students = courseToStudents.getValue();
+            for (Student student: students) {
+                assertTrue(firstNames.contains(student.getFirstName()));
+                assertTrue(studentIds.contains(student.getSchoolId()));
+            }
+        }
     }
 }

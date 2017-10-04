@@ -14,7 +14,7 @@ public class Student {
     private String lastName;  /* Student's last name */
     private String schoolId;  /* Identifier for each student provided by the school */
     private String userName;
-    private int uniqueId;     /* Identifier that we generate to uniquely identify each student inside the QR code */
+    private long uniqueId;     /* Identifier that we generate to uniquely identify each student inside the QR code */
     // every course that the student belongs to
     private Set<Course> courses;
 
@@ -24,7 +24,7 @@ public class Student {
             String lastName,
             String schoolId,
             String userName,
-            int uniqueId,
+            long uniqueId,
             Set<Course> courses
     ) {
         this.firstName = firstName;
@@ -73,11 +73,11 @@ public class Student {
         this.schoolId = schoolId;
     }
 
-    public int getUniqueId() {
+    public long getUniqueId() {
         return uniqueId;
     }
 
-    public void setUniqueId(int uniqueId) {
+    public void setUniqueId(long uniqueId) {
         this.uniqueId = uniqueId;
     }
 
@@ -93,7 +93,7 @@ public class Student {
 
     @Override
     public int hashCode() {
-        return uniqueId;
+        return (int) uniqueId;
     }
 
     public Set<Course> getCourses() {
@@ -117,7 +117,7 @@ public class Student {
         private String lastName;  /* Student's last name */
         private String schoolId;  /* Identifier for each student provided by the school */
         private String userName;
-        private int uniqueId;     /* Identifier that we generate to uniquely identify each student inside the QR code */
+        private long uniqueId;     /* Identifier that we generate to uniquely identify each student inside the QR code */
         // every course that the student belongs to
         private Set<Course> courses;
 
@@ -145,7 +145,7 @@ public class Student {
             return this;
         }
 
-        public Builder withUniqueId(int uniqueId) {
+        public Builder withUniqueId(long uniqueId) {
             this.uniqueId = uniqueId;
             return this;
         }

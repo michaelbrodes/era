@@ -10,6 +10,8 @@ import java.util.HashSet;
 
 public class Course {
     /* Class Fields */
+    // will be an unsigned int in the database.
+    private long id;
     private String department;                              /* Department where the course is held */
     private String name;                                    /* Name of Course */
     private String semester;                                /* Semester of Course */
@@ -43,6 +45,7 @@ public class Course {
         this.sectionNumber = builder.sectionNumber;
         this.assignments = builder.assignments;
     }
+
 
     /* Getters and Setters */
     public String getDepartment() {
@@ -115,7 +118,39 @@ public class Course {
         return new Builder();
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Course)) return false;
+
+        Course course = (Course) o;
+
+        if (department != null ? !department.equalsIgnoreCase(course.department) : course.department != null) return false;
+        if (semester != null ? !semester.equalsIgnoreCase(course.semester) : course.semester != null) return false;
+        if (courseNumber != null ? !courseNumber.equalsIgnoreCase(course.courseNumber) : course.courseNumber != null)
+            return false;
+        return sectionNumber != null ? sectionNumber.equals(course.sectionNumber) : course.sectionNumber == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = department != null ? department.hashCode() : 0;
+        result = 31 * result + (semester != null ? semester.hashCode() : 0);
+        result = 31 * result + (courseNumber != null ? courseNumber.hashCode() : 0);
+        result = 31 * result + (sectionNumber != null ? sectionNumber.hashCode() : 0);
+        return result;
+    }
+
     public static class Builder {
+        private long id;
         private String department;                              /* Department where the course is held */
         private String name;                                    /* Name of Course */
         private String semester;                                /* Semester of Course */
@@ -124,8 +159,13 @@ public class Course {
         private Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
         private Set<Assignment> assignments;
 
+        public Builder withDatabaseId(long id) {
+            this.id = id;
+            return this;
+        }
+
         public Builder forDepartment(String department) {
-            this.department = department;
+            this.department = department.toUpperCase();
             return this;
         }
 
@@ -135,17 +175,17 @@ public class Course {
         }
 
         public Builder forSemester(String semester) {
-            this.semester = semester;
+            this.semester = semester.toUpperCase();
             return this;
         }
 
         public Builder withCourseNumber(String courseNumber) {
-            this.courseNumber = courseNumber;
+            this.courseNumber = courseNumber.toUpperCase();
             return this;
         }
 
         public Builder withSectionNumber(String sectionNumber) {
-            this.sectionNumber = sectionNumber;
+            this.sectionNumber = sectionNumber.toUpperCase();
             return this;
         }
 

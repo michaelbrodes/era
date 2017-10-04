@@ -11,7 +11,7 @@ import era.uploader.data.model.Student;
 public interface CourseDAO {
     void insert(Course course);                               /* Create new course object */
     void insertCourseAndStudents(Multimap<Course, Student> coursesToStudents);
-    Course read(Course course);                               /* Access data from course object */
+    Course read(long id);                               /* Access data from course object */
     void update(Course courseToChange, Course courseChanged); /* Change data from existing course object */
     void delete(Course course);                               /* Delete existing course object */
 }
