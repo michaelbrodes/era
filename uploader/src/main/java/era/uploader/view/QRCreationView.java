@@ -1,6 +1,15 @@
 package era.uploader.view;
 
+import com.google.common.collect.Multimap;
+import era.uploader.controller.QRCreationController;
+import era.uploader.creation.QRCreator;
+import era.uploader.data.database.CourseDAOImpl;
+import era.uploader.data.database.PageDAOImpl;
+import era.uploader.data.model.Course;
+import era.uploader.data.model.Student;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
@@ -11,23 +20,33 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 public class QRCreationView extends Application {
 
     private UIManager uManage;
     private Stage mainStage;
+    private QRCreationController qrCtrl;
+    private String fullFileName;
 
     public QRCreationView() {
         UIManager uManage = new UIManager(mainStage);
         mainStage = uManage.getPrimaryStage();
+        qrCtrl = new QRCreationController(new PageDAOImpl(), new CourseDAOImpl());
     }
 
     public QRCreationView(UIManager uim) {
         uManage = uim;
         mainStage = uManage.getPrimaryStage();
+        qrCtrl = new QRCreationController(new PageDAOImpl(), new CourseDAOImpl());
     }
 
 
@@ -37,6 +56,7 @@ public class QRCreationView extends Application {
         //Initializing Button
         Button createQRButton = new Button("Create");
         Button createClassButton = new Button("Add Class");
+        Button fileBrowserButton = new Button("Browse");
 
         //Initializing Temporary Text Fields Right Now
         TextField firstName = new TextField();
@@ -88,9 +108,55 @@ public class QRCreationView extends Application {
 
         gridPane.add(orLabel, 4, 19);
         gridPane.add(classFileName, 4, 21);
+        gridPane.add(fileBrowserButton, 5, 21);
         gridPane.add(createClassButton, 4, 23);
 
         createQRButton.requestFocus();
+
+        final FileChooser fileChooser = new FileChooser();
+
+
+        fileBrowserButton.setOnAction((event) -> {
+           File file = fileChooser.showOpenDialog(mainStage);
+           Path fPath = file.toPath();
+           String fName = fPath.toString();
+           fullFileName = fName;
+           String[] splitFile = fName.split(File.separator);
+           fName = splitFile[splitFile.length-1];
+
+            if (fPath != null)
+                try {
+                    qrCtrl.generateStudents(fPath);
+                    classFileName.setText(fName);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    //TODO FILE NOT FOUND. How to display to user?
+                }
+
+            //TODO work on creating table to display students that have been added to roster
+        });
+
+
+
+        createClassButton.setOnAction((event) -> {
+            String fName;
+            if (fullFileName == null) {
+                fName = classFileName.getText();
+            } else {
+                fName = fullFileName;
+            }
+
+            Path fPath = Paths.get(fName);
+            if (fPath != null)
+                try {
+                    Multimap<Course, Student> courseStudentMultimap = qrCtrl.generateStudents(fPath);
+                    System.out.println(courseStudentMultimap.values());
+                } catch (IOException e) {
+                //TODO FILE NOT FOUND. How to display to user?
+                }
+                //TODO work on creating table to display students that have been added to roster
+        });
+
 
         Scene scene = new Scene(gridPane);
 

@@ -18,6 +18,7 @@ import era.uploader.data.model.Student;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
@@ -111,16 +112,16 @@ public class QRCreationController {
      * that CSV file is of Last Name, First Name, Username, Student ID, Child
      * Course ID, *. Anything after Child Course ID is ignored.
      *
-     * @param roster Path to the CSV file we are grabbing the students form
+     * @param filePath Path to the CSV file we are grabbing the students form
      * @return a map of courses to students.
      * @throws IOException We couldn't find the file you inputted.
      */
     @VisibleForTesting
-    public Multimap<Course, Student> generateStudents(String roster) throws IOException {
-        Preconditions.checkNotNull(roster);
+    public Multimap<Course, Student> generateStudents(Path filePath) throws IOException {
+        Preconditions.checkNotNull(filePath);
         // ignore the title record
         final int firstRecord = 1;
-        Multimap<Course, Student> courseToStudents = Files.lines(Paths.get(roster))
+        Multimap<Course, Student> courseToStudents = Files.lines(filePath)
                 .skip(firstRecord)
                 .map((inputStudent) -> inputStudent.split(","))
                 .map(CSVParser::parseLine)
