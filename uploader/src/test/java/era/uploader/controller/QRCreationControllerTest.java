@@ -78,7 +78,7 @@ public class QRCreationControllerTest {
                 "018"
         );
         List<String> firstNames = ImmutableList.of(
-                "Archer",
+                "Sterling",
                 "Pam",
                 "Lana",
                 "Dr"

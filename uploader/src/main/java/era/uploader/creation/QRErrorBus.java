@@ -59,7 +59,7 @@ public class QRErrorBus implements Runnable {
             QRErrorEvent current;
             while ((current = errorStack.takeLast()) != null) {
                 for (QRErrorObserver observer : observers) {
-                    observer.onError(current);
+                    observer.onMessage(current);
                 }
             }
         } catch (InterruptedException e) {
