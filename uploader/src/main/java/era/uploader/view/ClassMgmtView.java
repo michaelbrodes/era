@@ -31,6 +31,7 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class ClassMgmtView extends Application {
@@ -90,7 +91,23 @@ public class ClassMgmtView extends Application {
                String studentName =  student.getFirstName() + " " + student.getLastName();
                String schoolId = student.getSchoolId();
                String userName = student.getUserName();
+               Set<Course> courses = student.getCourses();
+               String studentCourse = "";
 
+               if (courses != null) {
+                   while (courses.iterator().hasNext()) {
+                       for (Course course : courses) {
+                           studentCourse += course.getDepartment() + "-" +
+                                   course.getCourseNumber() + "-" +
+                                   course.getSectionNumber();
+                           if (courses.iterator().hasNext()) {
+                               studentCourse += ", ";
+                           }
+                       }
+                   }
+                gridPane.add(new Label(studentCourse), 2, (4 + count));
+
+               }
                gridPane.add(new Label(studentName), 3, (4 + count));
                gridPane.add(new Label(userName), 4, (4 + count));
                gridPane.add(new Label(schoolId), 5, (4 + count));
@@ -98,14 +115,15 @@ public class ClassMgmtView extends Application {
                count++;
             }
 
-            Iterator item = courseStudentMultimap.asMap().values().iterator();
+            Button homeButton = new Button("Back to Home");
 
-            while(item.hasNext()){
-                item.next();
-            }
-        }
+            gridPane.add(homeButton, 3, (5 + count));
 
+        homeButton.setOnAction((event) -> {
+            uManage.changeToCreateView();
+        });
 
+    }
 
     @Override
     public void start(Stage stage) {
