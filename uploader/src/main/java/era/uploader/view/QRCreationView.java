@@ -123,17 +123,17 @@ public class QRCreationView extends Application {
            fullFileName = fName;
            String[] splitFile = fName.split(File.separator);
            fName = splitFile[splitFile.length-1];
+            classFileName.setText(fName);
 
-            if (fPath != null)
-                try {
-                    qrCtrl.generateStudents(fPath);
-                    classFileName.setText(fName);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    //TODO FILE NOT FOUND. How to display to user?
-                }
-
-            //TODO work on creating table to display students that have been added to roster
+//            if (fPath != null)
+//                try {
+//                    //qrCtrl.generateStudents(fPath);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    //TODO FILE NOT FOUND. How to display to user?
+//                }
+//
+//            //TODO work on creating table to display students that have been added to roster
         });
 
 
@@ -151,6 +151,7 @@ public class QRCreationView extends Application {
                 try {
                     Multimap<Course, Student> courseStudentMultimap = qrCtrl.generateStudents(fPath);
                     System.out.println(courseStudentMultimap.values());
+                    uManage.changeToClassMgmtView(courseStudentMultimap, gridPane);
                 } catch (IOException e) {
                 //TODO FILE NOT FOUND. How to display to user?
                 }

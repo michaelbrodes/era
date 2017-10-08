@@ -1,5 +1,8 @@
 package era.uploader.view;
 
+import com.google.common.collect.Multimap;
+import era.uploader.data.model.Course;
+import era.uploader.data.model.Student;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,6 +22,7 @@ public class UIManager extends Application {
     private QRCreationView createView;
     private UploadView uploadView;
     private UploaderApp mainWindow;
+    private ClassMgmtView classView;
     private Stage primaryStage;
     public GridPane root;
     public Scene mainScene;
@@ -60,6 +64,20 @@ public class UIManager extends Application {
 
         //this is changing to the QRCreationView
         createView.start(primaryStage);
+        primaryStage.show();
+    }
+
+    public void changeToClassMgmtView(Multimap<Course, Student> courseStudentMultimap, GridPane gridPane) {
+
+        //Changing to the ClassMgmtView()
+//        classView = new ClassMgmtView(this, courseStudentMultimap);
+//        GridPane secGrid = new GridPane();
+//        Scene secondScene = new Scene(secGrid, 600, 800);
+//        Stage secStage = new Stage();
+//        classView.start(secStage);
+
+        classView = new ClassMgmtView(this, courseStudentMultimap);
+        classView.start(primaryStage, gridPane);
         primaryStage.show();
     }
 
