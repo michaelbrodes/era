@@ -11,6 +11,7 @@ import era.uploader.data.model.Student;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class QRCreationControllerTest {
@@ -105,7 +105,7 @@ public class QRCreationControllerTest {
                 .withSectionNumber("001")
                 .build();
 
-        Multimap<Course, Student> coursesToStudents = ctrl.generateStudents(roster);
+        Multimap<Course, Student> coursesToStudents = ctrl.generateStudents(Paths.get(roster));
 
         Map<Course, Collection<Student>> coursesToStudentsMap = coursesToStudents.asMap();
         // 002 and 018 each have one member while 018 has two

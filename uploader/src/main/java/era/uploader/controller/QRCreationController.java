@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static era.uploader.creation.MultimapCollector.toMultimap;
 
@@ -121,13 +122,16 @@ public class QRCreationController {
         Preconditions.checkNotNull(filePath);
         // ignore the title record
         final int firstRecord = 1;
-        Multimap<Course, Student> courseToStudents = Files.lines(filePath)
-                .skip(firstRecord)
-                .map((inputStudent) -> inputStudent.split(","))
-                .map(CSVParser::parseLine)
-                .filter(Objects::nonNull)
-                .collect(toMultimap());
 
+        // The stream needs to be closed after the first reduce is done
+        Multimap<Course, Student> courseToStudents;
+        try (Stream<String> csvLines = Files.lines(filePath)) {
+            courseToStudents = csvLines.skip(firstRecord)
+                    .map((inputStudent) -> inputStudent.split(","))
+                    .map(CSVParser::parseLine)
+                    .filter(Objects::nonNull)
+                    .collect(toMultimap());
+        }
         courseDAO.insertCourseAndStudents(courseToStudents);
         return courseToStudents;
     }
