@@ -15,6 +15,8 @@ dependencies {
     compile 'com.google.zxing:javase:3.3.0'
     compile 'com.google.guava:guava:23.0'
     compile 'com.google.code.gson:gson:2.8.2'
+    // pdf stuff
+    compile 'org.apache.pdfbox:pdfbox:2.0.7'
     // database stuff
     compile 'org.xerial:sqlite-jdbc:3.20.0'
     compile 'org.jooq:jooq:3.10.0'
