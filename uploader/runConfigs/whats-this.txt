@@ -1,4 +1,0 @@
-This is the directory where the electronically returned assignments team
-can share their Intellij run configurations. This is here because we want
-to keep the git repo independent of IDEs so we ignored the `.idea` 
-directory 
