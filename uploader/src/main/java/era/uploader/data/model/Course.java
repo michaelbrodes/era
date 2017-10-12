@@ -57,6 +57,9 @@ public class Course {
     }
 
     public String getName() {
+        if (name == null) {
+            return department + '-' + courseNumber + '-' + sectionNumber;
+        }
         return name;
     }
 
