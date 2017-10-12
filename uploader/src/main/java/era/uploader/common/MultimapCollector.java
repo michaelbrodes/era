@@ -1,4 +1,4 @@
-package era.uploader.creation;
+package era.uploader.common;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;

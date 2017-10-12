@@ -130,3 +130,4 @@ gradlew.bat
 gradle/
 
 *.iml
+.DS_Store

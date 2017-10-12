@@ -3,6 +3,7 @@ package era.uploader.controller;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
+import era.uploader.common.IOUtil;
 import era.uploader.data.database.MockCourseDAOImpl;
 import era.uploader.data.database.MockPageDAOImpl;
 import era.uploader.data.model.Course;
@@ -70,7 +71,7 @@ public class QRCreationControllerTest {
 
     @Test
     public void generateStudents_MyronsFile() throws Exception {
-        String roster = "src/test/resources/mockRoll.csv";
+        String roster = IOUtil.convertToLocal("src/test/resources/mockRoll.csv");
         List<String> sections = ImmutableList.of(
                 "004",
                 "018",
