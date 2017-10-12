@@ -26,12 +26,16 @@ public class CourseDAOImpl implements CourseDAO {
 
     @Override
     public void insertCourseAndStudents(Multimap<Course, Student> coursesToStudents) {
-        courses.addAll(coursesToStudents.keys());
         for(Map.Entry<Course, Collection<Student>> studentsInCourse:
                 coursesToStudents.asMap().entrySet()) {
-            Course key = studentsInCourse.getKey();
-            key.getStudentsEnrolled().addAll(studentsInCourse.getValue());
+            Course course = studentsInCourse.getKey();
+            Collection<Student> students = studentsInCourse.getValue();
+            course.getStudentsEnrolled().addAll(students);
+            for (Student student : students) {
+                student.getCourses().add(course);
+            }
         }
+        courses.addAll(coursesToStudents.keys());
     }
 
     /* Access data from existing Course object from database */

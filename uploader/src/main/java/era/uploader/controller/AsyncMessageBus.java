@@ -14,7 +14,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  * {@link MessageObserver}. This class is usually subclassed by error message
  * queues.
  */
-@NotThreadSafe
 @ParametersAreNonnullByDefault
 public abstract class AsyncMessageBus<T> implements Runnable {
     private final BlockingQueue<MessageObserver<T>> observers;
