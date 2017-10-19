@@ -20,10 +20,10 @@ public class ClassMgmtView extends Application {
     private Stage mainStage;
     private Multimap<Course, Student> courseStudentMultimap;
 
-    public ClassMgmtView() {
-        UIManager uManage = new UIManager(mainStage);
-        mainStage = uManage.getPrimaryStage();
-    }
+//    public ClassMgmtView() {
+//        UIManager uManage = new UIManager(mainStage);
+//        mainStage = uManage.getPrimaryStage();
+//    }
 
     public ClassMgmtView(UIManager uim) {
         uManage = uim;
@@ -110,7 +110,7 @@ public class ClassMgmtView extends Application {
         gridPane.add(homeButton, 3, (5 + count));
 
         homeButton.setOnAction((event) -> {
-            uManage.changeToCreateView();
+            uManage.changeToCreateView(gridPane);
         });
 
     }

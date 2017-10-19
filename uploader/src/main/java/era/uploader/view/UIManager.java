@@ -16,19 +16,20 @@ public class UIManager extends Application {
     private UploadView uploadView;
     private UploaderApp mainWindow;
     private ClassMgmtView classView;
+    private PDFScanView pdfScanView;
     private Stage primaryStage;
     public GridPane root;
     public Scene mainScene;
 
-    public UIManager(Stage pStage) {
+    public UIManager(Stage pStage, GridPane gridPane) {
 
         createView = new QRCreationView(this);
         uploadView = new UploadView(this);
         primaryStage = pStage;
 
-        root = new GridPane();
-        mainScene = new Scene(root, 800, 600);
-        primaryStage.setScene(mainScene);
+        root = gridPane;
+        //mainScene = new Scene(root, 800, 600);
+        //primaryStage.setScene(mainScene);
         primaryStage.show();
 
     }
@@ -41,9 +42,7 @@ public class UIManager extends Application {
         return this.primaryStage;
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    public static void main(String[] args) { launch(args); }
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -53,10 +52,10 @@ public class UIManager extends Application {
 
     }
 
-    public void changeToCreateView() {
+    public void changeToCreateView(GridPane gridPane) {
 
         //this is changing to the QRCreationView
-        createView.start(primaryStage);
+        createView.start(primaryStage, gridPane);
         primaryStage.show();
     }
 
@@ -72,6 +71,14 @@ public class UIManager extends Application {
         classView = new ClassMgmtView(this, courseStudentMultimap);
         classView.start(primaryStage, gridPane);
         primaryStage.show();
+    }
+
+    public void changeToUploadPDFView(GridPane gridPane) {
+
+        pdfScanView = new PDFScanView(gridPane);
+        pdfScanView.start(primaryStage);
+        primaryStage.show();
+
     }
 
 }

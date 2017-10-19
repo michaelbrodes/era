@@ -1,5 +1,6 @@
 package era.uploader.controller;
 
+import com.google.common.collect.ImmutableList;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.processing.PDFProcessor;
@@ -21,5 +22,17 @@ public class PDFScanningController {
     public void scanPDF(Path pdf, Course course, String assignment) throws IOException {
         List<Assignment> assignments = PDFProcessor.process(pdf, course, assignment);
 
+    }
+
+    public List<Course> getAllCourses() {
+        //TODO Method to return all Courses instead of this dummy data
+        return ImmutableList.of(
+                Course.create()
+                    .withCourseNumber("111")
+                    .withName("John Mills")
+                    .forDepartment("CHEM")
+                    .withSectionNumber("002")
+                    .build()
+        );
     }
 }

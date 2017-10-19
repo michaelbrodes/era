@@ -29,11 +29,11 @@ public class QRCreationView extends Application {
     private QRCreationController qrCtrl;
     private String fullFileName;
 
-    public QRCreationView() {
-        UIManager uManage = new UIManager(mainStage);
-        mainStage = uManage.getPrimaryStage();
-        qrCtrl = new QRCreationController(new PageDAOImpl(), new CourseDAOImpl());
-    }
+//    public QRCreationView() {
+//        UIManager uManage = new UIManager(mainStage);
+//        mainStage = uManage.getPrimaryStage();
+//        qrCtrl = new QRCreationController(new PageDAOImpl(), new CourseDAOImpl());
+//    }
 
     public QRCreationView(UIManager uim) {
         uManage = uim;
@@ -45,10 +45,19 @@ public class QRCreationView extends Application {
     @Override
     public void start(Stage stage) {
 
+    }
+
+
+    public void start(Stage stage, GridPane gridPane) {
+
+        gridPane.getChildren().clear();
+
+
         //Initializing Button
         Button createQRButton = new Button("Create");
         Button createClassButton = new Button("Add Class");
         Button fileBrowserButton = new Button("Browse");
+        Button goHome = new Button("Home");
 
         //Initializing Temporary Text Fields Right Now
         TextField firstName = new TextField();
@@ -71,24 +80,20 @@ public class QRCreationView extends Application {
         Label orLabel = new Label("Or");
         Label classFileNameLabel = new Label("Class File Name: ");
 
-
-        //Initializing the GridPane (Easy for organizing objects on a screen)
-        GridPane gridPane = new GridPane();
-
         gridPane.setMinSize(800, 600);
         gridPane.setPadding(new Insets(10,10,10,10));
 
         gridPane.setVgap(10);
         gridPane.setHgap(10);
 
-        gridPane.add(studentSectionLabel, 4, 3);
-        gridPane.add(firstName, 4, 5);
-        gridPane.add(lastName, 4, 7);
-        gridPane.add(eID, 4, 9);
-        gridPane.add(studentNumber, 4, 11);
-        gridPane.add(className, 4, 13);
-        gridPane.add(sectionNumber, 4, 15);
-        gridPane.add(createQRButton, 4, 17);
+//        gridPane.add(studentSectionLabel, 4, 3);
+//        gridPane.add(firstName, 4, 5);
+//        gridPane.add(lastName, 4, 7);
+//        gridPane.add(eID, 4, 9);
+//        gridPane.add(studentNumber, 4, 11);
+//        gridPane.add(className, 4, 13);
+//        gridPane.add(sectionNumber, 4, 15);
+//        gridPane.add(createQRButton, 4, 17);
 
         firstName.setPromptText("First Name");
         lastName.setPromptText("Last Name");
@@ -98,10 +103,11 @@ public class QRCreationView extends Application {
         sectionNumber.setPromptText("Section Number");
         classFileName.setPromptText("Class Roster File Name");
 
-        gridPane.add(orLabel, 4, 19);
-        gridPane.add(classFileName, 4, 21);
-        gridPane.add(fileBrowserButton, 5, 21);
-        gridPane.add(createClassButton, 4, 23);
+//        gridPane.add(orLabel, 4, 19);
+        gridPane.add(classFileName, 4, 3);
+        gridPane.add(fileBrowserButton, 5, 3);
+        gridPane.add(createClassButton, 4, 5);
+        gridPane.add(goHome, 4, 7);
 
         createQRButton.requestFocus();
 
@@ -118,6 +124,10 @@ public class QRCreationView extends Application {
             classFileName.setText(fName);
         });
 
+        ;
+        goHome.setOnAction(event -> {
+            uManage.changeToHomeView();
+        });
 
 
         createClassButton.setOnAction((event) -> {
