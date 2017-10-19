@@ -14,11 +14,14 @@ public class Student {
     private String lastName;  /* Student's last name */
     private String schoolId;  /* Identifier for each student provided by the school */
     private String userName;
-    private long uniqueId;     /* Identifier that we generate to uniquely identify each student inside the QR code */
+    private long uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
     // every course that the student belongs to
     private Set<Course> courses;
 
-    /* Constructor */
+    /* Constructors */
+    public Student() {
+
+    }
     public Student(
             String firstName,
             String lastName,
@@ -117,7 +120,7 @@ public class Student {
         private String lastName;  /* Student's last name */
         private String schoolId;  /* Identifier for each student provided by the school */
         private String userName;
-        private long uniqueId;     /* Identifier that we generate to uniquely identify each student inside the QR code */
+        private long uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
         // every course that the student belongs to
         private Set<Course> courses;
 

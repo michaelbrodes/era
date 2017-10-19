@@ -32,6 +32,11 @@ public class MockPageDAOImpl implements PageDAO, MockDAO<Page> {
     }
 
     @Override
+    public Page read(String uuid) {
+        return null;
+    }
+
+    @Override
     public Set<Page> getDb () {
         return db;
     }

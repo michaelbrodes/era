@@ -21,6 +21,9 @@ public class Course {
     private Set<Assignment> assignments;
 
     /* Constructor */
+    public Course() {
+
+    }
     public Course(
             String department,
             String name,
@@ -57,6 +60,9 @@ public class Course {
     }
 
     public String getName() {
+        if (name == null) {
+            return department + '-' + courseNumber + '-' + sectionNumber;
+        }
         return name;
     }
 

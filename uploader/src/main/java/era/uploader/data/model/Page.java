@@ -22,6 +22,7 @@ public class Page {
 
     private transient PDDocument document;
     private Assignment assignment;
+    private PDDocument document;
 
     private Page(Builder builder) {
         this.student = builder.student;
@@ -81,6 +82,14 @@ public class Page {
 
     public void setAssignment(@Nullable Assignment assignment) {
         this.assignment = assignment;
+    }
+
+    public PDDocument getDocument() {
+        return document;
+    }
+
+    public void setDocument(PDDocument document) {
+        this.document = document;
     }
 
     @Override
