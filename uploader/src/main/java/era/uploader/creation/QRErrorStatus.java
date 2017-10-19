@@ -11,7 +11,9 @@ public enum QRErrorStatus {
     PARSE_ERROR("Error occurred while trying to parse a record in the input CSV file. Please have all records in the file be of the form: Last Name, First Name, Username, Student ID, Child Course ID"),
     COURSE_PARSE_ERROR("Error occurred while trying to parse the course id of a CSV record. Please have all course ID's be of the form DEPARTMENT-COURSE NUMBER-SECTION NUMBER-REFERENCE NUMBER"),
     INVALID_FILE("The file you have inserted doesn't exist. We cannot create any QR codes from it"),
-    INTERRUPT_ERROR("QR creation could not finish because it was interrupted.");
+    INTERRUPT_ERROR("QR creation could not finish because it was interrupted."),
+    UUID_ERROR("Could not find value of UUID on QR Code.")
+    ;
 
     private final String reason;
 

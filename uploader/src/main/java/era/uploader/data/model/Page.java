@@ -2,6 +2,7 @@ package era.uploader.data.model;
 
 import com.google.common.base.Preconditions;
 import com.google.zxing.common.BitMatrix;
+import org.apache.pdfbox.pdmodel.PDDocument;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -18,6 +19,8 @@ public class Page {
     // calls and it should not be stored in the database
     private transient BitMatrix qrCode;
     private String uuid;
+
+    private transient PDDocument document;
     private Assignment assignment;
 
     private Page(Builder builder) {
@@ -26,6 +29,7 @@ public class Page {
         this.uuid = builder.uuid;
         this.qrCode = builder.qrCode;
         this.assignment = builder.assignment;
+        this.document = builder.document;
     }
 
     public static Builder builder() {
@@ -94,6 +98,14 @@ public class Page {
         return uuid.hashCode();
     }
 
+    public PDDocument getDocument() {
+        return document;
+    }
+
+    public void setDocument(PDDocument document) {
+        this.document = document;
+    }
+
     @ParametersAreNonnullByDefault
     public static class Builder {
         private Student student;
@@ -101,6 +113,13 @@ public class Page {
         private BitMatrix qrCode;
         private Assignment assignment;
         private String uuid;
+        private PDDocument document;
+
+        public Builder withDocument(PDDocument document) {
+            Preconditions.checkNotNull(document);
+            this.document = document;
+            return this;
+        }
 
         public Builder byStudent(Student student) {
             Preconditions.checkNotNull(student);
