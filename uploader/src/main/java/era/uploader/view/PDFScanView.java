@@ -1,5 +1,8 @@
 package era.uploader.view;
 
+import era.uploader.controller.QRCreationController;
+import era.uploader.data.database.CourseDAOImpl;
+import era.uploader.data.database.PageDAOImpl;
 import era.uploader.processing.StatusChangeEvent;
 import javafx.application.Application;
 import javafx.scene.control.Button;
@@ -14,9 +17,14 @@ import java.nio.file.Path;
 public class PDFScanView extends Application {
 
     private GridPane gridPane;
+    private UIManager uManage;
+    private Stage mainStage;
 
 
-    public PDFScanView(GridPane gridPane) {
+    public PDFScanView(UIManager uim, GridPane gridPane) {
+
+        uManage = uim;
+        mainStage = uManage.getPrimaryStage();
         this.gridPane = gridPane;
     }
 
@@ -25,7 +33,8 @@ public class PDFScanView extends Application {
 
         //initializing
         final FileChooser fileChooser = new FileChooser();
-        Button fileBrowserButton = new Button();
+        Button fileBrowserButton = new Button("Browse");
+        Button returnHomeButton = new Button("Home");
 
         TextField pdfFileName = new TextField();
 
@@ -33,10 +42,12 @@ public class PDFScanView extends Application {
         //Clearing the view
         gridPane.getChildren().clear();
 
-        gridPane.add(pdfFileName, 2, 2);
-        gridPane.add(fileBrowserButton, 3, 2);
+        gridPane.add(pdfFileName, 2, 4);
+        gridPane.add(fileBrowserButton, 3, 4);
+        gridPane.add(returnHomeButton, 2, 2);
 
         pdfFileName.setPromptText("PDF File");
+
 
 
         fileBrowserButton.setOnAction((event) -> {
@@ -47,6 +58,10 @@ public class PDFScanView extends Application {
             String[] splitFile = fName.split(File.separator);
             fName = splitFile[splitFile.length-1];
             pdfFileName.setText(fName);
+        });
+
+        returnHomeButton.setOnAction(event -> {
+            uManage.changeToHomeView(gridPane);
         });
 
     }

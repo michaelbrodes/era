@@ -75,10 +75,16 @@ public class UIManager extends Application {
 
     public void changeToUploadPDFView(GridPane gridPane) {
 
-        pdfScanView = new PDFScanView(gridPane);
+        pdfScanView = new PDFScanView(this, gridPane);
         pdfScanView.start(primaryStage);
         primaryStage.show();
 
+    }
+
+    public void changeToHomeView(GridPane gridPane) {
+        mainWindow = new UploaderApp();
+        mainWindow.start(primaryStage);
+        primaryStage.show();
     }
 
 }

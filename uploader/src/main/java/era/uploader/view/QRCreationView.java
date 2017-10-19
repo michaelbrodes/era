@@ -80,11 +80,11 @@ public class QRCreationView extends Application {
         Label orLabel = new Label("Or");
         Label classFileNameLabel = new Label("Class File Name: ");
 
-        gridPane.setMinSize(800, 600);
-        gridPane.setPadding(new Insets(10,10,10,10));
-
-        gridPane.setVgap(10);
-        gridPane.setHgap(10);
+//        gridPane.setMinSize(800, 600);
+//        gridPane.setPadding(new Insets(10,10,10,10));
+//
+//        gridPane.setVgap(10);
+//        gridPane.setHgap(10);
 
 //        gridPane.add(studentSectionLabel, 4, 3);
 //        gridPane.add(firstName, 4, 5);
@@ -126,7 +126,7 @@ public class QRCreationView extends Application {
 
         ;
         goHome.setOnAction(event -> {
-            uManage.changeToHomeView();
+            uManage.changeToHomeView(gridPane);
         });
 
 
@@ -150,13 +150,13 @@ public class QRCreationView extends Application {
         });
 
 
-        Scene scene = new Scene(gridPane);
-
-        stage.setTitle("QR-Code Generation");
-
-        stage.setScene(scene);
-
-        stage.show();
+//        Scene scene = new Scene(gridPane);
+//
+//        stage.setTitle("QR-Code Generation");
+//
+//        stage.setScene(scene);
+//
+//        stage.show();
 
 
     }

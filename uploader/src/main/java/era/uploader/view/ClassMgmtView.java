@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.Map;
 
 
+//TODO add functionality for modifying the data that is displayed on this screen.
+
 public class ClassMgmtView extends Application {
 
     private UIManager uManage;
@@ -50,7 +52,7 @@ public class ClassMgmtView extends Application {
         Label studentColumnLabel = new Label("Student");
         Label eIDColumnLabel = new Label("eID");
         Label studentIDLabel = new Label("Student ID");
-        Label classIDLabel = new Label("Class");
+        Label classIDLabel = new Label("Course");
 
 
 //        gridPane.add(studentColumnLabel,4, 3);
@@ -66,15 +68,22 @@ public class ClassMgmtView extends Application {
         gridPane.add(studentIDLabel, 5,3);
         gridPane.add(classIDLabel, 2, 3);
 
-        int count = 0;
+        int count = 4;
         for (Map.Entry<Course, Collection<Student>> courseToStudents :
                 courseStudentMultimap.asMap().entrySet()) {
-            System.out.println("Course :"
-                    + courseToStudents.getKey().getDepartment() + ""
-                    + courseToStudents.getKey().getCourseNumber());
+            String course = courseToStudents.getKey().getDepartment() + ""
+                    + courseToStudents.getKey().getCourseNumber() + "-"
+                    + courseToStudents.getKey().getSectionNumber();
+            gridPane.add(new Label(course), 2, count);
             for (Student student : courseToStudents.getValue()) {
-                System.out.println("\tStudent: " + student.getUserName());
+                //System.out.println("\tStudent: " + student.getUserName());
+                gridPane.add(new Label(student.getFirstName() + " "
+                            + student.getLastName()), 3, count);
+                gridPane.add(new Label(student.getUserName()), 4, count);
+                gridPane.add(new Label(student.getSchoolId()), 5, count);
+                count++;
             }
+            count += 2;
         }
 
 //        for (Student student : courseStudentMultimap.values()) {
@@ -107,7 +116,7 @@ public class ClassMgmtView extends Application {
 
         Button homeButton = new Button("Back to Home");
 
-        gridPane.add(homeButton, 3, (5 + count));
+        gridPane.add(homeButton, 2, (++count));
 
         homeButton.setOnAction((event) -> {
             uManage.changeToCreateView(gridPane);
