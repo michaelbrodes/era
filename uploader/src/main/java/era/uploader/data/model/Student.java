@@ -19,6 +19,9 @@ public class Student {
     private Set<Course> courses;
 
     /* Constructors */
+    public Student() {
+
+    }
     public Student(
             String firstName,
             String lastName,

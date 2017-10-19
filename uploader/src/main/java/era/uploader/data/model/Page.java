@@ -2,6 +2,7 @@ package era.uploader.data.model;
 
 import com.google.common.base.Preconditions;
 import com.google.zxing.common.BitMatrix;
+import org.apache.pdfbox.pdmodel.PDDocument;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,6 +20,7 @@ public class Page {
     private transient BitMatrix qrCode;
     private String uuid;
     private Assignment assignment;
+    private PDDocument document;
 
     private Page(Builder builder) {
         this.student = builder.student;
@@ -77,6 +79,14 @@ public class Page {
 
     public void setAssignment(@Nullable Assignment assignment) {
         this.assignment = assignment;
+    }
+
+    public PDDocument getDocument() {
+        return document;
+    }
+
+    public void setDocument(PDDocument document) {
+        this.document = document;
     }
 
     @Override

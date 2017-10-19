@@ -21,6 +21,9 @@ public class Course {
     private Set<Assignment> assignments;
 
     /* Constructor */
+    public Course() {
+
+    }
     public Course(
             String department,
             String name,

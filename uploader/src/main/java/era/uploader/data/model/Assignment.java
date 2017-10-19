@@ -14,6 +14,7 @@ public class Assignment {
     private Set<Page> pages = new HashSet<>();  /* Set of Page objects for each Assignment */
     private PDDocument image;
     private Student student;
+    private Course course;
 
     /* Constructor */
     public Assignment(
@@ -34,10 +35,11 @@ public class Assignment {
             Student student,
             Course course
     ) {
-        this.imageFilePath = course.getName() + File.separator + student.getSchoolId() + name;
+        this.imageFilePath = course.getName() + '_' + student.getSchoolId() + name;
         this.name = name;
         this.pages = pages;
         this.student = student;
+        this.course = course;
     }
 
     @Override
@@ -88,4 +90,11 @@ public class Assignment {
         this.pages = pages;
     }
 
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
 }
