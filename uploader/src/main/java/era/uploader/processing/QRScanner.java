@@ -34,7 +34,7 @@ public class QRScanner {
 
     private static final QRErrorBus BUS = QRErrorBus.instance();
 
-    public Page convertPDFtoBufferedImg(PDDocument document){
+    public Page extractQRCodeInformation(PDDocument document){
         PDFRenderer renderer = new PDFRenderer(document);
 
         String tmpFinalResult = "";
