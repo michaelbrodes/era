@@ -1,5 +1,7 @@
 package era.uploader.data.model;
 
+import com.google.common.collect.Sets;
+
 import java.util.Set;
 
 /**
@@ -16,7 +18,7 @@ public class Student {
     private String userName;
     private long uniqueId;     /* Identifier that we generate to uniquely identify each student inside the QR code */
     // every course that the student belongs to
-    private Set<Course> courses;
+    private Set<Course> courses = Sets.newHashSet();
 
     /* Constructor */
     public Student(
@@ -119,7 +121,7 @@ public class Student {
         private String userName;
         private long uniqueId;     /* Identifier that we generate to uniquely identify each student inside the QR code */
         // every course that the student belongs to
-        private Set<Course> courses;
+        private Set<Course> courses = Sets.newHashSet();
 
         public Builder() {
 
@@ -151,7 +153,12 @@ public class Student {
         }
 
         public Builder takingCourses(Set<Course> courses) {
-            this.courses = courses;
+            this.courses.addAll(courses);
+            return this;
+        }
+
+        public Builder takingCourse(Course course) {
+            this.courses.add(course);
             return this;
         }
 

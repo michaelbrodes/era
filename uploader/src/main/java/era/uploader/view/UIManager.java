@@ -1,19 +1,12 @@
 package era.uploader.view;
 
 import com.google.common.collect.Multimap;
+import era.uploader.UploaderApp;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-
-import era.uploader.UploaderApp;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
-import javafx.scene.control.TextField;
-import javafx.scene.control.PasswordField;
 import javafx.stage.Stage;
 
 public class UIManager extends Application {

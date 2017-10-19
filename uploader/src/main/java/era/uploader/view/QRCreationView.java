@@ -2,27 +2,19 @@ package era.uploader.view;
 
 import com.google.common.collect.Multimap;
 import era.uploader.controller.QRCreationController;
-import era.uploader.creation.QRCreator;
 import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.PageDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-
-import era.uploader.view.UIManager;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.PasswordField;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.scene.control.Label;
 
 import java.io.File;
 import java.io.IOException;
@@ -124,16 +116,6 @@ public class QRCreationView extends Application {
            String[] splitFile = fName.split(File.separator);
            fName = splitFile[splitFile.length-1];
             classFileName.setText(fName);
-
-//            if (fPath != null)
-//                try {
-//                    //qrCtrl.generateStudents(fPath);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    //TODO FILE NOT FOUND. How to display to user?
-//                }
-//
-//            //TODO work on creating table to display students that have been added to roster
         });
 
 
@@ -155,7 +137,6 @@ public class QRCreationView extends Application {
                 } catch (IOException e) {
                 //TODO FILE NOT FOUND. How to display to user?
                 }
-                //TODO work on creating table to display students that have been added to roster
         });
 
 

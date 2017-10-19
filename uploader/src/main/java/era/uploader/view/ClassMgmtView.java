@@ -1,37 +1,17 @@
 package era.uploader.view;
 
 import com.google.common.collect.Multimap;
-import era.uploader.controller.QRCreationController;
-import era.uploader.creation.QRCreator;
-import era.uploader.data.database.CourseDAOImpl;
-import era.uploader.data.database.PageDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-
-import era.uploader.view.UIManager;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
-import javafx.scene.control.TextField;
-import javafx.scene.control.PasswordField;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 
 public class ClassMgmtView extends Application {
@@ -87,37 +67,47 @@ public class ClassMgmtView extends Application {
         gridPane.add(classIDLabel, 2, 3);
 
         int count = 0;
-            for (Student student : courseStudentMultimap.values()) {
-               String studentName =  student.getFirstName() + " " + student.getLastName();
-               String schoolId = student.getSchoolId();
-               String userName = student.getUserName();
-               Set<Course> courses = student.getCourses();
-               String studentCourse = "";
-
-               if (courses != null) {
-                   while (courses.iterator().hasNext()) {
-                       for (Course course : courses) {
-                           studentCourse += course.getDepartment() + "-" +
-                                   course.getCourseNumber() + "-" +
-                                   course.getSectionNumber();
-                           if (courses.iterator().hasNext()) {
-                               studentCourse += ", ";
-                           }
-                       }
-                   }
-                gridPane.add(new Label(studentCourse), 2, (4 + count));
-
-               }
-               gridPane.add(new Label(studentName), 3, (4 + count));
-               gridPane.add(new Label(userName), 4, (4 + count));
-               gridPane.add(new Label(schoolId), 5, (4 + count));
-
-               count++;
+        for (Map.Entry<Course, Collection<Student>> courseToStudents :
+                courseStudentMultimap.asMap().entrySet()) {
+            System.out.println("Course :"
+                    + courseToStudents.getKey().getDepartment() + ""
+                    + courseToStudents.getKey().getCourseNumber());
+            for (Student student : courseToStudents.getValue()) {
+                System.out.println("\tStudent: " + student.getUserName());
             }
+        }
 
-            Button homeButton = new Button("Back to Home");
+//        for (Student student : courseStudentMultimap.values()) {
+//            String studentName =  student.getFirstName() + " " + student.getLastName();
+//            String schoolId = student.getSchoolId();
+//            String userName = student.getUserName();
+//            Set<Course> courses = student.getCourses();
+//            String studentCourse = "";
+//
+//            if (courses != null) {
+//                while (courses.iterator().hasNext()) {
+//                    for (Course course : courses) {
+//                        studentCourse += course.getDepartment() + "-" +
+//                                course.getCourseNumber() + "-" +
+//                                course.getSectionNumber();
+//                        if (courses.iterator().hasNext()) {
+//                            studentCourse += ", ";
+//                        }
+//                    }
+//                }
+//                gridPane.add(new Label(studentCourse), 2, (4 + count));
+//
+//            }
+//            gridPane.add(new Label(studentName), 3, (4 + count));
+//            gridPane.add(new Label(userName), 4, (4 + count));
+//            gridPane.add(new Label(schoolId), 5, (4 + count));
+//
+//            count++;
+//        }
 
-            gridPane.add(homeButton, 3, (5 + count));
+        Button homeButton = new Button("Back to Home");
+
+        gridPane.add(homeButton, 3, (5 + count));
 
         homeButton.setOnAction((event) -> {
             uManage.changeToCreateView();
