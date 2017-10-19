@@ -51,7 +51,6 @@ public class QRScanner {
                 BUS.fire(new QRErrorEvent(QRErrorStatus.UUID_ERROR));
                 return null;
             }
-            System.out.println(tmpFinalResult);
         }
         catch (IOException | NotFoundException e) {
             System.out.println("Error: " + e );
