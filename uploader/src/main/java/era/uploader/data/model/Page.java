@@ -19,6 +19,7 @@ public class Page {
     // calls and it should not be stored in the database
     private transient BitMatrix qrCode;
     private String uuid;
+
     private transient PDDocument document;
     private Assignment assignment;
 
@@ -97,6 +98,14 @@ public class Page {
         return uuid.hashCode();
     }
 
+    public PDDocument getDocument() {
+        return document;
+    }
+
+    public void setDocument(PDDocument document) {
+        this.document = document;
+    }
+
     @ParametersAreNonnullByDefault
     public static class Builder {
         private Student student;
@@ -106,7 +115,7 @@ public class Page {
         private String uuid;
         private PDDocument document;
 
-        public Builder withDocument(PDDocument document){
+        public Builder withDocument(PDDocument document) {
             Preconditions.checkNotNull(document);
             this.document = document;
             return this;
