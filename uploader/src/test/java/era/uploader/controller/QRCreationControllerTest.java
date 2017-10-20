@@ -90,21 +90,21 @@ public class QRCreationControllerTest {
                 "822222222",
                 "833333333"
         );
-        Course eighteen = Course.create()
+        Course eighteen = Course.builder()
                 .forDepartment("CHEM")
                 .withCourseNumber("131")
                 .withSectionNumber("018")
-                .build();
-        Course two = Course.create()
+                .create();
+        Course two = Course.builder()
                 .forDepartment("CHEM")
                 .withCourseNumber("131")
                 .withSectionNumber("002")
-                .build();
-        Course notExist = Course.create()
+                .create();
+        Course notExist = Course.builder()
                 .forDepartment("Spooky spooky ghosts")
                 .withCourseNumber("101")
                 .withSectionNumber("001")
-                .build();
+                .create();
 
         Multimap<Course, Student> coursesToStudents = ctrl.generateStudents(Paths.get(roster));
 

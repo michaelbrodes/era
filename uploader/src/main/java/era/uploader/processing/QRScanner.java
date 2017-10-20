@@ -18,17 +18,18 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 
-public class QRScanner {
+class QRScanner {
 
     private MultiFormatReader multiForm;
 
-    public QRScanner (){
+    QRScanner (){
         multiForm = new MultiFormatReader();
         multiForm.setHints(ImmutableMap.of(
-                DecodeHintType.POSSIBLE_FORMATS, Arrays.asList(BarcodeFormat.QR_CODE)
+                DecodeHintType.POSSIBLE_FORMATS, Collections.singletonList(BarcodeFormat.QR_CODE)
                 , DecodeHintType.TRY_HARDER, Boolean.TRUE  //initialize this flag if in later development QR Codes aren't being found in large batches,
                                                            //***required for 300dpi images***
         ));
@@ -37,11 +38,12 @@ public class QRScanner {
 
     private static final QRErrorBus BUS = QRErrorBus.instance();
 
-    public Page extractQRCodeInformation(PDDocument document){
-        PDFRenderer renderer = new PDFRenderer(document);
-
-        String tmpFinalResult = "";
+    Page extractQRCodeInformation(String documentName){
+        String tmpFinalResult;
         try{
+            PDDocument document = PDDocument.load(new File(documentName));
+            PDFRenderer renderer = new PDFRenderer(document);
+
             BufferedImage pdf = renderer.renderImageWithDPI(0, 300);
 
             LuminanceSource tmpSource = new BufferedImageLuminanceSource(pdf);
@@ -54,6 +56,7 @@ public class QRScanner {
                 BUS.fire(new QRErrorEvent(QRErrorStatus.UUID_ERROR));
                 return null;
             }
+            document.close();
         }
         catch (IOException | NotFoundException e) {
             System.out.println("Error: " + e );
@@ -61,7 +64,7 @@ public class QRScanner {
             return null;
         }
         return Page.builder()
-                .withDocument(document)
+                .withTempDocumentName(documentName)
                 .create(tmpFinalResult);
     }//convertPDFtoBufferedImage
 }

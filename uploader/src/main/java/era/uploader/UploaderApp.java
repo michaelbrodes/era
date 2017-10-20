@@ -18,6 +18,7 @@ public class UploaderApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
 
         root = new GridPane();
         mainScene = new Scene(root, 800, 600);

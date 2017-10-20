@@ -33,7 +33,10 @@ public class MockPageDAOImpl implements PageDAO, MockDAO<Page> {
 
     @Override
     public Page read(String uuid) {
-        return null;
+        return db.stream()
+                .filter(page -> page.getUuid().equals(uuid))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override

@@ -5,6 +5,8 @@ import era.uploader.data.CourseDAO;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 
+import java.util.Set;
+
 /**
  * This class will eventually map to a RESTful API on the server.
  */
@@ -32,5 +34,10 @@ public class CourseService implements CourseDAO {
     @Override
     public void delete(Course course) {
 
+    }
+
+    @Override
+    public Set<Course> getAllCourses() {
+        return null;
     }
 }

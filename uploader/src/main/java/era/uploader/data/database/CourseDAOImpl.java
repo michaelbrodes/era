@@ -7,9 +7,9 @@ import era.uploader.data.model.Grader;
 import era.uploader.data.model.Student;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 
 /**
  * Provides CRUD functionality for {@link Course} objects stored in the
@@ -61,5 +61,10 @@ public class CourseDAOImpl implements CourseDAO {
     @Override
     public void delete(Course course) {
         courses.remove(course);
+    }
+
+    @Override
+    public Set<Course> getAllCourses() {
+        return courses;
     }
 }
