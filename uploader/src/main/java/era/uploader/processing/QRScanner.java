@@ -1,13 +1,16 @@
 package era.uploader.processing;
 
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
-import com.google.zxing.*;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.DecodeHintType;
+import com.google.zxing.LuminanceSource;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import era.uploader.controller.QRErrorBus;
-import era.uploader.creation.MultimapCollector;
 import era.uploader.creation.QRErrorEvent;
 import era.uploader.creation.QRErrorStatus;
 import era.uploader.data.model.Page;
@@ -59,7 +62,6 @@ public class QRScanner {
         }
         return Page.builder()
                 .withDocument(document)
-                .withUuid(tmpFinalResult)
-                .create();
+                .create(tmpFinalResult);
     }//convertPDFtoBufferedImage
 }

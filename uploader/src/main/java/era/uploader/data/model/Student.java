@@ -4,7 +4,7 @@ import java.util.Set;
 
 /**
  * Class that will represent each individual student and provide a means to
- * create QR codes, and match the information inside of each code to its
+ * builder QR codes, and match the information inside of each code to its
  * respective student.
  */
 
@@ -47,7 +47,7 @@ public class Student {
         this.userName = builder.userName;
     }
 
-    public static Builder create() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -115,6 +115,14 @@ public class Student {
         this.userName = userName;
     }
 
+    /**
+     * A Builder is a <em>design pattern</em> that allows you to specify constructor
+     * arguments with just plain setters. The reason why a builder is used on
+     * this class is that there is a plethora of potentially nullable fields in
+     * this class, which would require an exponentially large amount of
+     * constructor overloads. You are welcome to write those constructor
+     * overloads but I am too lazy for it.
+     */
     public static class Builder {
         private String firstName; /* Student's first name */
         private String lastName;  /* Student's last name */
@@ -158,7 +166,7 @@ public class Student {
             return this;
         }
 
-        public Student build() {
+        public Student create() {
             return new Student(this);
         }
     }

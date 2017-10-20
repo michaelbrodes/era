@@ -1,6 +1,7 @@
 package era.uploader.processing;
 
 import com.google.common.collect.ImmutableSet;
+import era.uploader.data.database.MockPageDAOImpl;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Page;
@@ -32,13 +33,11 @@ public class PDFProcessorTest {
         Student test_student = new Student();
         test_student.setSchoolId("schoolid");
         testCourse.setName("COURSE_NAME");
-        PDFProcessor p = new PDFProcessor(Collections.singletonList(testDoc), testCourse, "testAssignment");
+        PDFProcessor p = new PDFProcessor(new MockPageDAOImpl(), Collections.singletonList(testDoc), testCourse, "testAssignment");
         Set<Assignment> test_assignments = new HashSet<>();
-        Page test_page = Page.builder().create();
-        Page test_page2 = Page.builder().create();
-        test_page.setUuid("testuuid");
+        Page test_page = Page.builder().create("testuuid");
+        Page test_page2 = Page.builder().create("testuuid2");
         test_page.setDocument(testDoc);
-        test_page2.setUuid("testuid2");
         test_page2.setDocument(testDoc);
         Assignment a = new Assignment("src/test/resources/split/tests.pdf", "assignment_name", ImmutableSet.of(test_page, test_page2), test_student);
         test_assignments.add(a);

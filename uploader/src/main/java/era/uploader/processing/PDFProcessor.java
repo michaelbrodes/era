@@ -1,27 +1,28 @@
 package era.uploader.processing;
 
 import com.google.common.base.Preconditions;
-import com.sun.org.apache.xpath.internal.operations.Mult;
-import era.uploader.controller.StatusChangeBus;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import era.uploader.creation.QRErrorBus;
 import era.uploader.creation.QRErrorEvent;
 import era.uploader.creation.QRErrorStatus;
-import era.uploader.data.AssignmentDAO;
-import era.uploader.data.database.PageDAOImpl;
+import era.uploader.data.PageDAO;
 import era.uploader.data.database.AssignmentDAOImpl;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
-import era.uploader.data.model.Student;
 import era.uploader.data.model.Page;
+import era.uploader.data.model.Student;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @ParametersAreNonnullByDefault
 public class PDFProcessor {
@@ -29,22 +30,54 @@ public class PDFProcessor {
     private final List<PDDocument> pages;
     private final Course course;
     private final String assignmentName;
-    private PageDAOImpl pageDAO;
+    private final PageDAO pageDAO;
 
-    PDFProcessor(List<PDDocument> pages, Course course, String assignmentName) {
+    PDFProcessor(
+            PageDAO pageDao,
+            List<PDDocument> pages,
+            Course course,
+            String assignmentName
+    ) {
         this.pages = pages;
         this.course = course;
         this.assignmentName = assignmentName;
+        this.pageDAO = pageDao;
     }
 
-    public static List<Assignment> process(Path pdf, Course course, String assignmentName)
-            throws IOException {
+    /**
+     * Entry point into the {@link era.uploader.processing} package. It is our
+     * PDF processing algorithm (i.e. the algorithm that matches students to
+     * pages in an inputted PDF). The algorithm is heavily based upon
+     * MapReduce. Map reduce allows for high concurrency by creating a pipeline
+     * of sorts, while also keeping logic modularized. The stages of the
+     * pipeline are Spit a large pdf into pages -> scatter those pages with
+     * {@link List#parallelStream()} -> feed them into
+     * {@link QRScanner#extractQRCodeInformation(PDDocument)} to grab uuid ->
+     * match {@link #associateStudentsWithPage(Page)} -> merge student
+     * associated Pages into one pdf -> store in either the local database or
+     * the remote database.
+     *
+     * @param pdf a path to a large pdf filled with multiple student
+     *            assignments, in arbitrary order.
+     * @param course the course this pdf was submitted to.
+     * @param assignmentName the name of the assignment that this pdf was for
+     * @return a list of PDFs that have pages that were associated with
+     *         students.
+     * @throws IOException couldn't find the pdf from the path specified.
+     */
+    public static List<Assignment> process(
+            PageDAO pageDAO,
+            Path pdf,
+            Course course,
+            String assignmentName
+    ) throws IOException {
         Preconditions.checkNotNull(pdf);
         Preconditions.checkNotNull(course);
         Preconditions.checkNotNull(assignmentName);
+        Preconditions.checkNotNull(pageDAO);
 
         List<PDDocument> pages = TASKalfaConverter.convertFile(pdf);
-        PDFProcessor processor = new PDFProcessor(pages, course, assignmentName);
+        PDFProcessor processor = new PDFProcessor(pageDAO, pages, course, assignmentName);
 
         return processor.startPipeline();
     }

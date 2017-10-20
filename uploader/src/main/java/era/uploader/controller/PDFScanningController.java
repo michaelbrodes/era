@@ -1,5 +1,7 @@
 package era.uploader.controller;
 
+import era.uploader.data.PageDAO;
+import era.uploader.data.database.PageDAOImpl;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.processing.PDFProcessor;
@@ -15,11 +17,11 @@ import java.util.List;
  * {@link era.uploader.processing} package.
  *
  *
- * TODO Josh and Cam implement your functions for US01 here. Make sure to unit test them by right clicking the class > GO TO > Test > create new
  */
 public class PDFScanningController {
+    private final PageDAO pageDAO = new PageDAOImpl();
     public void scanPDF(Path pdf, Course course, String assignment) throws IOException {
-        List<Assignment> assignments = PDFProcessor.process(pdf, course, assignment);
+        List<Assignment> assignments = PDFProcessor.process(pageDAO, pdf, course, assignment);
 
     }
 }

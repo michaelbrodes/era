@@ -34,11 +34,11 @@ public class QRCreationControllerTest {
 
     @Test
     public void createQRs_SingletonSet() throws Exception {
-        Student robMcGuy = Student.create()
+        Student robMcGuy = Student.builder()
                 .withFirstName("Rob")
                 .withLastName("Mcguy")
                 .withSchoolId("rmcguy")
-                .build();
+                .create();
         robMcGuy.setSchoolId("rmcguy");
         int numberOfAssignments = 2;
         ImmutableSet<Student> students = ImmutableSet.of(robMcGuy);
