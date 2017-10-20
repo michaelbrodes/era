@@ -9,6 +9,7 @@ import era.uploader.data.model.Student;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -57,7 +58,7 @@ public class QRCreationView extends Application {
         Button createQRButton = new Button("Create");
         Button createClassButton = new Button("Add Class");
         Button fileBrowserButton = new Button("Browse");
-        Button goHome = new Button("Home");
+        Button goHome = new Button("Back");
 
         //Initializing Temporary Text Fields Right Now
         TextField firstName = new TextField();
@@ -104,10 +105,10 @@ public class QRCreationView extends Application {
         classFileName.setPromptText("Class Roster File Name");
 
 //        gridPane.add(orLabel, 4, 19);
-        gridPane.add(classFileName, 4, 3);
-        gridPane.add(fileBrowserButton, 5, 3);
-        gridPane.add(createClassButton, 4, 5);
-        gridPane.add(goHome, 4, 7);
+        gridPane.add(classFileName, 4, 4);
+        gridPane.add(fileBrowserButton, 5, 4);
+        gridPane.add(createClassButton, 4, 6);
+        gridPane.add(goHome, 4, 2);
 
         createQRButton.requestFocus();
 
@@ -115,13 +116,16 @@ public class QRCreationView extends Application {
 
 
         fileBrowserButton.setOnAction((event) -> {
-           File file = fileChooser.showOpenDialog(mainStage);
-           Path fPath = file.toPath();
-           String fName = fPath.toString();
-           fullFileName = fName;
-           String[] splitFile = fName.split(File.separator);
-           fName = splitFile[splitFile.length-1];
-            classFileName.setText(fName);
+            File file = null;
+           file = fileChooser.showOpenDialog(mainStage);
+           if (file != null) {
+               Path fPath = file.toPath();
+               String fName = fPath.toString();
+               fullFileName = fName;
+               String[] splitFile = fName.split(File.separator);
+               fName = splitFile[splitFile.length - 1];
+               classFileName.setText(fName);
+           }
         });
 
         ;
@@ -146,7 +150,10 @@ public class QRCreationView extends Application {
                     uManage.changeToClassMgmtView(courseStudentMultimap, gridPane);
                 } catch (IOException e) {
                 //TODO FILE NOT FOUND. How to display to user?
-                }
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setHeaderText("File Not Found");
+                    errorAlert.setContentText("The File that you specified cannot be found");
+                    errorAlert.showAndWait();                }
         });
 
 

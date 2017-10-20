@@ -1,6 +1,7 @@
 package era.uploader.controller;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.processing.PDFProcessor;
@@ -8,6 +9,7 @@ import era.uploader.processing.PDFProcessor;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This controller is responsible for taking in PDFs, extracting the UUID
@@ -24,9 +26,9 @@ public class PDFScanningController {
 
     }
 
-    public List<Course> getAllCourses() {
+    public Set<Course> getAllCourses() {
         //TODO Method to return all Courses instead of this dummy data
-        return ImmutableList.of(
+        return ImmutableSet.of(
                 Course.create()
                     .withCourseNumber("111")
                     .withName("John Mills")

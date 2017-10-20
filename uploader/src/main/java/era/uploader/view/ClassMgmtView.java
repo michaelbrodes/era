@@ -114,7 +114,7 @@ public class ClassMgmtView extends Application {
 //            count++;
 //        }
 
-        Button homeButton = new Button("Back to Home");
+        Button homeButton = new Button("Back");
 
         gridPane.add(homeButton, 2, (++count));
 
