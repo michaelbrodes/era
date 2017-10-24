@@ -1,6 +1,7 @@
 package era.uploader.data.model;
 
 import com.google.common.collect.Sets;
+import era.uploader.common.IOUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import java.util.Collection;
@@ -35,7 +36,11 @@ public class Assignment {
             Student student,
             Course course
     ) {
-        this.imageFilePath = course.getName() + '_' + student.getSchoolId() + name;
+        this.imageFilePath = IOUtil.removeSpaces(course.getName())
+                + '_'
+                + student.getSchoolId()
+                + "_"
+                + IOUtil.removeSpaces(name);
         this.name = name;
         this.pages = pages;
         this.student = student;

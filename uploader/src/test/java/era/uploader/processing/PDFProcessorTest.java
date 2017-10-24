@@ -118,7 +118,7 @@ public class PDFProcessorTest {
         test_page2.setDocument(testDoc);
         Assignment a = new Assignment("src/test/resources/split/tests.pdf", "assignment_name", ImmutableSet.of(test_page, test_page2), test_student);
         test_assignments.add(a);
-        p.mergePDF(test_assignments);
+        p.mergeAssignmentPages(test_assignments);
         Assert.assertTrue(new File("src/test/resources/split/tests.pdf").exists());
     }
 }

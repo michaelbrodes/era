@@ -132,3 +132,4 @@ gradle/
 *.iml
 .DS_Store
 uploader/src/test/resources/split
+uploader.db

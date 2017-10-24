@@ -149,7 +149,7 @@ public class PDFProcessor {
             Student student = pages.getKey();
             Collection<Page> pagesToAdd = pages.getValue();
             assignments.add(new Assignment(assignmentName, pagesToAdd, student, course));
-            mergePDF(assignments);
+            mergeAssignmentPages(assignments);
         }
 
         return assignments;
@@ -158,7 +158,7 @@ public class PDFProcessor {
     /**After this is called, all pages for each student are now merged, and saved at the
      * appropriate location. also stores the assignment file location in the database
      */
-    public void mergePDF(Set<Assignment> assignments) {
+    public void mergeAssignmentPages(Set<Assignment> assignments) {
         PDFMergerUtility merger = new PDFMergerUtility();
         AssignmentDAOImpl assignmentDAO = new AssignmentDAOImpl();
         for (Assignment a : assignments
