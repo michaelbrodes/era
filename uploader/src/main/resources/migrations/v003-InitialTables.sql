@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS student (
   unique_id  INTEGER PRIMARY KEY AUTOINCREMENT,
   first_name TEXT NULL,
   last_name  TEXT NULL,
-  -- a school id is the external integer id that the school uses for a student
-  school_id  TEXT NOT NULL,
+  -- a school uniqueId is the external integer uniqueId that the school uses for a student
+  school_id  TEXT NULL,
   username   TEXT NOT NULL,
   -- for the most part this field is generated from the username when importing
   -- the roster and defaults to <username>@siue.edu, but to keep it generic
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS course (
   name           TEXT NULL,
   semester       TEXT NULL,
   -- the following are not nullable because they are generated from the roster file
-  department     TEXT NOT NULL COLLATE NOCASE,
+  department     TEXT NOT NULL,
   course_number  TEXT NOT NULL,
   section_number TEXT NOT NULL
 );
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS page (
   sequence_number INTEGER NULL,
   -- pages where we just generated a QR code will not be part of an assignment
   assignment_id   INTEGER NULL,
-  student_id      INTEGER NOT NULL,
+  student_id      INTEGER NULL,
   FOREIGN KEY (assignment_id) REFERENCES assignment(unique_id),
   FOREIGN KEY (student_id)    REFERENCES student(unique_id)
 );

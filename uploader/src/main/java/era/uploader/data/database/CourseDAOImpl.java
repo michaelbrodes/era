@@ -43,7 +43,7 @@ public class CourseDAOImpl implements CourseDAO {
     public Course read(long id) {
         for (Course otherCourse :
                 courses) {
-            if (otherCourse.getId() == id) {
+            if (otherCourse.getUniqueId() == id) {
                 return otherCourse;
             }
         }

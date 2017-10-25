@@ -1,9 +1,11 @@
 package era.uploader.data.model;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import era.uploader.common.IOUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,32 +19,64 @@ public class Assignment {
     private Student student;
     private Course course;
 
-    /* Constructor */
+    /* Constructors */
+
+    /**
+     * Creates a new Assignment object. All Nonnull arguments are required
+     * arguments and match "NOT NULL" columns in the database.
+     *
+     * @param imageFilePath the path to the pdf storing this assignment
+     * @param name the name of the assignment
+     * @param course the course that this assignment belongs to
+     * @param pages the pages that make up this assignment
+     * @param student the student who turned this assignment in
+     */
     public Assignment(
-            String imageFilePath,
-            String name,
+            @Nonnull String imageFilePath,
+            @Nonnull String name,
+            @Nonnull Course course,
             Collection<Page> pages,
-            Student student
+            @Nonnull Student student
     ) {
+        Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
+        Preconditions.checkNotNull(imageFilePath, "Cannot create an Assignment with a null imageFilePath");
+        Preconditions.checkNotNull(student, "Cannot create an Assignment with a null student");
+        Preconditions.checkNotNull(course, "Cannot create an Assignment with a null course");
+
         this.imageFilePath = imageFilePath;
         this.name = name;
-        this.pages = pages;
+        this.pages = pages == null ? Sets.newHashSet() : pages;
         this.student = student;
+        this.course = course;
     }
 
+    /**
+     * Creates a new Assignment object. All Nonnull arguments are required
+     * arguments and match "NOT NULL" columns in the database.
+     *
+     * @param name the name of the assignment
+     * @param course the course that this assignment belongs to
+     * @param pages the pages that make up this assignment
+     * @param student the student who turned this assignment in
+     */
     public Assignment(
-            String name,
+            @Nonnull String name,
             Collection<Page> pages,
-            Student student,
-            Course course
+            @Nonnull Student student,
+            @Nonnull Course course
     ) {
+        Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
+        Preconditions.checkNotNull(student, "Cannot create an Assignment with a null student");
+        Preconditions.checkNotNull(course, "Cannot create an Assignment with a null course");
+
         this.imageFilePath = IOUtil.removeSpaces(course.getName())
                 + '_'
                 + student.getSchoolId()
                 + "_"
-                + IOUtil.removeSpaces(name);
+                + IOUtil.removeSpaces(name)
+                + ".pdf";
         this.name = name;
-        this.pages = pages;
+        this.pages = pages == null ? Sets.newHashSet() : pages;
         this.student = student;
         this.course = course;
     }
@@ -71,22 +105,27 @@ public class Assignment {
     }
 
     /* Getters and Setters */
+    @Nonnull
     public String getImageFilePath() {
         return imageFilePath;
     }
 
-    public void setImageFilePath(String imageFilePath) {
+    public void setImageFilePath(@Nonnull String imageFilePath) {
+        Preconditions.checkNotNull(imageFilePath, "a null imageFilePath cannot be stored in the database");
         this.imageFilePath = imageFilePath;
     }
 
+    @Nonnull
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(@Nonnull String name) {
+        Preconditions.checkNotNull(name, "a null name cannot be stored in the database.");
         this.name = name;
     }
 
+    @Nonnull
     public Collection<Page> getPages() {
         return pages;
     }
@@ -94,19 +133,22 @@ public class Assignment {
     /**
      * Convenience method for if you want a set of pages.
      */
+    @Nonnull
     public Set<Page> getPagesSet() {
         return Sets.newHashSet(pages);
     }
 
     public void setPages(Set<Page> pages) {
-        this.pages = pages;
+        this.pages = pages == null ? Sets.newHashSet() : pages;
     }
 
+    @Nonnull
     public Course getCourse() {
         return course;
     }
 
-    public void setCourse(Course course) {
+    public void setCourse(@Nonnull Course course) {
+        Preconditions.checkNotNull(course, "a null course cannot be stored in the database");
         this.course = course;
     }
 }

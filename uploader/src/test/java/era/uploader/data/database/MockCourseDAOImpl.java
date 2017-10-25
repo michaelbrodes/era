@@ -42,7 +42,7 @@ public class MockCourseDAOImpl implements CourseDAO, MockDAO<Course> {
     public Course read(long id) {
         for (Course otherCourse :
                 courses) {
-            if (otherCourse.getId() == id) {
+            if (otherCourse.getUniqueId() == id) {
                 return otherCourse;
             }
         }

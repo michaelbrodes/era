@@ -17,10 +17,10 @@ public class QRCreatorTest {
     @Test
     public void call_NotNullStudent() throws Exception {
         Student robMcGuy = Student.builder()
-                .withSchoolId("rmcguy")
+                .withSchoolId("800999999")
                 .withFirstName("McGuy")
                 .withFirstName("Rob")
-                .create();
+                .create("rmcguy");
         int sequenceNumber = 1;
         QRCreator creator = new QRCreator(robMcGuy, sequenceNumber);
         QRErrorBus bus = QRErrorBus.instance();

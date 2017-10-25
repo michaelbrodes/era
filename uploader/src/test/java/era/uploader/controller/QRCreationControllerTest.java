@@ -37,9 +37,8 @@ public class QRCreationControllerTest {
         Student robMcGuy = Student.builder()
                 .withFirstName("Rob")
                 .withLastName("Mcguy")
-                .withSchoolId("rmcguy")
-                .create();
-        robMcGuy.setSchoolId("rmcguy");
+                .withSchoolId("800999999")
+                .create("rmcguy");
         int numberOfAssignments = 2;
         ImmutableSet<Student> students = ImmutableSet.of(robMcGuy);
         QRErrorBus bus = QRErrorBus.instance();
@@ -90,21 +89,9 @@ public class QRCreationControllerTest {
                 "822222222",
                 "833333333"
         );
-        Course eighteen = Course.builder()
-                .forDepartment("CHEM")
-                .withCourseNumber("131")
-                .withSectionNumber("018")
-                .create();
-        Course two = Course.builder()
-                .forDepartment("CHEM")
-                .withCourseNumber("131")
-                .withSectionNumber("002")
-                .create();
-        Course notExist = Course.builder()
-                .forDepartment("Spooky spooky ghosts")
-                .withCourseNumber("101")
-                .withSectionNumber("001")
-                .create();
+        Course eighteen = new Course("CHEM", "131", "018");
+        Course two = new Course("CHEM", "131", "002");
+        Course notExist = new Course("Spooky spooky ghosts", "101", "001");
 
         Multimap<Course, Student> coursesToStudents = ctrl.generateStudents(Paths.get(roster));
 

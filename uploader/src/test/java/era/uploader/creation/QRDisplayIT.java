@@ -29,7 +29,11 @@ public class QRDisplayIT {
     @Test
     public void QRDisplayTest() throws Exception {
         //test to find out if the UUID that is encoded into the QR Code is done so properly and shows up on a visualized QR Code
-        Student robMcGuy = Student.builder().withSchoolId("rmcguy").withFirstName("Rob").withLastName("McGuy").create();
+        Student robMcGuy = Student.builder()
+                .withSchoolId("800999999")
+                .withFirstName("Rob")
+                .withLastName("McGuy")
+                .create("rmcguy");
         int sequenceNumber = 1;
         QRCreator creator = new QRCreator(robMcGuy, sequenceNumber);
 

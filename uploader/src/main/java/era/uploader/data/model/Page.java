@@ -174,7 +174,7 @@ public class Page {
         }
 
         public Page create(@Nonnull String uuid) {
-            Preconditions.checkNotNull(uuid);
+            Preconditions.checkNotNull(uuid, "Cannot create a Page without a uuid");
             return new Page(uuid, this);
         }
     }
