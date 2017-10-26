@@ -12,8 +12,8 @@ import java.util.Set;
  */
 public class CourseService implements CourseDAO {
     @Override
-    public void insert(Course course) {
-
+    public Course insert(Course course) {
+        return null;
     }
 
     @Override

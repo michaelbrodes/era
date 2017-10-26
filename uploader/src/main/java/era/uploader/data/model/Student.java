@@ -19,7 +19,7 @@ public class Student {
     private String lastName;  /* Student's last name */
     private String schoolId;  /* Identifier for each student provided by the school */
     private String userName;
-    private long uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
+    private int uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
     // every course that the student belongs to
     private Set<Course> courses = Sets.newHashSet();
 
@@ -50,7 +50,7 @@ public class Student {
             String lastName,
             String schoolId,
             @Nonnull String userName,
-            long uniqueId,
+            int uniqueId,
             Set<Course> courses
     ) {
         Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
@@ -114,11 +114,11 @@ public class Student {
         this.schoolId = schoolId;
     }
 
-    public long getUniqueId() {
+    public int getUniqueId() {
         return uniqueId;
     }
 
-    public void setUniqueId(long uniqueId) {
+    public void setUniqueId(int uniqueId) {
         this.uniqueId = uniqueId;
     }
 
@@ -157,6 +157,16 @@ public class Student {
     }
 
     /**
+     * A getter for the email of a student. It defaults to an SIUE type email.
+     *
+     * @return an SIUE type email
+     */
+    @Nonnull
+    public String getEmail() {
+        return userName + "@siue.edu";
+    }
+
+    /**
      * A Builder is a <em>design pattern</em> that allows you to specify constructor
      * arguments with just plain setters. The reason why a builder is used on
      * this class is that there is a plethora of potentially nullable fields in
@@ -169,7 +179,7 @@ public class Student {
         private String lastName;  /* Student's last name */
         private String schoolId;  /* Identifier for each student provided by the school */
         private String userName;
-        private long uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
+        private int uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
         // every course that the student belongs to
         private Set<Course> courses;
 
@@ -203,7 +213,7 @@ public class Student {
             return this;
         }
 
-        public Builder withUniqueId(long uniqueId) {
+        public Builder withUniqueId(int uniqueId) {
             this.uniqueId = uniqueId;
             return this;
         }

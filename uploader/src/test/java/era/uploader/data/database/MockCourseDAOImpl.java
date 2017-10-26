@@ -20,11 +20,14 @@ import java.util.Set;
  */
 public class MockCourseDAOImpl implements CourseDAO, MockDAO<Course> {
     private Set<Course> courses = new HashSet<>();
+    private static int idCount = 0;
 
     /* Create and Insert a new Course object into the database */
     @Override
-    public void insert(Course course) {
+    public Course insert(Course course) {
         courses.add(course);
+        course.setUniqueId(++idCount);
+        return course;
     }
 
     @Override

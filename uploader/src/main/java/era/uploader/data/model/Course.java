@@ -17,7 +17,7 @@ import java.util.Set;
 public class Course {
     /* Class Fields */
     // will be an unsigned int in the database.
-    private long uniqueId;
+    private int uniqueId;
     private String department;                              /* Department where the course is held */
     private String name;                                    /* Name of Course */
     private String semester;                                /* Semester of Course */
@@ -180,11 +180,11 @@ public class Course {
         return new Builder();
     }
 
-    public long getUniqueId() {
+    public int getUniqueId() {
         return uniqueId;
     }
 
-    public void setUniqueId(long uniqueId) {
+    public void setUniqueId(int uniqueId) {
         this.uniqueId = uniqueId;
     }
 
@@ -212,7 +212,7 @@ public class Course {
     }
 
     public static class Builder {
-        private long uniqueId;
+        private int uniqueId;
         private String department;                              /* Department where the course is held */
         private String name;                                    /* Name of Course */
         private String semester;                                /* Semester of Course */
@@ -221,7 +221,7 @@ public class Course {
         private Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
         private Set<Assignment> assignments;
 
-        public Builder withDatabaseId(long uniqueId) {
+        public Builder withDatabaseId(int uniqueId) {
             this.uniqueId = uniqueId;
             return this;
         }
