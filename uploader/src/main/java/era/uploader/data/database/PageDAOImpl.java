@@ -28,6 +28,16 @@ public class PageDAOImpl implements PageDAO {
         }
     }
 
+    @Override
+    public Page read(String uuid) {
+        for  (Page page: db) {
+            if (page.getUuid().equals(uuid)) {
+                return page;
+            }
+        }
+        return null;
+    }
+
     public Set<Page> getDb () {
         return db;
     }

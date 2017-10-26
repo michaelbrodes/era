@@ -66,12 +66,12 @@ public class CSVParser {
                                 .withCourseNumber(courseRecord[COURSE_NBR])
                                 .withSectionNumber(courseRecord[SECTION_NBR])
                                 .build(),
-                        Student.create()
+                        Student.builder()
                                 .withLastName(fields[LAST_NAME])
                                 .withFirstName(fields[FIRST_NAME])
                                 .withUserName(fields[USER_NAME])
                                 .withSchoolId(fields[SCHOOL_ID])
-                                .build()
+                                .create()
                 );
                 return ret;
             } else {

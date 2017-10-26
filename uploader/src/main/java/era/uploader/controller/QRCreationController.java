@@ -53,14 +53,28 @@ public class QRCreationController {
     /**
      * Provided a course with students and a number of QR codes to generate
      * for each student this method generates QR codes for students. The QR
-     * codes will be a hash of the students schoolId with a sequence number
-     * for the page.
+     * codes will encode <em>Universally Unique IDs</em> to match students to
+     * their assignment "Pages". Universally Unique IDs make it so the
+     * students can't easily reverse engineer the QR Codes and allow for the
+     * primary keys in the remote database to match the primary keys in the
+     * local database (traditional sequence numbers aren't guaranteed to be
+     * synced up).
      *
+     * <strong>NOTE</strong>: Because we need to match UUIDs to pages at a
+     * later date and time we need up creating new Page entries in the database
+     * that aren't matched to a particular pdf page.
+     *
+     * @see java.util.UUID
      * @param students    A set of students that are partaking in a course.
      * @param numberOfQRs the number of qr codes we should generate for each
      *                    student
+     * @return numberOfQrs worth of Pages grouped by the Students they are
+     *         associated with. See {@link Multimap} to find out how a multimap
+     *         works
      */
     public Multimap<Student, Page> createQRs(Collection<Student> students, int numberOfQRs) {
+        Preconditions.checkNotNull(students);
+
         int processors = Runtime.getRuntime().availableProcessors();
         ExecutorService threads = Executors.newFixedThreadPool(processors);
         List<Future<Page>> futures =
@@ -116,7 +130,6 @@ public class QRCreationController {
      * @return a map of courses to students.
      * @throws IOException We couldn't find the file you inputted.
      */
-    @VisibleForTesting
     public Multimap<Course, Student> generateStudents(Path filePath) throws IOException {
         Preconditions.checkNotNull(filePath);
         // ignore the title record

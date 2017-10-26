@@ -1,7 +1,12 @@
 package era.uploader.controller;
 
+<<<<<<< HEAD
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+=======
+import era.uploader.data.PageDAO;
+import era.uploader.data.database.PageDAOImpl;
+>>>>>>> 72f8f1bc7567fc474d707f3fa96e336d9cfccbe0
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.processing.PDFProcessor;
@@ -18,12 +23,16 @@ import java.util.Set;
  * {@link era.uploader.processing} package.
  *
  *
- * TODO Josh and Cam implement your functions for US01 here. Make sure to unit test them by right clicking the class > GO TO > Test > create new
  */
 public class PDFScanningController {
+    private final PageDAO pageDAO = new PageDAOImpl();
     public void scanPDF(Path pdf, Course course, String assignment) throws IOException {
+<<<<<<< HEAD
         //System.out.print("Recieved PDFs");
         List<Assignment> assignments = PDFProcessor.process(pdf, course, assignment);
+=======
+        List<Assignment> assignments = PDFProcessor.process(pageDAO, pdf, course, assignment);
+>>>>>>> 72f8f1bc7567fc474d707f3fa96e336d9cfccbe0
 
     }
 

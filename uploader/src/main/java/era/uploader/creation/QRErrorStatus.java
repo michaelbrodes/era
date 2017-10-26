@@ -10,8 +10,13 @@ public enum QRErrorStatus {
     GENERATION_ERROR("The QR code could not be generated."),
     PARSE_ERROR("Error occurred while trying to parse a record in the input CSV file. Please have all records in the file be of the form: Last Name, First Name, Username, Student ID, Child Course ID"),
     COURSE_PARSE_ERROR("Error occurred while trying to parse the course id of a CSV record. Please have all course ID's be of the form DEPARTMENT-COURSE NUMBER-SECTION NUMBER-REFERENCE NUMBER"),
-    INVALID_FILE("The file you have inserted doesn't exist. We cannot create any QR codes from it"),
-    INTERRUPT_ERROR("QR creation could not finish because it was interrupted.");
+    INVALID_FILE("The file you have inserted doesn't exist. We cannot builder any QR codes from it"),
+    INTERRUPT_ERROR("QR creation could not finish because it was interrupted."),
+    MERGE_ERROR("Error occurred when trying to merge PDF documents"),
+    SAVE_ERROR("Error occurred when trying to save the complete PDF with all pages"),
+    UUID_ERROR("Could not find value of UUID on QR Code.")
+    ;
+
 
     private final String reason;
 

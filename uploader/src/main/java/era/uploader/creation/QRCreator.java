@@ -58,10 +58,9 @@ public class QRCreator implements Callable<Page> {
         }
 
         return Page.builder()
-                .withUuid(uuid)
                 .withQRCode(qrCode)
                 .withSequenceNumber(sequenceNumber)
                 .byStudent(student)
-                .create();
+                .create(uuid);
     }
 }

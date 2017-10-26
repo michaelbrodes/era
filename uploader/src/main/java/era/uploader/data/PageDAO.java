@@ -9,4 +9,5 @@ import java.util.Set;
 public interface PageDAO {
     void insert(Page page);
     void insertAll(Collection<Page> pages);
+    Page read(String uuid);
 }
