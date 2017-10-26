@@ -19,7 +19,7 @@ public class Page {
     // calls and it should not be stored in the database
     private transient BitMatrix qrCode;
     private String uuid;
-
+    private String tempDocumentName;
     private transient PDDocument document;
     private Assignment assignment;
 
@@ -31,6 +31,7 @@ public class Page {
         this.qrCode = builder.qrCode;
         this.assignment = builder.assignment;
         this.document = builder.document;
+        this.tempDocumentName = builder.tempDocumentName;
     }
 
     public Student getStudent() {
@@ -117,6 +118,14 @@ public class Page {
         return new Builder();
     }
 
+    public String getTempDocumentName() {
+        return tempDocumentName;
+    }
+
+    public void setTempDocumentName(String tempDocumentName) {
+        this.tempDocumentName = tempDocumentName;
+    }
+
 
     /**
      * A Builder is a <em>design pattern</em> that allows you to specify constructor
@@ -132,6 +141,7 @@ public class Page {
         private BitMatrix qrCode;
         private Assignment assignment;
         private PDDocument document;
+        private String tempDocumentName;
 
         public Builder withDocument(PDDocument document) {
             this.document = document;
@@ -155,6 +165,11 @@ public class Page {
 
         public Builder forAssignment(Assignment assignment) {
             this.assignment = assignment;
+            return this;
+        }
+
+        public Builder withTempDocumentName(String name) {
+            this.tempDocumentName = name;
             return this;
         }
 

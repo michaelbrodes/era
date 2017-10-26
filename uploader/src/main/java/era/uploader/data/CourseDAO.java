@@ -4,6 +4,8 @@ import com.google.common.collect.Multimap;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 
+import java.util.Set;
+
 /* Interface for the CourseDAOImpl class which will be used to
  * implement the CRUD functionality for the Course objects in the
  * database.
@@ -14,4 +16,6 @@ public interface CourseDAO {
     Course read(long id);                               /* Access data from course object */
     void update(Course courseToChange, Course courseChanged); /* Change data from existing course object */
     void delete(Course course);                               /* Delete existing course object */
+
+    Set<Course> getAllCourses();
 }

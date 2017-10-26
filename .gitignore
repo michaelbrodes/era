@@ -134,3 +134,4 @@ server/modules
 *.iml
 .DS_Store
 *.db
+uploader/src/test/resources/split

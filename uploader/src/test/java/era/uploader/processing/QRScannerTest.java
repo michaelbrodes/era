@@ -1,13 +1,10 @@
 package era.uploader.processing;
 
 import era.uploader.data.model.Page;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-
-import static org.junit.Assert.*;
 
 public class QRScannerTest {
 
@@ -15,11 +12,9 @@ public class QRScannerTest {
 
     @Test
     public void extractQRCodeInformation() throws Exception {
-        PDDocument testScan = PDDocument.load(new File(path));
         QRScanner qrScanner = new QRScanner();
-        Page scannedPage = qrScanner.extractQRCodeInformation(testScan);
+        Page scannedPage = qrScanner.extractQRCodeInformation(path);
         Assert.assertEquals(scannedPage.getUuid(), "6ab251a5-6c4e-4688-843f-60aea570c3a6");
-        Assert.assertEquals(testScan,scannedPage.getDocument());
     }
 
 }

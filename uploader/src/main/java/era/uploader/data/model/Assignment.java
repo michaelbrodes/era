@@ -1,17 +1,17 @@
 package era.uploader.data.model;
 
-import era.uploader.processing.PDFProcessor;
+import com.google.common.collect.Sets;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
-import java.io.File;
-import java.util.Set;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 public class Assignment {
     /* Class Fields */
     private String imageFilePath;               /* Path to the PDF file with the images associated with the assignment */
     private String name;                        /* Name of the Assignment */
-    private Set<Page> pages = new HashSet<>();  /* Set of Page objects for each Assignment */
+    private Collection<Page> pages = new HashSet<>();  /* Set of Page objects for each Assignment */
     private PDDocument image;
     private Student student;
     private Course course;
@@ -20,7 +20,7 @@ public class Assignment {
     public Assignment(
             String imageFilePath,
             String name,
-            Set<Page> pages,
+            Collection<Page> pages,
             Student student
     ) {
         this.imageFilePath = imageFilePath;
@@ -31,7 +31,7 @@ public class Assignment {
 
     public Assignment(
             String name,
-            Set<Page> pages,
+            Collection<Page> pages,
             Student student,
             Course course
     ) {
@@ -82,8 +82,15 @@ public class Assignment {
         this.name = name;
     }
 
-    public Set<Page> getPages() {
+    public Collection<Page> getPages() {
         return pages;
+    }
+
+    /**
+     * Convenience method for if you want a set of pages.
+     */
+    public Set<Page> getPagesSet() {
+        return Sets.newHashSet(pages);
     }
 
     public void setPages(Set<Page> pages) {

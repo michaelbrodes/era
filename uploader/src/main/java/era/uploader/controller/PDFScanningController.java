@@ -1,19 +1,16 @@
 package era.uploader.controller;
 
-<<<<<<< HEAD
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-=======
+import era.uploader.data.CourseDAO;
 import era.uploader.data.PageDAO;
+import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.PageDAOImpl;
->>>>>>> 72f8f1bc7567fc474d707f3fa96e336d9cfccbe0
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.processing.PDFProcessor;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -26,25 +23,13 @@ import java.util.Set;
  */
 public class PDFScanningController {
     private final PageDAO pageDAO = new PageDAOImpl();
-    public void scanPDF(Path pdf, Course course, String assignment) throws IOException {
-<<<<<<< HEAD
-        //System.out.print("Recieved PDFs");
-        List<Assignment> assignments = PDFProcessor.process(pdf, course, assignment);
-=======
-        List<Assignment> assignments = PDFProcessor.process(pageDAO, pdf, course, assignment);
->>>>>>> 72f8f1bc7567fc474d707f3fa96e336d9cfccbe0
+    private final CourseDAO courseDAO = new CourseDAOImpl();
 
+    public Collection<Assignment> scanPDF(Path pdf, Course course, String assignment) throws IOException {
+        return PDFProcessor.process(pageDAO, pdf, course, assignment);
     }
 
     public Set<Course> getAllCourses() {
-        //TODO Method to return all Courses instead of this dummy data
-        return ImmutableSet.of(
-                Course.create()
-                    .withCourseNumber("111")
-                    .withName("John Mills")
-                    .forDepartment("CHEM")
-                    .withSectionNumber("002")
-                    .build()
-        );
+        return courseDAO.getAllCourses();
     }
 }
