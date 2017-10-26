@@ -84,6 +84,8 @@ public class PDFProcessor {
         List<String> pages = TASKalfaConverter.convertFile(pdf);
         PDFProcessor processor = new PDFProcessor(pageDAO, pages, course, assignmentName);
 
+        //TODO at the end of processing add a message to the screen that says that processing was successful
+        
         return processor.startPipeline();
     }
 

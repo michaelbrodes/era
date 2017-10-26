@@ -18,6 +18,8 @@ import java.util.Set;
  * embedded in them, and mapping those UUIDs to placeholder pages in the
  * database. This controller will rely heavily on the
  * {@link era.uploader.processing} package.
+ *
+ *
  */
 public class PDFScanningController {
     private final PageDAO pageDAO = new PageDAOImpl();

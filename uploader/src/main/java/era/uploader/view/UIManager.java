@@ -1,19 +1,12 @@
 package era.uploader.view;
 
 import com.google.common.collect.Multimap;
+import era.uploader.UploaderApp;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-
-import era.uploader.UploaderApp;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
-import javafx.scene.control.TextField;
-import javafx.scene.control.PasswordField;
 import javafx.stage.Stage;
 
 public class UIManager extends Application {
@@ -23,19 +16,21 @@ public class UIManager extends Application {
     private UploadView uploadView;
     private UploaderApp mainWindow;
     private ClassMgmtView classView;
+    private PDFScanView pdfScanView;
     private Stage primaryStage;
     public GridPane root;
     public Scene mainScene;
 
-    public UIManager(Stage pStage) {
+    public UIManager(Scene scene, Stage pStage, GridPane gridPane) {
 
         createView = new QRCreationView(this);
         uploadView = new UploadView(this);
         primaryStage = pStage;
+        mainScene = scene;
 
-        root = new GridPane();
-        mainScene = new Scene(root, 800, 600);
-        primaryStage.setScene(mainScene);
+        root = gridPane;
+        //mainScene = new Scene(root, 800, 600);
+        //primaryStage.setScene(mainScene);
         primaryStage.show();
 
     }
@@ -48,9 +43,7 @@ public class UIManager extends Application {
         return this.primaryStage;
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    public static void main(String[] args) { launch(args); }
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -60,10 +53,10 @@ public class UIManager extends Application {
 
     }
 
-    public void changeToCreateView() {
+    public void changeToCreateView(GridPane gridPane) {
 
         //this is changing to the QRCreationView
-        createView.start(primaryStage);
+        createView.start(primaryStage, gridPane);
         primaryStage.show();
     }
 
@@ -79,6 +72,24 @@ public class UIManager extends Application {
         classView = new ClassMgmtView(this, courseStudentMultimap);
         classView.start(primaryStage, gridPane);
         primaryStage.show();
+    }
+
+    public void changeToUploadPDFView(GridPane gridPane) {
+
+        pdfScanView = new PDFScanView(this, gridPane);
+        pdfScanView.start(primaryStage);
+        primaryStage.show();
+
+    }
+
+    public void changeToHomeView() {
+        mainWindow = new UploaderApp();
+        mainWindow.start(primaryStage);
+        primaryStage.show();
+    }
+
+    public void hidePrimaryStage() {
+        primaryStage.hide();
     }
 
 }

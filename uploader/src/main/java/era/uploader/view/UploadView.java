@@ -23,10 +23,10 @@ public class UploadView extends Application {
         mainStage = uManage.getPrimaryStage();
     }
 
-    public UploadView() {
-        UIManager uManage = new UIManager(mainStage);
-        mainStage = uManage.getPrimaryStage();
-    }
+//    public UploadView() {
+//        UIManager uManage = new UIManager(mainStage);
+//        mainStage = uManage.getPrimaryStage();
+//    }
 
     @Override
     public void start(Stage stage) {
