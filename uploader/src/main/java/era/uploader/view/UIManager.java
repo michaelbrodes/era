@@ -21,11 +21,12 @@ public class UIManager extends Application {
     public GridPane root;
     public Scene mainScene;
 
-    public UIManager(Stage pStage, GridPane gridPane) {
+    public UIManager(Scene scene, Stage pStage, GridPane gridPane) {
 
         createView = new QRCreationView(this);
         uploadView = new UploadView(this);
         primaryStage = pStage;
+        mainScene = scene;
 
         root = gridPane;
         //mainScene = new Scene(root, 800, 600);
@@ -81,10 +82,14 @@ public class UIManager extends Application {
 
     }
 
-    public void changeToHomeView(GridPane gridPane) {
+    public void changeToHomeView() {
         mainWindow = new UploaderApp();
         mainWindow.start(primaryStage);
         primaryStage.show();
+    }
+
+    public void hidePrimaryStage() {
+        primaryStage.hide();
     }
 
 }

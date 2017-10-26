@@ -2,6 +2,7 @@ package era.uploader;
 
 import era.uploader.view.UIManager;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -20,11 +21,11 @@ public class UploaderApp extends Application {
     public Scene mainScene;
 
     @Override
-    public void start(Stage primaryStage) {
-
+    public void start(Stage pStage) {
+        primaryStage = pStage;
         primaryStage = new Stage();
         root = new GridPane();
-        mainScene = new Scene(root, 800, 600);
+        mainScene = new Scene(root, 600, 600);
         primaryStage.setScene(mainScene);
         primaryStage.show();
 
@@ -34,7 +35,7 @@ public class UploaderApp extends Application {
         root.setVgap(10);
         root.setHgap(10);
 
-        UIManager uManage = new UIManager(primaryStage, root);
+        UIManager uManage = new UIManager(mainScene, primaryStage, root);
 
         Button qrCreateButton = new Button("Create Class");
         Button pdfUploadButton = new Button("Scan PDF");
@@ -52,7 +53,7 @@ public class UploaderApp extends Application {
             uManage.changeToCreateView(root);
         });
 
-        pdfUploadButton.setOnAction(event -> {
+        pdfUploadButton.setOnAction((ActionEvent event) -> {
             uManage.changeToUploadPDFView(root);
         });
 

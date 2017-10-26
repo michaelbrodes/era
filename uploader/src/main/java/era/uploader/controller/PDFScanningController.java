@@ -22,6 +22,7 @@ import java.util.Set;
  */
 public class PDFScanningController {
     public void scanPDF(Path pdf, Course course, String assignment) throws IOException {
+        //System.out.print("Recieved PDFs");
         List<Assignment> assignments = PDFProcessor.process(pdf, course, assignment);
 
     }

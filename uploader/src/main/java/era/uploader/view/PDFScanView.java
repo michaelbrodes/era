@@ -7,8 +7,11 @@ import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 import javafx.application.Application;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -46,12 +49,16 @@ public class PDFScanView extends Application {
     @Override
     public void start(Stage stage) {
 
+//        uManage.hidePrimaryStage();
+
+        stage.setWidth(500);
+        stage.setHeight(400);
+
+        mainStage = stage;
+
+        stage.hide();
         //Getting the course, and then the assignment or creating the assignment
-
-        while(!buttonPressed)
-            getCourse();
-
-        getAssignment();
+        getCourse();
 
         //initializing
         final FileChooser fileChooser = new FileChooser();
@@ -87,7 +94,8 @@ public class PDFScanView extends Application {
         });
 
         returnHomeButton.setOnAction(event -> {
-            uManage.changeToHomeView(gridPane);
+            stage.getScene().getWindow().hide();
+            uManage.changeToHomeView();
         });
 
 
@@ -131,10 +139,33 @@ public class PDFScanView extends Application {
     }
 
     public void getCourse(){
-            gridPane.getChildren().clear();
-            Set<Course> courses = pdfCtrl.getAllCourses();
-            gridPane.add(returnHomeButton, 4, 2);
 
+            //Setting up the new window for the additional information required to create assignment
+            Stage secondStage = new Stage();
+            GridPane gridPane2 = new GridPane();
+            secondStage.setScene(new Scene(gridPane2));
+
+            gridPane2.setHgap(20);
+            gridPane2.setVgap(20);
+
+            secondStage.setTitle("Choose Class");
+            secondStage.setX(mainStage.getX() + 200);
+            secondStage.setY(mainStage.getY() + 100);
+            secondStage.setAlwaysOnTop(true);
+
+            //Getting all the courses
+            //TODO HIDE THE PREVIOUS WINDOW. WHY WILL THIS NOT WORK
+            Set<Course> courses = pdfCtrl.getAllCourses();
+
+            //Dynamically will make the window as large as it needs with how many classes there are
+            secondStage.setHeight(courses.size() * 250);
+            secondStage.setWidth(300);
+
+            secondStage.show();
+
+            gridPane2.add(returnHomeButton, 4, 2);
+
+            //Setting up the radio button group
             final ToggleGroup group = new ToggleGroup();
             Button choiceButton = new Button("Select");
 
@@ -142,6 +173,7 @@ public class PDFScanView extends Application {
 
             int count = 0;
 
+            //Iterates through the courses and displays the course names on the Radio button options
             for (Course curr : courses) {
 
                 radioButtons[count] = new RadioButton(curr.getDepartment() + "-"
@@ -150,21 +182,22 @@ public class PDFScanView extends Application {
                 );
                 radioButtons[count].setToggleGroup(group);
 
-                gridPane.add(radioButtons[count], 4,  3 + 2 * count);
+                gridPane2.add(radioButtons[count], 4,  3 + 2 * count);
                 count++;
             }
 
-            gridPane.add(choiceButton, 4, 3 + count);
+            gridPane2.add(choiceButton, 4, 3 + count);
 
-            buttonPressed = false;
+            //buttonPressed = false;
 
 
-
+            //Executes whenever the user has selected a choice and has a radio button selected.
             choiceButton.setOnAction(event -> {
-                buttonPressed = true;
+                //buttonPressed = true;
                 Toggle selectedCourse = group.getSelectedToggle();
                 String courseName = selectedCourse.toString();
-                String[] splitName = courseName.split("-");
+                String[] getCourseName = courseName.split("\\'");
+                String[] splitName = getCourseName[1].split("-");
 
                 for (Course curr : courses) {
                     if (curr.getDepartment().equals(splitName[0]) &&
@@ -173,12 +206,57 @@ public class PDFScanView extends Application {
                         currentCourse = curr;
                     }
                 }
+
+                gridPane2.getChildren().clear();
+
+                getAssignment(secondStage, gridPane2);
             });
         
     }
 
-    public void getAssignment(){
-        gridPane.getChildren().clear();
+    public void getAssignment(Stage secondStage, GridPane gridPane2){
+
+
+        //Resets the size of the Stage for the assignment name prompt text field
+        secondStage.setWidth(500);
+        secondStage.setHeight(400);
+
+        secondStage.setTitle("Assignment Name");
+
+        Label enterLabel = new Label("Enter the Assignment/Test Name");
+        TextField assignmentName = new TextField();
+        Button submitButton = new Button("Submit");
+
+        assignmentName.setPromptText("Name of Assignment");
+
+        gridPane2.add(enterLabel, 2, 2);
+        gridPane2.add(assignmentName, 2, 3);
+        gridPane2.add(submitButton, 3, 3);
+
+
+
+        //This executes once the user has entered in an assignment name
+        submitButton.setOnAction(event -> {
+
+            //This checks to make sure that the text field is not empty
+            if(assignmentName.getText() == null){
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setHeaderText("Not a Valid Assignment Name");
+                errorAlert.setContentText("You must enter a valid Assignment Name.");
+                errorAlert.showAndWait();
+            } else {
+                //Will prep to have the assignment created
+                currentAssignment = assignmentName.getText();
+                secondStage.hide();
+
+                mainStage.show();
+            }
+
+
+
+        });
+
+
     }
 
 }

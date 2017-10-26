@@ -32,7 +32,7 @@ public class PDFProcessor {
 
         List<PDDocument> pages = TASKalfaConverter.convertFile(pdf);
         PDFProcessor processor = new PDFProcessor(pages, course, assignmentName);
-
+        
         return processor.startPipeline();
     }
 
