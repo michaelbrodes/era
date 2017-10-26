@@ -44,7 +44,8 @@ public class MultimapCollector<T,V>
     @Override
     public Set<Characteristics> characteristics() {
         return Sets.immutableEnumSet (
-                Characteristics.UNORDERED
+                Characteristics.UNORDERED,
+                Characteristics.CONCURRENT
         );
     }
 

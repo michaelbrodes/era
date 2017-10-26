@@ -63,6 +63,11 @@ public class MockCourseDAOImpl implements CourseDAO, MockDAO<Course> {
     }
 
     @Override
+    public Set<Course> getAllCourses() {
+        return courses;
+    }
+
+    @Override
     public Set<Course> getDb() {
         return courses;
     }
