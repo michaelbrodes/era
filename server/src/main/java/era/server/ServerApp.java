@@ -2,6 +2,10 @@ package era.server;
 
 import era.server.common.AppConfig;
 import era.server.common.ConfigOpts;
+import era.server.controller.UploadController;
+import era.server.data.database.AssignmentDAO;
+import era.server.data.database.CourseDAO;
+import era.server.data.database.StudentDAO;
 import spark.Spark;
 
 import java.util.Map;
@@ -19,7 +23,17 @@ public class ServerApp {
         AppConfig config = AppConfig.instance();
         config.setConnectionString(host, port, user, password);
 
-        UploadController upc = new UploadController();
+        // startup all the DAOs so we don't have any duplicated connections
+        final StudentDAO studentDAO = new StudentDAO();;
+        final AssignmentDAO assignmentDAO = new AssignmentDAO();
+        final CourseDAO courseDAO = new CourseDAO();
+
+        UploadController upc = new UploadController(
+                courseDAO,
+                assignmentDAO,
+                studentDAO
+        );
+
         Spark.port(3000);
         Spark.get("/hello", (req, res) -> {
             res.status(200);

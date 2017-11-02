@@ -1,4 +1,4 @@
-package era.server;
+package era.server.controller;
 
 import era.server.data.database.AssignmentDAO;
 import era.server.data.database.CourseDAO;
@@ -26,9 +26,19 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.WRITE;
 
 public class UploadController {
-    private final CourseDAO courseDAO = new CourseDAO();
-    private final AssignmentDAO assignmentDAO = new AssignmentDAO();
-    private final StudentDAO studentDAO = new StudentDAO();
+    private final CourseDAO courseDAO;
+    private final AssignmentDAO assignmentDAO;
+    private final StudentDAO studentDAO;
+
+    public UploadController(
+            final CourseDAO courseDAO,
+            final AssignmentDAO assignmentDAO,
+            final StudentDAO studentDAO
+    ) {
+        this.courseDAO = courseDAO;
+        this.assignmentDAO = assignmentDAO;
+        this.studentDAO = studentDAO;
+    }
 
 
     public void handleRequest(Request request, Response response) {
