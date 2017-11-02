@@ -13,7 +13,7 @@ import com.google.zxing.common.HybridBinarizer;
 import era.uploader.controller.QRErrorBus;
 import era.uploader.creation.QRErrorEvent;
 import era.uploader.creation.QRErrorStatus;
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
@@ -38,7 +38,7 @@ class QRScanner {
 
     private static final QRErrorBus BUS = QRErrorBus.instance();
 
-    Page extractQRCodeInformation(String documentName){
+    QRCodeMapping extractQRCodeInformation(String documentName){
         String tmpFinalResult;
         try{
             PDDocument document = PDDocument.load(new File(documentName));
@@ -63,7 +63,7 @@ class QRScanner {
             BUS.fire(new QRErrorEvent(QRErrorStatus.UUID_ERROR));
             return null;
         }
-        return Page.builder()
+        return QRCodeMapping.builder()
                 .withTempDocumentName(documentName)
                 .create(tmpFinalResult);
     }//convertPDFtoBufferedImage

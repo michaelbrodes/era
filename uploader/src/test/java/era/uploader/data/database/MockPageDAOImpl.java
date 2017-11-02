@@ -2,7 +2,8 @@ package era.uploader.data.database;
 
 import com.google.common.collect.Sets;
 import era.uploader.data.PageDAO;
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
+import era.uploader.data.model.Student;
 
 import java.util.Collection;
 import java.util.Set;
@@ -14,25 +15,25 @@ import java.util.Set;
  * {@link PageDAOImpl}</strong>. You should test the that DAO against the
  * real database using a corresponding integration test.
  */
-public class MockPageDAOImpl implements PageDAO, MockDAO<Page> {
-    private final Set<Page> db = Sets.newHashSet();
+public class MockPageDAOImpl implements PageDAO, MockDAO<QRCodeMapping> {
+    private final Set<QRCodeMapping> db = Sets.newHashSet();
 
     @Override
-    public void insert(Page page) {
-        if (!getDb().add(page)) {
-            throw new IllegalArgumentException("Page wasn't unique");
+    public void insert(QRCodeMapping QRCodeMapping) {
+        if (!getDb().add(QRCodeMapping)) {
+            throw new IllegalArgumentException("QRCodeMapping wasn't unique");
         }
     }
 
     @Override
-    public void insertAll(Collection<Page> pages) {
-        for (Page page : pages) {
-            insert(page);
+    public void insertAll(Collection<QRCodeMapping> QRCodeMappings) {
+        for (QRCodeMapping QRCodeMapping : QRCodeMappings) {
+            insert(QRCodeMapping);
         }
     }
 
     @Override
-    public Page read(String uuid) {
+    public QRCodeMapping read(String uuid) {
         return db.stream()
                 .filter(page -> page.getUuid().equals(uuid))
                 .findFirst()
@@ -40,7 +41,9 @@ public class MockPageDAOImpl implements PageDAO, MockDAO<Page> {
     }
 
     @Override
-    public Set<Page> getDb () {
+    public Set<QRCodeMapping> getDb () {
         return db;
     }
+
+
 }

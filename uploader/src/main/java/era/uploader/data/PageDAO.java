@@ -1,11 +1,11 @@
 package era.uploader.data;
 
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
 
 import java.util.Collection;
 
 public interface PageDAO extends DAO {
-    void insert(Page page);
-    void insertAll(Collection<Page> pages);
-    Page read(String uuid);
+    void insert(QRCodeMapping QRCodeMapping);
+    void insertAll(Collection<QRCodeMapping> QRCodeMappings);
+    QRCodeMapping read(String uuid);
 }

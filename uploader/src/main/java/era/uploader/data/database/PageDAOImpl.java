@@ -2,7 +2,7 @@ package era.uploader.data.database;
 
 import com.google.common.collect.Sets;
 import era.uploader.data.PageDAO;
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
 
 import java.util.Collection;
 import java.util.Set;
@@ -11,33 +11,33 @@ import java.util.Set;
  * Provides CRUD functionality for Pages inside a database.
  */
 public class PageDAOImpl implements PageDAO {
-    private final Set<Page> db = Sets.newHashSet();
+    private final Set<QRCodeMapping> db = Sets.newHashSet();
 
     @Override
-    public void insert(Page page) {
-        if (!getDb().add(page)) {
-            throw new IllegalArgumentException("Page wasn't unique");
+    public void insert(QRCodeMapping QRCodeMapping) {
+        if (!getDb().add(QRCodeMapping)) {
+            throw new IllegalArgumentException("QRCodeMapping wasn't unique");
         }
     }
 
     @Override
-    public void insertAll(Collection<Page> pages) {
-        for (Page page : pages) {
-            insert(page);
+    public void insertAll(Collection<QRCodeMapping> QRCodeMappings) {
+        for (QRCodeMapping QRCodeMapping : QRCodeMappings) {
+            insert(QRCodeMapping);
         }
     }
 
     @Override
-    public Page read(String uuid) {
-        for  (Page page: db) {
-            if (page.getUuid().equals(uuid)) {
-                return page;
+    public QRCodeMapping read(String uuid) {
+        for  (QRCodeMapping QRCodeMapping : db) {
+            if (QRCodeMapping.getUuid().equals(uuid)) {
+                return QRCodeMapping;
             }
         }
         return null;
     }
 
-    public Set<Page> getDb () {
+    public Set<QRCodeMapping> getDb () {
         return db;
     }
 }

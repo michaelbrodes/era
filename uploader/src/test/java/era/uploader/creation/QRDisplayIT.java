@@ -8,7 +8,7 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 import org.junit.Test;
 
@@ -37,10 +37,10 @@ public class QRDisplayIT {
         int sequenceNumber = 1;
         QRCreator creator = new QRCreator(robMcGuy, sequenceNumber);
 
-        Page robsPage = creator.call();
+        QRCodeMapping robsQRCodeMapping = creator.call();
 
         try {
-            BitMatrix byteMatrix = robsPage.getQrCode();
+            BitMatrix byteMatrix = robsQRCodeMapping.getQrCode();
             assertTrue(byteMatrix != null);
             MatrixToImageWriter.writeToPath(byteMatrix, "PNG", Paths.get(path));
 
@@ -48,7 +48,7 @@ public class QRDisplayIT {
             System.out.println("Encountered error: " + e);
             assertTrue(false);
         }
-        System.out.println("Hash: " + robsPage.getUuid());
+        System.out.println("Hash: " + robsQRCodeMapping.getUuid());
 
         //Test to find out if stored qr code is the same as the one generated
         InputStream is = new FileInputStream(QRDisplayIT.path);
@@ -64,7 +64,7 @@ public class QRDisplayIT {
 
         tmpFinalResult = String.valueOf(tmpResult.getText());
 
-        assertEquals(robsPage.getUuid(), tmpFinalResult);
+        assertEquals(robsQRCodeMapping.getUuid(), tmpFinalResult);
 
     }
 

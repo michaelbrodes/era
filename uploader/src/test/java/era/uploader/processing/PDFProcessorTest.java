@@ -7,7 +7,7 @@ import era.uploader.data.PageDAO;
 import era.uploader.data.database.MockPageDAOImpl;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.Assert;
@@ -39,13 +39,13 @@ public class PDFProcessorTest {
                 .withUniqueId(1)
                 .withSchoolId("800888888")
                 .create("sarcher");
-        Page dbPage = Page.builder()
+        QRCodeMapping dbQRCodeMapping = QRCodeMapping.builder()
                 .withSequenceNumber(1)
                 .byStudent(student)
                 .create("6ab251a5-6c4e-4688-843f-60aea570c3a6");
         String assignmentName = "Infiltrate the Kremlin";
         PageDAO pageDAO = new MockPageDAOImpl();
-        pageDAO.insert(dbPage);
+        pageDAO.insert(dbQRCodeMapping);
 
         Collection<Assignment> processed = PDFProcessor.process(
                 pageDAO,
@@ -57,7 +57,7 @@ public class PDFProcessorTest {
         Assert.assertTrue(processed.size() == 1);
         Assignment assignment = Iterators.getOnlyElement(processed.iterator());
         Assert.assertEquals(assignmentName, assignment.getName());
-        Assert.assertTrue(assignment.getPages().size() == 5);
+        Assert.assertTrue(assignment.getQRCodeMappings().size() == 5);
     }
 
     @Test
@@ -74,13 +74,13 @@ public class PDFProcessorTest {
                 .withUniqueId(1)
                 .withSchoolId("800888888")
                 .create("lkane");
-        Page dbPage = Page.builder()
+        QRCodeMapping dbQRCodeMapping = QRCodeMapping.builder()
                 .withSequenceNumber(1)
                 .byStudent(student)
                 .create("6ab251a5-6c4e-4688-843f-60aea570c3a6");
         String assignmentName = "Defeat ODIN";
         PageDAO pageDAO = new MockPageDAOImpl();
-        pageDAO.insert(dbPage);
+        pageDAO.insert(dbQRCodeMapping);
 
         Collection<Assignment> processed = PDFProcessor.process(
                 pageDAO,
@@ -92,7 +92,7 @@ public class PDFProcessorTest {
         Assert.assertTrue(processed.size() == 1);
         Assignment assignment = Iterators.getOnlyElement(processed.iterator());
         Assert.assertEquals(assignmentName, assignment.getName());
-        Assert.assertTrue(assignment.getPages().size() == 1);
+        Assert.assertTrue(assignment.getQRCodeMappings().size() == 1);
     }
 
     @Test
@@ -105,11 +105,11 @@ public class PDFProcessorTest {
         test_student.setSchoolId("schoolid");
         PDFProcessor p = new PDFProcessor(new MockPageDAOImpl(), Collections.singletonList(SINGLE_TEST), testCourse, "testAssignment");
         Set<Assignment> test_assignments = new HashSet<>();
-        Page test_page = Page.builder().create("testuuid");
-        Page test_page2 = Page.builder().create("testuuid2");
-        test_page.setDocument(testDoc);
-        test_page2.setDocument(testDoc);
-        Assignment a = new Assignment("src/test/resources/split/tests.pdf", "assignment_name", testCourse, ImmutableSet.of(test_page, test_page2), test_student);
+        QRCodeMapping test_QRCodeMapping = QRCodeMapping.builder().create("testuuid");
+        QRCodeMapping test_QRCodeMapping2 = QRCodeMapping.builder().create("testuuid2");
+        test_QRCodeMapping.setDocument(testDoc);
+        test_QRCodeMapping2.setDocument(testDoc);
+        Assignment a = new Assignment("src/test/resources/split/tests.pdf", "assignment_name", testCourse, ImmutableSet.of(test_QRCodeMapping, test_QRCodeMapping2), test_student);
         test_assignments.add(a);
         p.mergeAssignmentPages(test_assignments);
         Assert.assertTrue(new File("src/test/resources/split/tests.pdf").exists());

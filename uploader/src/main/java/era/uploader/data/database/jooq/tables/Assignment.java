@@ -37,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Assignment extends TableImpl<AssignmentRecord> {
 
-    private static final long serialVersionUID = -694368706;
+    private static final long serialVersionUID = -640066539;
 
     /**
      * The reference instance of <code>assignment</code>
@@ -71,6 +71,11 @@ public class Assignment extends TableImpl<AssignmentRecord> {
      * The column <code>assignment.course_id</code>.
      */
     public final TableField<AssignmentRecord, Integer> COURSE_ID = createField("course_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
+     * The column <code>assignment.student_id</code>.
+     */
+    public final TableField<AssignmentRecord, Integer> STUDENT_ID = createField("student_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * Create a <code>assignment</code> table reference
@@ -130,7 +135,7 @@ public class Assignment extends TableImpl<AssignmentRecord> {
      */
     @Override
     public List<ForeignKey<AssignmentRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<AssignmentRecord, ?>>asList(Keys.FK_ASSIGNMENT_COURSE_1);
+        return Arrays.<ForeignKey<AssignmentRecord, ?>>asList(Keys.FK_ASSIGNMENT_COURSE_1, Keys.FK_ASSIGNMENT_STUDENT_1);
     }
 
     /**

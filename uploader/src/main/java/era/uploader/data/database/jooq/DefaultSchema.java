@@ -7,7 +7,7 @@ package era.uploader.data.database.jooq;
 import era.uploader.data.database.jooq.tables.Assignment;
 import era.uploader.data.database.jooq.tables.Course;
 import era.uploader.data.database.jooq.tables.CourseStudent;
-import era.uploader.data.database.jooq.tables.Page;
+import era.uploader.data.database.jooq.tables.QrCodeMapping;
 import era.uploader.data.database.jooq.tables.SqliteSequence;
 import era.uploader.data.database.jooq.tables.Student;
 
@@ -35,7 +35,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = -705412442;
+    private static final long serialVersionUID = -1919788780;
 
     /**
      * The reference instance of <code></code>
@@ -58,9 +58,9 @@ public class DefaultSchema extends SchemaImpl {
     public final CourseStudent COURSE_STUDENT = era.uploader.data.database.jooq.tables.CourseStudent.COURSE_STUDENT;
 
     /**
-     * The table <code>page</code>.
+     * The table <code>qr_code_mapping</code>.
      */
-    public final Page PAGE = era.uploader.data.database.jooq.tables.Page.PAGE;
+    public final QrCodeMapping QR_CODE_MAPPING = era.uploader.data.database.jooq.tables.QrCodeMapping.QR_CODE_MAPPING;
 
     /**
      * The table <code>sqlite_sequence</code>.
@@ -100,7 +100,7 @@ public class DefaultSchema extends SchemaImpl {
             Assignment.ASSIGNMENT,
             Course.COURSE,
             CourseStudent.COURSE_STUDENT,
-            Page.PAGE,
+            QrCodeMapping.QR_CODE_MAPPING,
             SqliteSequence.SQLITE_SEQUENCE,
             Student.STUDENT);
     }

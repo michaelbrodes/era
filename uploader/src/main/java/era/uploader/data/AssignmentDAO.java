@@ -4,4 +4,5 @@ import era.uploader.data.model.Assignment;
 
 public interface AssignmentDAO extends DAO {
     void storeAssignment(Assignment assignment);
+    Assignment insert(Assignment assignment);
 }

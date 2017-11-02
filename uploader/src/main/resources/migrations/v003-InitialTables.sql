@@ -60,11 +60,11 @@ CREATE TABLE IF NOT EXISTS assignment (
   FOREIGN KEY (course_id) REFERENCES course(unique_id)
 );
 
-CREATE TABLE IF NOT EXISTS page (
+CREATE TABLE IF NOT EXISTS QRCodeMapping (
   -- not null because sqlite data types are dumb
   uuid            TEXT PRIMARY KEY NOT NULL,
   sequence_number INTEGER NULL,
-  -- pages where we just generated a QR code will not be part of an assignment
+  -- QRCodeMappings where we just generated a QR code will not be part of an assignment
   assignment_id   INTEGER NULL,
   student_id      INTEGER NULL,
   FOREIGN KEY (assignment_id) REFERENCES assignment(unique_id),

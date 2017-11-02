@@ -6,7 +6,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import era.uploader.controller.QRErrorBus;
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -18,7 +18,7 @@ import java.util.concurrent.Callable;
  * combination of {@link Student#schoolId} and a unique sequence number.
  */
 @ParametersAreNonnullByDefault
-public class QRCreator implements Callable<Page> {
+public class QRCreator implements Callable<QRCodeMapping> {
     private static final int QR_HEIGHT = 100;
     private static final int QR_WIDTH = 100;
     private static final QRErrorBus BUS = QRErrorBus.instance();
@@ -41,7 +41,7 @@ public class QRCreator implements Callable<Page> {
      *                   the class throw a general exception
      */
     @Override
-    public Page call() throws Exception {
+    public QRCodeMapping call() throws Exception {
         String uuid = UUID.randomUUID().toString();
         MultiFormatWriter writer = new MultiFormatWriter();
         BitMatrix qrCode = null;
@@ -57,7 +57,7 @@ public class QRCreator implements Callable<Page> {
             BUS.fire(new QRErrorEvent(status, student));
         }
 
-        return Page.builder()
+        return QRCodeMapping.builder()
                 .withQRCode(qrCode)
                 .withSequenceNumber(sequenceNumber)
                 .byStudent(student)

@@ -7,7 +7,7 @@ import era.uploader.common.IOUtil;
 import era.uploader.data.database.MockCourseDAOImpl;
 import era.uploader.data.database.MockPageDAOImpl;
 import era.uploader.data.model.Course;
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,17 +43,17 @@ public class QRCreationControllerTest {
         ImmutableSet<Student> students = ImmutableSet.of(robMcGuy);
         QRErrorBus bus = QRErrorBus.instance();
 
-        Multimap<Student, Page> qRs = ctrl.createQRs(students, numberOfAssignments);
-        Collection<Page> values = qRs.values();
+        Multimap<Student, QRCodeMapping> qRs = ctrl.createQRs(students, numberOfAssignments);
+        Collection<QRCodeMapping> values = qRs.values();
 
         assertFalse(values.isEmpty());
         assertTrue(bus.isEmpty());
         assertEquals(2, values.size());
         int i = 0;
-        for (Page page : values) {
-            assertEquals(i, page.getSequenceNumber());
-            assertEquals(robMcGuy, page.getStudent());
-            assertNotNull(page.getQrCode());
+        for (QRCodeMapping QRCodeMapping : values) {
+            assertEquals(i, QRCodeMapping.getSequenceNumber());
+            assertEquals(robMcGuy, QRCodeMapping.getStudent());
+            assertNotNull(QRCodeMapping.getQrCode());
             i++;
         }
     }
@@ -63,7 +63,7 @@ public class QRCreationControllerTest {
         int numberOfAssignments = 2;
         ImmutableSet<Student> students = ImmutableSet.of();
 
-        Multimap<Student, Page> qRs = ctrl.createQRs(students, numberOfAssignments);
+        Multimap<Student, QRCodeMapping> qRs = ctrl.createQRs(students, numberOfAssignments);
 
         assertEquals(0, qRs.size());
     }

@@ -4,6 +4,7 @@ import era.uploader.data.StudentDAO;
 import era.uploader.data.database.jooq.tables.records.StudentRecord;
 import era.uploader.data.model.Student;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -15,16 +16,41 @@ import static era.uploader.data.database.jooq.Tables.STUDENT;
  * database
  */
 public class StudentDAOImpl implements StudentDAO, DatabaseDAO<StudentRecord, Student> {
+    @Deprecated
     private static int sequenceNum = 0; /* Used to make sure each Student gets their own unique id. */
+    @Deprecated
     private Set<Student> students = new HashSet<>(); /* A set of students to act as the database table */
 
     /* Create and Insert a new Student object into the database */
-     public void insert(Student student) {
-        students.add(student);
-        sequenceNum++;
-        student.setUniqueId(sequenceNum);
+    //Currently not in use because we are doing all of the insertions when inserting Courses into the database
+    /* (public void insert(Student student) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            student.setUniqueId(ctx.insertInto(
+                    //table
+                    STUDENT,
+                    //columns
+                    STUDENT.FIRST_NAME,
+                    STUDENT.LAST_NAME,
+                    STUDENT.USERNAME,
+                    STUDENT.SCHOOL_ID,
+                    STUDENT.EMAIL
+                    )
+                    .values(
+                            student.getFirstName(),
+                            student.getLastName(),
+                            student.getUserName(),
+                            student.getSchoolId(),
+                            student.getEmail()
+                    )
+                    .returning(
+                            STUDENT.UNIQUE_ID
+                    )
+                    .fetchOne()
+                    .getUniqueId()
+            );
+        }
      }
-
+*/
     /* Access data from existing Student object from database */
     public Student read(long id) {
         for (Student otherStudent :

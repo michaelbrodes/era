@@ -12,7 +12,7 @@ import javax.annotation.ParametersAreNullableByDefault;
  * unique uuid of the student's schoolId and a sequence number.
  */
 @ParametersAreNullableByDefault
-public class Page {
+public class QRCodeMapping {
     private Student student;
     private int sequenceNumber;
     // transient means that the BitMatrix should not be serialized over rest
@@ -21,15 +21,13 @@ public class Page {
     private String uuid;
     private String tempDocumentName;
     private transient PDDocument document;
-    private Assignment assignment;
 
-    private Page(@Nonnull String uuid, Builder builder) {
+    private QRCodeMapping(@Nonnull String uuid, Builder builder) {
         Preconditions.checkNotNull(uuid);
         this.uuid = uuid;
         this.student = builder.student;
         this.sequenceNumber = builder.sequenceNumber;
         this.qrCode = builder.qrCode;
-        this.assignment = builder.assignment;
         this.document = builder.document;
         this.tempDocumentName = builder.tempDocumentName;
     }
@@ -72,23 +70,14 @@ public class Page {
         this.qrCode = qrCode;
     }
 
-
-    public Assignment getAssignment() {
-        return assignment;
-    }
-
-    public void setAssignment( Assignment assignment) {
-        this.assignment = assignment;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Page)) return false;
+        if (!(o instanceof QRCodeMapping)) return false;
 
-        Page page = (Page) o;
+        QRCodeMapping QRCodeMapping = (QRCodeMapping) o;
 
-        return uuid.equals(page.uuid);
+        return uuid.equals(QRCodeMapping.uuid);
     }
 
     @Override
@@ -112,7 +101,7 @@ public class Page {
      * constructor overloads. You are welcome to write those constructor
      * overloads but I am too lazy for it.
      *
-     * @return a new {@link Page.Builder} used to construct a new Page
+     * @return a new {@link QRCodeMapping.Builder} used to construct a new QRCodeMapping
      */
     public static Builder builder() {
         return new Builder();
@@ -139,7 +128,6 @@ public class Page {
         private Student student;
         private int sequenceNumber;
         private BitMatrix qrCode;
-        private Assignment assignment;
         private PDDocument document;
         private String tempDocumentName;
 
@@ -163,19 +151,14 @@ public class Page {
             return this;
         }
 
-        public Builder forAssignment(Assignment assignment) {
-            this.assignment = assignment;
-            return this;
-        }
-
         public Builder withTempDocumentName(String name) {
             this.tempDocumentName = name;
             return this;
         }
 
-        public Page create(@Nonnull String uuid) {
-            Preconditions.checkNotNull(uuid, "Cannot create a Page without a uuid");
-            return new Page(uuid, this);
+        public QRCodeMapping create(@Nonnull String uuid) {
+            Preconditions.checkNotNull(uuid, "Cannot create a QRCodeMapping without a uuid");
+            return new QRCodeMapping(uuid, this);
         }
     }
 }

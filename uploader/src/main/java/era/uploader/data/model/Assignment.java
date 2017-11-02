@@ -14,10 +14,11 @@ public class Assignment {
     /* Class Fields */
     private String imageFilePath;               /* Path to the PDF file with the images associated with the assignment */
     private String name;                        /* Name of the Assignment */
-    private Collection<Page> pages = new HashSet<>();  /* Set of Page objects for each Assignment */
+    private Collection<QRCodeMapping> QRCodeMappings = new HashSet<>();  /* Set of QRCodeMapping objects for each Assignment */
     private PDDocument image;
     private Student student;
     private Course course;
+    private int uniqueId;
 
     /* Constructors */
 
@@ -28,14 +29,14 @@ public class Assignment {
      * @param imageFilePath the path to the pdf storing this assignment
      * @param name the name of the assignment
      * @param course the course that this assignment belongs to
-     * @param pages the pages that make up this assignment
+     * @param QRCodeMappings the QRCodeMappings that make up this assignment
      * @param student the student who turned this assignment in
      */
     public Assignment(
             @Nonnull String imageFilePath,
             @Nonnull String name,
             @Nonnull Course course,
-            Collection<Page> pages,
+            Collection<QRCodeMapping> QRCodeMappings,
             @Nonnull Student student
     ) {
         Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
@@ -45,7 +46,7 @@ public class Assignment {
 
         this.imageFilePath = imageFilePath;
         this.name = name;
-        this.pages = pages == null ? Sets.newHashSet() : pages;
+        this.QRCodeMappings = QRCodeMappings == null ? Sets.newHashSet() : QRCodeMappings;
         this.student = student;
         this.course = course;
     }
@@ -56,12 +57,12 @@ public class Assignment {
      *
      * @param name the name of the assignment
      * @param course the course that this assignment belongs to
-     * @param pages the pages that make up this assignment
+     * @param QRCodeMappings the QRCodeMappings that make up this assignment
      * @param student the student who turned this assignment in
      */
     public Assignment(
             @Nonnull String name,
-            Collection<Page> pages,
+            Collection<QRCodeMapping> QRCodeMappings,
             @Nonnull Student student,
             @Nonnull Course course
     ) {
@@ -76,7 +77,7 @@ public class Assignment {
                 + IOUtil.removeSpaces(name)
                 + ".pdf";
         this.name = name;
-        this.pages = pages == null ? Sets.newHashSet() : pages;
+        this.QRCodeMappings = QRCodeMappings == null ? Sets.newHashSet() : QRCodeMappings;
         this.student = student;
         this.course = course;
     }
@@ -91,7 +92,7 @@ public class Assignment {
         if (getImageFilePath() != null ? !getImageFilePath().equals(that.getImageFilePath()) : that.getImageFilePath() != null)
             return false;
         if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) return false;
-        if (getPages() != null ? !getPages().equals(that.getPages()) : that.getPages() != null) return false;
+        if (getQRCodeMappings() != null ? !getQRCodeMappings().equals(that.getQRCodeMappings()) : that.getQRCodeMappings() != null) return false;
         return student != null ? student.equals(that.student) : that.student == null;
     }
 
@@ -99,7 +100,7 @@ public class Assignment {
     public int hashCode() {
         int result = getImageFilePath() != null ? getImageFilePath().hashCode() : 0;
         result = 31 * result + (getName() != null ? getName().hashCode() : 0);
-        result = 31 * result + (getPages() != null ? getPages().hashCode() : 0);
+        result = 31 * result + (getQRCodeMappings() != null ? getQRCodeMappings().hashCode() : 0);
         result = 31 * result + (student != null ? student.hashCode() : 0);
         return result;
     }
@@ -126,20 +127,20 @@ public class Assignment {
     }
 
     @Nonnull
-    public Collection<Page> getPages() {
-        return pages;
+    public Collection<QRCodeMapping> getQRCodeMappings() {
+        return QRCodeMappings;
     }
 
     /**
-     * Convenience method for if you want a set of pages.
+     * Convenience method for if you want a set of QRCodeMappings.
      */
     @Nonnull
-    public Set<Page> getPagesSet() {
-        return Sets.newHashSet(pages);
+    public Set<QRCodeMapping> getPagesSet() {
+        return Sets.newHashSet(QRCodeMappings);
     }
 
-    public void setPages(Set<Page> pages) {
-        this.pages = pages == null ? Sets.newHashSet() : pages;
+    public void setQRCodeMappings(Set<QRCodeMapping> QRCodeMappings) {
+        this.QRCodeMappings = QRCodeMappings == null ? Sets.newHashSet() : QRCodeMappings;
     }
 
     @Nonnull
@@ -150,5 +151,13 @@ public class Assignment {
     public void setCourse(@Nonnull Course course) {
         Preconditions.checkNotNull(course, "a null course cannot be stored in the database");
         this.course = course;
+    }
+
+    public int getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(int uniqueId) {
+        this.uniqueId = uniqueId;
     }
 }

@@ -5,7 +5,7 @@ package era.uploader.data.database.jooq;
 
 
 import era.uploader.data.database.jooq.tables.CourseStudent;
-import era.uploader.data.database.jooq.tables.Page;
+import era.uploader.data.database.jooq.tables.QrCodeMapping;
 
 import javax.annotation.Generated;
 
@@ -32,7 +32,7 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     public static final Index SQLITE_AUTOINDEX_COURSE_STUDENT_1 = Indexes0.SQLITE_AUTOINDEX_COURSE_STUDENT_1;
-    public static final Index SQLITE_AUTOINDEX_PAGE_1 = Indexes0.SQLITE_AUTOINDEX_PAGE_1;
+    public static final Index SQLITE_AUTOINDEX_QR_CODE_MAPPING_1 = Indexes0.SQLITE_AUTOINDEX_QR_CODE_MAPPING_1;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
@@ -40,6 +40,6 @@ public class Indexes {
 
     private static class Indexes0 extends AbstractKeys {
         public static Index SQLITE_AUTOINDEX_COURSE_STUDENT_1 = createIndex("sqlite_autoindex_course_student_1", CourseStudent.COURSE_STUDENT, new OrderField[] { CourseStudent.COURSE_STUDENT.COURSE_ID, CourseStudent.COURSE_STUDENT.STUDENT_ID }, true);
-        public static Index SQLITE_AUTOINDEX_PAGE_1 = createIndex("sqlite_autoindex_page_1", Page.PAGE, new OrderField[] { Page.PAGE.UUID }, true);
+        public static Index SQLITE_AUTOINDEX_QR_CODE_MAPPING_1 = createIndex("sqlite_autoindex_qr_code_mapping_1", QrCodeMapping.QR_CODE_MAPPING, new OrderField[] { QrCodeMapping.QR_CODE_MAPPING.UUID }, true);
     }
 }

@@ -53,7 +53,11 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
                        course.getName(),
                        course.getSemester()
                )
-               .execute());
+                    .returning(
+                            COURSE.UNIQUE_ID
+                    )
+               .fetchOne().getUniqueId()
+            );
 
             for (Student student : course.getStudentsEnrolled()) {
                 student.setUniqueId(ctx.insertInto (
@@ -73,7 +77,10 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
                            student.getSchoolId(),
                            student.getEmail()
                    )
-                   .execute());
+                        .returning(
+                                STUDENT.UNIQUE_ID
+                        )
+                   .fetchOne().getUniqueId());
 
                 ctx.insertInto(
                         // table
@@ -86,7 +93,7 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
                            course.getUniqueId(),
                            student.getUniqueId()
                    )
-                   .executeAsync();
+                   .execute();
             }
 
             for (Assignment assignment : course.getAssignments()) {
@@ -102,7 +109,7 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
                         assignment.getName(),
                         assignment.getImageFilePath()
                    )
-                   .executeAsync();
+                   .execute();
             }
         }
 
@@ -120,6 +127,7 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
                 student.getCourses().add(course);
             }
         }
+
         courses.addAll(coursesToStudents.keys());
     }
 

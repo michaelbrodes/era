@@ -7,7 +7,7 @@ package era.uploader.data.database.jooq;
 import era.uploader.data.database.jooq.tables.Assignment;
 import era.uploader.data.database.jooq.tables.Course;
 import era.uploader.data.database.jooq.tables.CourseStudent;
-import era.uploader.data.database.jooq.tables.Page;
+import era.uploader.data.database.jooq.tables.QrCodeMapping;
 import era.uploader.data.database.jooq.tables.SqliteSequence;
 import era.uploader.data.database.jooq.tables.Student;
 
@@ -43,9 +43,9 @@ public class Tables {
     public static final CourseStudent COURSE_STUDENT = era.uploader.data.database.jooq.tables.CourseStudent.COURSE_STUDENT;
 
     /**
-     * The table <code>page</code>.
+     * The table <code>qr_code_mapping</code>.
      */
-    public static final Page PAGE = era.uploader.data.database.jooq.tables.Page.PAGE;
+    public static final QrCodeMapping QR_CODE_MAPPING = era.uploader.data.database.jooq.tables.QrCodeMapping.QR_CODE_MAPPING;
 
     /**
      * The table <code>sqlite_sequence</code>.
