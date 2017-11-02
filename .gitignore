@@ -140,4 +140,4 @@ uploader/src/test/resources/test-pdfs
 
 # database files for server
 server/docker/db
-
+server/docker/.env
