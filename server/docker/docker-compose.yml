@@ -1,0 +1,18 @@
+# This compose file is meant to set up the environment to run the
+# Electronically Returned Assignments Server.
+version: "3"
+services:
+  era-db:
+    image: mariadb
+    container_name: era-db
+    restart: unless-stopped
+    ports:
+        # 3000 is the port of the main application during development so we
+        # chose 3001 so we can develop while running the database
+      - 3001:3306
+    environment:
+      # IMPORTANT: change .env when deployed
+      MYSQL_ROOT_PASSWORD: "${ROOT_PASS}"
+      MYSQL_DATABASE: "era"
+    volumes:
+      - ./db/:/var/lib/mysql

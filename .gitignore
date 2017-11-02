@@ -135,3 +135,9 @@ server/modules
 .DS_Store
 *.db
 uploader/src/test/resources/split
+# got to stop committing this files! 
+uploader/src/test/resources/test-pdfs
+
+# database files for server
+server/docker/db
+
