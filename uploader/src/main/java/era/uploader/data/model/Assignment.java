@@ -203,11 +203,4 @@ public class Assignment {
         this.uniqueId = uniqueId;
     }
 
-    public Student getStudent() {
-        return student;
-    }
-
-    public void setStudent(Student student) {
-        this.student = student;
-    }
 }
