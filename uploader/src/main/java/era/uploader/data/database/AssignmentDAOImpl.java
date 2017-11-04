@@ -4,6 +4,7 @@ package era.uploader.data.database;
 import com.google.common.collect.Sets;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.database.jooq.tables.records.AssignmentRecord;
+import era.uploader.data.database.jooq.tables.records.CourseRecord;
 import era.uploader.data.model.Assignment;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -47,5 +48,30 @@ public class AssignmentDAOImpl implements AssignmentDAO {
         }
 
         return assignment;
+    }
+
+    @Override
+    public Assignment read(long id) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            AssignmentRecord assignmentRecord = ctx.selectFrom(ASSIGNMENT)
+                    .where(ASSIGNMENT.UNIQUE_ID.eq((int) id))
+                    .fetchOne();
+
+            return convertToModel(assignmentRecord);
+        }
+    }
+
+    /* Modify data stored in already existing Course in database */
+    @Override
+    public void update(Assignment changedAssignment) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            ctx.update(ASSIGNMENT)
+                    .set(ASSIGNMENT.COURSE_ID, changedAssignment.getCourse().getUniqueId())
+                    .set(ASSIGNMENT.IMAGE_FILE_PATH, changedAssignment.getImageFilePath())
+                    .set(ASSIGNMENT.NAME, changedAssignment.getName())
+                    .set(ASSIGNMENT.STUDENT_ID, changedAssignment.getStudent_id())
+                    .where(ASSIGNMENT.UNIQUE_ID.eq(changedAssignment.getUniqueId()))
+                    .execute();
+        }
     }
 }

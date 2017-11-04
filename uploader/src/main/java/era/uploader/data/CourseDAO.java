@@ -14,8 +14,8 @@ public interface CourseDAO extends DAO {
     Course insert(Course course);                               /* Create new course object */
     void insertCourseAndStudents(Multimap<Course, Student> coursesToStudents);
     Course read(long id);                               /* Access data from course object */
-    void update(Course courseToChange, Course courseChanged); /* Change data from existing course object */
-    void delete(Course course);                               /* Delete existing course object */
+    void update(Course changedCourse); /* Change data from existing course object */
+    void delete(long id);                               /* Delete existing course object */
 
     Set<Course> getAllCourses();
 }

@@ -10,7 +10,9 @@ import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Grader;
 import era.uploader.data.model.Student;
+import jdk.nashorn.internal.runtime.regexp.JoniRegExp;
 import org.jooq.DSLContext;
+import org.jooq.Record6;
 import org.jooq.impl.DSL;
 
 import java.util.Collection;
@@ -22,7 +24,6 @@ import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
 import static era.uploader.data.database.jooq.Tables.COURSE;
 import static era.uploader.data.database.jooq.Tables.COURSE_STUDENT;
 import static era.uploader.data.database.jooq.Tables.STUDENT;
-
 /**
  * Provides CRUD functionality for {@link Course} objects stored in the
  * database. A course has many {@link Student}s and many {@link Grader}s.
@@ -134,26 +135,39 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
     /* Access data from existing Course object from database */
     @Override
     public Course read(long id) {
-        for (Course otherCourse :
-                courses) {
-            if (otherCourse.getUniqueId() == id) {
-                return otherCourse;
-            }
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            CourseRecord courseRecord = ctx.selectFrom(COURSE)
+                    .where(COURSE.UNIQUE_ID.eq((int) id))
+                    .fetchOne();
+
+            return convertToModel(courseRecord);
         }
-        return null;
     }
 
     /* Modify data stored in already existing Course in database */
     @Override
-    public void update(Course courseToChange, Course courseChanged) {
-        courses.remove(courseToChange);
-        courses.add(courseChanged);
+    public void update(Course changedCourse) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            ctx.update(COURSE)
+            .set(COURSE.COURSE_NUMBER, changedCourse.getCourseNumber())
+            .set(COURSE.DEPARTMENT, changedCourse.getDepartment())
+            .set(COURSE.NAME, changedCourse.getName())
+            .set(COURSE.SECTION_NUMBER, changedCourse.getSectionNumber())
+            .set(COURSE.SEMESTER, changedCourse.getSemester())
+            .where(COURSE.UNIQUE_ID.eq(changedCourse.getUniqueId()))
+            .execute();
+        }
     }
 
     /* Delete existing Course object in database */
     @Override
-    public void delete(Course course) {
-        courses.remove(course);
+    public void delete(long id) {
+        try(DSLContext ctx = DSL.using(CONNECTION_STR)){
+            ctx.deleteFrom(COURSE)
+            .where(COURSE.UNIQUE_ID.eq((int)id))
+            .execute();
+        }
+
     }
 
     @Override

@@ -1,6 +1,7 @@
 package era.uploader.data.database;
 
 import era.uploader.data.StudentDAO;
+import era.uploader.data.database.jooq.tables.records.CourseRecord;
 import era.uploader.data.database.jooq.tables.records.StudentRecord;
 import era.uploader.data.model.Student;
 import org.jooq.DSLContext;
@@ -40,7 +41,7 @@ public class StudentDAOImpl implements StudentDAO, DatabaseDAO<StudentRecord, St
                             student.getLastName(),
                             student.getUserName(),
                             student.getSchoolId(),
-                            student.getEmail()
+                           student.getEmail()
                     )
                     .returning(
                             STUDENT.UNIQUE_ID
@@ -53,24 +54,37 @@ public class StudentDAOImpl implements StudentDAO, DatabaseDAO<StudentRecord, St
 */
     /* Access data from existing Student object from database */
     public Student read(long id) {
-        for (Student otherStudent :
-                students) {
-            if (otherStudent.getUniqueId() == id) {
-                return otherStudent;
-            }
-       }
-       return null;
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            StudentRecord studentRecord = ctx.selectFrom(STUDENT)
+                    .where(STUDENT.UNIQUE_ID.eq((int)id))
+                    .fetchOne();
+
+            return convertToModel(studentRecord);
+        }
     }
 
     /* Modify data stored in already existing Student in database */
-    public void update(Student studentToChange, Student studentChanged) {
-        students.remove(studentToChange);
-        students.add(studentChanged);
+    public void update(Student changedStudent) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            ctx.update(STUDENT)
+                    .set(STUDENT.FIRST_NAME, changedStudent.getFirstName())
+                    .set(STUDENT.LAST_NAME, changedStudent.getLastName())
+                    .set(STUDENT.EMAIL, changedStudent.getEmail())
+                    .set(STUDENT.SCHOOL_ID, changedStudent.getSchoolId())
+                    .set(STUDENT.USERNAME, changedStudent.getUserName())
+                    .where(STUDENT.UNIQUE_ID.eq(changedStudent.getUniqueId()))
+                    .execute();
+        }
     }
 
     /* Delete existing Student object in database */
-    public void delete(Student student) {
-        students.remove(student);
+    public void delete(long id) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            ctx.deleteFrom(STUDENT)
+                    .where(STUDENT.UNIQUE_ID.eq((int)id))
+                    .execute();
+        }
+
     }
 
     @Override
