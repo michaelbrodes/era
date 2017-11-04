@@ -7,8 +7,8 @@ import era.uploader.common.MultimapCollector;
 import era.uploader.creation.QRErrorBus;
 import era.uploader.creation.QRErrorEvent;
 import era.uploader.creation.QRErrorStatus;
+import era.uploader.data.AssignmentDAO;
 import era.uploader.data.PageDAO;
-import era.uploader.data.database.AssignmentDAOImpl;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
@@ -36,14 +36,17 @@ public class PDFProcessor {
     private final Course course;
     private final String assignmentName;
     private final PageDAO pageDAO;
+    private final AssignmentDAO assignmentDAO;
 
     PDFProcessor(
             PageDAO pageDao,
+            AssignmentDAO assignmentDAO,
             List<String> pages,
             Course course,
             String assignmentName
     ) {
         this.pages = pages;
+        this.assignmentDAO = assignmentDAO;
         this.course = course;
         this.assignmentName = assignmentName;
         this.pageDAO = pageDao;
@@ -72,6 +75,7 @@ public class PDFProcessor {
      */
     public static Collection<Assignment> process(
             PageDAO pageDAO,
+            AssignmentDAO assignmentDAO,
             Path pdf,
             Course course,
             String assignmentName
@@ -82,7 +86,7 @@ public class PDFProcessor {
         Preconditions.checkNotNull(pageDAO);
 
         List<String> pages = TASKalfaConverter.convertFile(pdf);
-        PDFProcessor processor = new PDFProcessor(pageDAO, pages, course, assignmentName);
+        PDFProcessor processor = new PDFProcessor(pageDAO, assignmentDAO, pages, course, assignmentName);
 
         return processor.startPipeline();
     }
@@ -160,7 +164,6 @@ public class PDFProcessor {
      */
     public void mergeAssignmentPages(Set<Assignment> assignments) {
         PDFMergerUtility merger = new PDFMergerUtility();
-        AssignmentDAOImpl assignmentDAO = new AssignmentDAOImpl();
         for (Assignment a : assignments
              ) {
             PDDocument allPages = new PDDocument();

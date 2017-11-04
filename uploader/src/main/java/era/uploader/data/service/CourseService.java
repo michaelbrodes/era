@@ -27,12 +27,12 @@ public class CourseService implements CourseDAO {
     }
 
     @Override
-    public void update(Course courseToChange, Course courseChanged) {
+    public void update(Course changedCourse) {
 
     }
 
     @Override
-    public void delete(Course course) {
+    public void delete(long id) {
 
     }
 

@@ -52,16 +52,16 @@ public class MockCourseDAOImpl implements CourseDAO, MockDAO<Course> {
         return null;
     }
 
-    /* Modify data stored in already existing Course in database */
     @Override
-    public void update(Course courseToChange, Course courseChanged) {
-        courses.remove(courseToChange);
-        courses.add(courseChanged);
+    public void update(Course changedCourse) {
+        Course prevCourse = read(changedCourse.getUniqueId());
+        courses.remove(changedCourse);
+        courses.add(changedCourse);
     }
 
-    /* Delete existing Course object in database */
     @Override
-    public void delete(Course course) {
+    public void delete(long id) {
+        Course course = read(id);
         courses.remove(course);
     }
 

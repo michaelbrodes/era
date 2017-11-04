@@ -1,14 +1,15 @@
 package era.uploader.data.database;
 
 
-import com.google.common.collect.Sets;
 import era.uploader.data.AssignmentDAO;
+import era.uploader.data.CourseDAO;
+import era.uploader.data.StudentDAO;
 import era.uploader.data.database.jooq.tables.records.AssignmentRecord;
-import era.uploader.data.database.jooq.tables.records.CourseRecord;
 import era.uploader.data.model.Assignment;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,8 +19,14 @@ import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
  * Provides CRUD functionality for Assignments inside a database.
  */
 public class AssignmentDAOImpl implements AssignmentDAO {
+    private final CourseDAO courseDAO;
     private final Set<Assignment> db = new HashSet<>();
+    private final StudentDAO studentDAO;
 
+    public AssignmentDAOImpl(StudentDAO studentDAO, CourseDAO courseDAO) {
+        this.courseDAO = courseDAO;
+        this.studentDAO = studentDAO;
+    }
     public void storeAssignment(Assignment assignment) {
         db.add(assignment);
     }
@@ -69,9 +76,19 @@ public class AssignmentDAOImpl implements AssignmentDAO {
                     .set(ASSIGNMENT.COURSE_ID, changedAssignment.getCourse().getUniqueId())
                     .set(ASSIGNMENT.IMAGE_FILE_PATH, changedAssignment.getImageFilePath())
                     .set(ASSIGNMENT.NAME, changedAssignment.getName())
-                    .set(ASSIGNMENT.STUDENT_ID, changedAssignment.getStudent_id())
+                    .set(ASSIGNMENT.STUDENT_ID, changedAssignment.getStudent().getUniqueId())
                     .where(ASSIGNMENT.UNIQUE_ID.eq(changedAssignment.getUniqueId()))
                     .execute();
         }
+    }
+
+    public Assignment convertToModel(AssignmentRecord record) {
+        return new Assignment(
+                record.getImageFilePath(),
+                record.getName(),
+                courseDAO.read(record.getCourseId()),
+                Collections.emptyList(),
+                studentDAO.read(record.getStudentId())
+        );
     }
 }

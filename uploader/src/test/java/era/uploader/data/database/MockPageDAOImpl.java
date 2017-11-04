@@ -3,7 +3,6 @@ package era.uploader.data.database;
 import com.google.common.collect.Sets;
 import era.uploader.data.PageDAO;
 import era.uploader.data.model.QRCodeMapping;
-import era.uploader.data.model.Student;
 
 import java.util.Collection;
 import java.util.Set;
@@ -30,6 +29,13 @@ public class MockPageDAOImpl implements PageDAO, MockDAO<QRCodeMapping> {
         for (QRCodeMapping QRCodeMapping : QRCodeMappings) {
             insert(QRCodeMapping);
         }
+    }
+
+    @Override
+    public void update(QRCodeMapping changedQRCodeMapping) {
+        QRCodeMapping prevQRMapping = read(changedQRCodeMapping.getUuid());
+        db.remove(prevQRMapping);
+        db.add(changedQRCodeMapping);
     }
 
     @Override
