@@ -169,4 +169,5 @@ public class QrCodeMapping extends TableImpl<QrCodeMappingRecord> {
     public QrCodeMapping rename(Name name) {
         return new QrCodeMapping(name, null);
     }
+
 }

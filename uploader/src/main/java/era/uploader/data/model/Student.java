@@ -62,6 +62,21 @@ public class Student {
         this.courses = courses == null ? Sets.newHashSet() : courses;
     }
 
+    public Student(
+            String firstName,
+            String lastName,
+            String schoolId,
+            @Nonnull String userName,
+            int uniqueId
+    ) {
+        Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.schoolId = schoolId;
+        this.userName = userName;
+        this.uniqueId = uniqueId;
+    }
+
     @Deprecated
     public Student(Builder builder) {
         this.courses = builder.courses;
