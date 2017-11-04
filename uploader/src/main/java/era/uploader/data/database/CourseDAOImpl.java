@@ -98,6 +98,7 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
             }
 
             for (Assignment assignment : course.getAssignments()) {
+                //TODO: Ask michael why we arent setting the 'Assignment' uniqueId here
                 ctx.insertInto (
                         // table
                         ASSIGNMENT,

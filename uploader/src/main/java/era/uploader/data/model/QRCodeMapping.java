@@ -2,6 +2,7 @@ package era.uploader.data.model;
 
 import com.google.common.base.Preconditions;
 import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.encoder.QRCode;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import javax.annotation.Nonnull;
@@ -30,6 +31,11 @@ public class QRCodeMapping {
         this.qrCode = builder.qrCode;
         this.document = builder.document;
         this.tempDocumentName = builder.tempDocumentName;
+    }
+
+    public QRCodeMapping(String uuid, int sequenceNumber) {
+        this.uuid = uuid;
+        this.sequenceNumber = sequenceNumber;
     }
 
     public Student getStudent() {

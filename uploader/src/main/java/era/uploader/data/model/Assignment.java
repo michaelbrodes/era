@@ -18,10 +18,14 @@ public class Assignment {
     private PDDocument image;
     private Student student;
     private Course course;
+    private int course_id;
+    private int student_id;
     private int uniqueId;
 
     /* Constructors */
+    public Assignment() {
 
+    }
     /**
      * Creates a new Assignment object. All Nonnull arguments are required
      * arguments and match "NOT NULL" columns in the database.
@@ -82,6 +86,20 @@ public class Assignment {
         this.course = course;
     }
 
+    public Assignment(
+            String imageFilePath,
+            String name,
+            int course_id,
+            int student_id,
+            int uniqueId
+    ) {
+        this.imageFilePath = imageFilePath;
+        this.name = name;
+        this.course_id = course_id;
+        this.student_id = student_id;
+        this.uniqueId = uniqueId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -134,6 +152,22 @@ public class Assignment {
         this.name = name;
     }
 
+    public int getCourse_id() {
+        return course_id;
+    }
+
+    public void setCourse_id(int course_id) {
+        this.course_id = course_id;
+    }
+
+    public int getStudent_id() {
+        return student_id;
+    }
+
+    public void setStudent_id(int student_id) {
+        this.student_id = student_id;
+    }
+
     @Nonnull
     public Collection<QRCodeMapping> getQRCodeMappings() {
         return QRCodeMappings;
@@ -167,5 +201,13 @@ public class Assignment {
 
     public void setUniqueId(int uniqueId) {
         this.uniqueId = uniqueId;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 }
