@@ -7,7 +7,7 @@ import era.uploader.data.model.Student;
  * database.
  */
 public interface StudentDAO extends DAO {
-    //void insert(Student student);                       /* Create new student object */
+    void insert(Student student);                       /* Create new student object */
     Student read(long student);                           /* Access data from student object */
     void update(Student changedStudent);                  /* Change data from existing student object */
     void delete(long id);                                 /* Delete existing student object */

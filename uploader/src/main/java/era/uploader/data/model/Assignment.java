@@ -123,13 +123,7 @@ public class Assignment {
         return result;
     }
 
-    public Student getStudent() {
-        return student;
-    }
 
-    public void setStudent(Student student) {
-        this.student = student;
-    }
 
     /* Getters and Setters */
     @Nonnull

@@ -23,12 +23,12 @@ public class MockStudentDAOImpl implements MockDAO<Student>, StudentDAO {
     }
 
     /* Create and Insert a new Student object into the database */
-    /*@Override
+    @Override
     public void insert(Student student) {
         students.add(student);
         sequenceNum++;
         student.setUniqueId(sequenceNum);
-    }*/
+    }
 
     /* Access data from existing Student object from database */
     @Override

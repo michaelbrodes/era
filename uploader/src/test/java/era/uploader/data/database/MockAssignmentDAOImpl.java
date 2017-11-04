@@ -3,8 +3,12 @@ package era.uploader.data.database;
 import com.google.common.collect.Sets;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.model.Assignment;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import java.util.Set;
+
+import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
 
 public class MockAssignmentDAOImpl implements AssignmentDAO{
     Set<Assignment> db = Sets.newHashSet();
@@ -38,5 +42,14 @@ public class MockAssignmentDAOImpl implements AssignmentDAO{
         Assignment prevAssignment = read(changedAssignment.getUniqueId());
         db.remove(prevAssignment);
         db.add(changedAssignment);
+    }
+
+    @Override
+    public void delete(Assignment assignment) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            ctx.deleteFrom(ASSIGNMENT)
+                    .where(ASSIGNMENT.UNIQUE_ID.eq(assignment.getUniqueId()))
+                    .execute();
+        }
     }
 }
