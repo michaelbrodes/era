@@ -24,8 +24,8 @@ public class QRErrorBusTest {
         Student timmy = Student.builder()
                 .withFirstName("timmy")
                 .withLastName("dude")
-                .withSchoolId("tdude")
-                .create();
+                .withSchoolId("800999999")
+                .create("tdude");
 
         QRErrorEvent generation = new QRErrorEvent(QRErrorStatus.GENERATION_ERROR, timmy);
         QRErrorEvent timeout = new QRErrorEvent(QRErrorStatus.TIMEOUT_ERROR);

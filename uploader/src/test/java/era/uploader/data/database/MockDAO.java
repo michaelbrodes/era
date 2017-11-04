@@ -1,5 +1,7 @@
 package era.uploader.data.database;
 
+import era.uploader.data.model.Student;
+
 import java.util.Set;
 
 /**

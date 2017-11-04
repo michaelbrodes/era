@@ -19,4 +19,8 @@ public class IOUtil {
     public static String convertToLocal(String path) {
         return path.replace("\\|/", Matcher.quoteReplacement(File.separator));
     }
+
+    public static String removeSpaces(String path) {
+        return path.replace("\\s", "-");
+    }
 }

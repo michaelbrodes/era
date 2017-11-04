@@ -42,16 +42,16 @@ public class MockStudentDAOImpl implements MockDAO<Student>, StudentDAO {
         return null;
     }
 
-    /* Modify data stored in already existing Student in database */
     @Override
-    public void update(Student studentToChange, Student studentChanged) {
-        students.remove(studentToChange);
-        students.add(studentChanged);
+    public void update(Student changedStudent) {
+        Student prevStudent = read(changedStudent.getUniqueId());
+        getDb().remove(prevStudent);
+        getDb().add(changedStudent);
     }
 
-    /* Delete existing Student object in database */
     @Override
-    public void delete(Student student) {
-        students.remove(student);
+    public void delete(long id) {
+        Student student = read(id);
+        getDb().remove(student);
     }
 }

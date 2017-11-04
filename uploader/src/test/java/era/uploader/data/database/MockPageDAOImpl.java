@@ -2,10 +2,14 @@ package era.uploader.data.database;
 
 import com.google.common.collect.Sets;
 import era.uploader.data.PageDAO;
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import java.util.Collection;
 import java.util.Set;
+
+import static era.uploader.data.database.jooq.Tables.QR_CODE_MAPPING;
 
 /**
  * This class is mock of {@link PageDAOImpl} to make unit testing methods
@@ -14,33 +18,50 @@ import java.util.Set;
  * {@link PageDAOImpl}</strong>. You should test the that DAO against the
  * real database using a corresponding integration test.
  */
-public class MockPageDAOImpl implements PageDAO, MockDAO<Page> {
-    private final Set<Page> db = Sets.newHashSet();
+public class MockPageDAOImpl implements PageDAO, MockDAO<QRCodeMapping> {
+    private final Set<QRCodeMapping> db = Sets.newHashSet();
 
     @Override
-    public void insert(Page page) {
-        if (!getDb().add(page)) {
-            throw new IllegalArgumentException("Page wasn't unique");
+    public void insert(QRCodeMapping QRCodeMapping) {
+        if (!getDb().add(QRCodeMapping)) {
+            throw new IllegalArgumentException("QRCodeMapping wasn't unique");
         }
     }
 
     @Override
-    public void insertAll(Collection<Page> pages) {
-        for (Page page : pages) {
-            insert(page);
+    public void insertAll(Collection<QRCodeMapping> QRCodeMappings) {
+        for (QRCodeMapping QRCodeMapping : QRCodeMappings) {
+            insert(QRCodeMapping);
         }
     }
 
     @Override
-    public Page read(String uuid) {
+    public void update(QRCodeMapping changedQRCodeMapping) {
+        QRCodeMapping prevQRMapping = read(changedQRCodeMapping.getUuid());
+        db.remove(prevQRMapping);
+        db.add(changedQRCodeMapping);
+    }
+
+    @Override
+    public QRCodeMapping read(String uuid) {
         return db.stream()
                 .filter(page -> page.getUuid().equals(uuid))
                 .findFirst()
                 .orElse(null);
     }
 
+    public void delete(String uuid) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            ctx.deleteFrom(QR_CODE_MAPPING)
+                    .where(QR_CODE_MAPPING.UUID.eq(uuid))
+                    .execute();
+        }
+    }
+
     @Override
-    public Set<Page> getDb () {
+    public Set<QRCodeMapping> getDb () {
         return db;
     }
+
+
 }

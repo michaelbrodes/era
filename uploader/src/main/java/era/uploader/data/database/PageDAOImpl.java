@@ -1,43 +1,109 @@
 package era.uploader.data.database;
 
 import com.google.common.collect.Sets;
+import com.google.zxing.qrcode.encoder.QRCode;
 import era.uploader.data.PageDAO;
-import era.uploader.data.model.Page;
+import era.uploader.data.database.jooq.tables.records.QrCodeMappingRecord;
+import era.uploader.data.model.QRCodeMapping;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import java.util.Collection;
 import java.util.Set;
 
+import static era.uploader.data.database.jooq.Tables.QR_CODE_MAPPING;
+
+
+
 /**
  * Provides CRUD functionality for Pages inside a database.
  */
-public class PageDAOImpl implements PageDAO {
-    private final Set<Page> db = Sets.newHashSet();
+public class PageDAOImpl implements PageDAO, DatabaseDAO<QrCodeMappingRecord, QRCodeMapping> {
+    private final Set<QRCodeMapping> db = Sets.newHashSet();
 
     @Override
-    public void insert(Page page) {
-        if (!getDb().add(page)) {
-            throw new IllegalArgumentException("Page wasn't unique");
+    public void insert(QRCodeMapping QRCodeMapping) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            QRCodeMapping.setUuid(ctx.insertInto(
+                    //table
+                    QR_CODE_MAPPING,
+                    //columns
+                    QR_CODE_MAPPING.SEQUENCE_NUMBER,
+                    QR_CODE_MAPPING.STUDENT_ID
+            )
+            .values(
+                    QRCodeMapping.getSequenceNumber(),
+                    QRCodeMapping.getStudent().getUniqueId()
+            )
+            .returning (
+                    QR_CODE_MAPPING.UUID
+            )
+            .fetchOne()
+            .getUuid()
+            );
         }
     }
 
     @Override
-    public void insertAll(Collection<Page> pages) {
-        for (Page page : pages) {
-            insert(page);
+    public void insertAll(Collection<QRCodeMapping> QRCodeMappings) {
+        for (QRCodeMapping QRCodeMapping : QRCodeMappings) {
+            insert(QRCodeMapping);
         }
     }
 
     @Override
-    public Page read(String uuid) {
-        for  (Page page: db) {
-            if (page.getUuid().equals(uuid)) {
-                return page;
+    public QRCodeMapping read(String uuid) {
+        for  (QRCodeMapping QRCodeMapping : db) {
+            if (QRCodeMapping.getUuid().equals(uuid)) {
+                return QRCodeMapping;
             }
         }
         return null;
     }
 
-    public Set<Page> getDb () {
+    /* Modify data stored in already existing QR_CODE_MAPPING in database */
+    public void update(QRCodeMapping changedQRCodeMapping) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            ctx.update(QR_CODE_MAPPING)
+                    .set(QR_CODE_MAPPING.SEQUENCE_NUMBER, changedQRCodeMapping.getSequenceNumber())
+                    .set(QR_CODE_MAPPING.STUDENT_ID, changedQRCodeMapping.getStudent().getUniqueId())
+                    .set(QR_CODE_MAPPING.UUID, changedQRCodeMapping.getUuid())
+                    .execute();
+        }
+    }
+
+    public void delete(String uuid) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            ctx.deleteFrom(QR_CODE_MAPPING)
+                    .where(QR_CODE_MAPPING.UUID.eq(uuid))
+                    .execute();
+        }
+    }
+    public Set<QRCodeMapping> getDb () {
         return db;
     }
+
+    @Override
+    public QRCodeMapping convertToModel(QrCodeMappingRecord record) {
+        QRCodeMapping newQRCodeMapping = new QRCodeMapping(
+                record.getUuid(),
+                record.getSequenceNumber()
+        );
+        return newQRCodeMapping;
+    }
+
+    @Override
+    public QrCodeMappingRecord convertToRecord(QRCodeMapping model, DSLContext ctx) {
+        QrCodeMappingRecord qrCodeMapping = ctx.newRecord(QR_CODE_MAPPING);
+        qrCodeMapping.setSequenceNumber(model.getSequenceNumber());
+        qrCodeMapping.setStudentId(model.getStudent().getUniqueId());
+
+        if (model.getUuid() != "") {
+            qrCodeMapping.setUuid(model.getUuid());
+        }
+
+        // unique id cannot be 0 because that is an invalid database id
+        return qrCodeMapping;
+    }
+
 }

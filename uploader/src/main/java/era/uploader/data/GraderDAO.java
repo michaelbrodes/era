@@ -1,4 +1,4 @@
 package era.uploader.data;
 
-public interface GraderDAO {
+public interface GraderDAO extends DAO {
 }
