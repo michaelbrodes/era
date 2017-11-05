@@ -28,10 +28,9 @@ public class TASKalfaConverterTest {
         MockStatusObserver observer = new MockStatusObserver();
         bus.register(observer);
 
-        List<PDDocument> pages = TASKalfaConverter.convertFile(pdf);
+        List<String> pages = TASKalfaConverter.convertFile(pdf);
 
         assertEquals(5, pages.size());
-        pages.forEach(p -> assertEquals(1, p.getNumberOfPages()));
         Thread.sleep(500);
         assertTrue(observer.sentMessages.isEmpty());
     }
@@ -43,10 +42,9 @@ public class TASKalfaConverterTest {
         MockStatusObserver observer = new MockStatusObserver();
         bus.register(observer);
 
-        List<PDDocument> pages = TASKalfaConverter.convertFile(pdf);
+        List<String> pages = TASKalfaConverter.convertFile(pdf);
 
         assertEquals(5, pages.size());
-        pages.forEach(p -> assertEquals(1, p.getNumberOfPages()));
         assertTrue(observer.sentMessages.isEmpty());
     }
 
@@ -57,7 +55,7 @@ public class TASKalfaConverterTest {
         MockStatusObserver observer = new MockStatusObserver();
         bus.register(observer);
         boolean notFound = false;
-        List<PDDocument> pages = null;
+        List<String> pages = null;
 
         try {
             pages = TASKalfaConverter.convertFile(pdf);
@@ -74,11 +72,11 @@ public class TASKalfaConverterTest {
     @Ignore
     public void convert_OutputSplit() throws Exception {
         Path pdf = Paths.get(IOUtil.convertToLocal("src/test/resources/test-pdfs/300dpi.pdf"));
-        List<PDDocument> pages = TASKalfaConverter.convertFile(pdf);
+        List<String> pages = TASKalfaConverter.convertFile(pdf);
         for (int i = 0; i < pages.size(); i++) {
             File file = new File(IOUtil.convertToLocal("src/test/resources/split/" + i + ".pdf"));
             try {
-                pages.get(i).save(file);
+                PDDocument.load(new File(pages.get(i))).save(file);
             } catch (IOException e) {
                 e.printStackTrace();
             }

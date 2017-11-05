@@ -56,7 +56,7 @@ public class AssignmentUploader {
             post.setEntity(entity);
 
             HttpResponse response = client.execute(post);
-            
+
         }
     }
 

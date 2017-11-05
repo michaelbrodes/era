@@ -1,7 +1,7 @@
 package era.uploader.data.model;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /* Class that will represent Courses which assignments will belong to. This
  * will allow the instructor to associate multiple assignments to a single
@@ -46,7 +46,9 @@ public class Course {
         this.semester = builder.semester;
         this.courseNumber = builder.courseNumber;
         this.sectionNumber = builder.sectionNumber;
+        this.studentsEnrolled = builder.studentsEnrolled;
         this.assignments = builder.assignments;
+        this.id = builder.id;
     }
 
 
@@ -120,7 +122,7 @@ public class Course {
         return assignments;
     }
 
-    public static Builder create() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -205,7 +207,7 @@ public class Course {
             return this;
         }
 
-        public Course build() {
+        public Course create() {
             return new Course(this);
         }
     }

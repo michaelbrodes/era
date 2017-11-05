@@ -9,9 +9,11 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Converts a PDF that was photo scanned by a TASKalfa scanner into a list of
@@ -26,13 +28,13 @@ import java.util.List;
  * are scanned in as 300 DPI and have a QR code on the top right.
  */
 @ParametersAreNonnullByDefault
-public class TASKalfaConverter implements Converter<Path, List<PDDocument>> {
+public class TASKalfaConverter implements Converter<Path, List<String>> {
     private static final int FIRST_PAGE = 1;
     private static final int PAGES_IN_SPLIT = 1;
 
     /**
      * Converts a PDF that was photo scanned by a TASKalfa scanner into a List
-     * {@link PDDocument} with one document per page in the original PDF.
+     * of strings with one document per page in the original PDF.
      *
      * @param file a PDF file that was photo scanned by a TASKalfa scanner
      * @return a list of pages that make up that PDF.
@@ -40,17 +42,31 @@ public class TASKalfaConverter implements Converter<Path, List<PDDocument>> {
      */
     @Override
     @Nonnull
-    public List<PDDocument> convert(Path file) throws IOException {
+    public List<String> convert(Path file) throws IOException {
         Preconditions.checkNotNull(file);
         Splitter pdfSplitter = new Splitter();
-        List<PDDocument> ret;
+        List<String> ret;
 
         try {
             PDDocument inputPDF = PDDocument.load(file.toFile());
             pdfSplitter.setStartPage(FIRST_PAGE);
             pdfSplitter.setEndPage(inputPDF.getNumberOfPages());
             pdfSplitter.setSplitAtPage(PAGES_IN_SPLIT);
-            ret = ImmutableList.copyOf(pdfSplitter.split(inputPDF));
+            ImmutableList.Builder<String> tmpFiles = ImmutableList.builder();
+            Random rand = new Random();
+            for (PDDocument document: pdfSplitter.split(inputPDF)) {
+                StringBuilder filenameBuilder = new StringBuilder();
+                while (filenameBuilder.length() < 10) {
+                    filenameBuilder.append(rand.nextInt());
+                }
+                String filename = filenameBuilder.toString();
+                File pdf = File.createTempFile(filename, "pdf");
+                document.save(pdf);
+                tmpFiles.add(pdf.getAbsolutePath());
+                document.close();
+            }
+            ret = tmpFiles.build();
+            inputPDF.close();
         } catch (IOException e) {
             StatusChangeBus
                     .instance()
@@ -62,7 +78,7 @@ public class TASKalfaConverter implements Converter<Path, List<PDDocument>> {
     }
 
     @Nonnull
-    static List<PDDocument> convertFile(Path file) throws IOException {
+    static List<String> convertFile(Path file) throws IOException {
         return new TASKalfaConverter().convert(file);
     }
 }
