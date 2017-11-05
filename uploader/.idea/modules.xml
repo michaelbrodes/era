@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/uploader.iml" filepath="$PROJECT_DIR$/.idea/modules/uploader.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/uploader.iml" filepath="$PROJECT_DIR$/.idea/modules/uploader.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/uploader_main.iml" filepath="$PROJECT_DIR$/.idea/modules/uploader_main.iml" group="uploader" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/uploader_test.iml" filepath="$PROJECT_DIR$/.idea/modules/uploader_test.iml" group="uploader" />
     </modules>
