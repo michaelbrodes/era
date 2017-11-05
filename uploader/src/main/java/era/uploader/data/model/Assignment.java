@@ -97,4 +97,6 @@ public class Assignment {
     public void setCourse(Course course) {
         this.course = course;
     }
+
+    public Student getStudent() { return this.student; }
 }
