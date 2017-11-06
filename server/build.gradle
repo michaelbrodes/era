@@ -2,7 +2,7 @@ plugins {
     id 'nu.studer.jooq' version '2.0.9'
 }
 
-group 'era.uploader'
+group 'era.server'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
@@ -14,31 +14,24 @@ repositories {
 }
 
 dependencies {
-    // google repos
-    compile 'com.google.zxing:core:3.3.0'
-    compile 'com.google.zxing:javase:3.3.0'
     compile 'com.google.guava:guava:23.0'
     compile 'com.google.code.gson:gson:2.8.2'
-    // pdf stuff
-    compile 'org.apache.pdfbox:pdfbox:2.0.7'
-    //Client communication stuff
-    compile 'org.apache.httpcomponents:httpclient:4.5.3'
-    // database stuff
-    compile 'org.xerial:sqlite-jdbc:3.20.0'
     compile 'org.jooq:jooq:3.10.0'
-    testCompile 'junit:junit:4.12'
-    jooqRuntime 'org.xerial:sqlite-jdbc:3.20.0'
+    compile 'com.sparkjava:spark-core:2.3'
+    compile 'org.mariadb.jdbc:mariadb-java-client:2.1.2'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    jooqRuntime 'org.mariadb.jdbc:mariadb-java-client:2.1.2'
 }
-
-File databaseFile = file("uploader.db")
 
 jooq {
     version = '3.10.0'
     edition = 'OSS'
-    uploaderDB(sourceSets.main) {
+    serverDB(sourceSets.main) {
         jdbc {
-            driver = 'org.sqlite.JDBC'
-            url = 'jdbc:sqlite:' + databaseFile.absolutePath
+            driver = 'org.mariadb.jdbc.Driver'
+            url = 'jdbc:mariadb://localhost:3001/era'
+            user = 'root'
+            password = 'fee3kie0paed0ahghe1iH8reol8aepaN'
         }
         generator {
             name = 'org.jooq.util.DefaultGenerator'
@@ -46,7 +39,8 @@ jooq {
                 name = 'org.jooq.util.DefaultGeneratorStrategy'
             }
             database {
-                name = 'org.jooq.util.sqlite.SQLiteDatabase'
+                name = 'org.jooq.util.mariadb.MariaDBDatabase'
+                inputSchema = 'era'
             }
             generate {
                 relations = true
@@ -56,7 +50,7 @@ jooq {
                 fluentSetters = true
             }
             target {
-                packageName = 'era.uploader.data.database.jooq'
+                packageName = 'era.server.database'
                 directory = 'src/main/java'
             }
         }
@@ -68,10 +62,5 @@ jar {
         zipTree it
     }
 
-    manifest.attributes "Main-Class" : "era.uploader.UploaderApp"
-}
-
-task run (type: JavaExec, dependsOn: classes) {
-    main 'era.uploader.UploaderApp'
-    classpath sourceSets.main.runtimeClasspath
+    manifest.attributes "Main-Class" : "era.server.ServerApp"
 }
