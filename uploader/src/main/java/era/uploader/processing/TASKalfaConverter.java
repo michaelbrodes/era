@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import era.uploader.controller.StatusChangeBus;
 import era.uploader.data.model.FileStatus;
+import era.uploader.data.model.QRCodeMapping;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
@@ -20,7 +21,7 @@ import java.util.Random;
  * {@link PDDocument} pages. The reason that the file is split up into a list
  * of individual pages is because the scanner just concatenates every scanned
  * page into one huge file. Each page of that huge file corresponds to an
- * existing {@link era.uploader.data.model.Page}. The pages have no predefined
+ * existing {@link QRCodeMapping}. The pages have no predefined
  * order.
  * <p>
  * TASKalfa is the type of photo scanner ERA is written against, however ERA

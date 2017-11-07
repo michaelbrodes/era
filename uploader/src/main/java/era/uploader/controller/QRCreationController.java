@@ -1,6 +1,5 @@
 package era.uploader.controller;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
@@ -12,7 +11,7 @@ import era.uploader.creation.QRErrorStatus;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.PageDAO;
 import era.uploader.data.model.Course;
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -61,7 +60,7 @@ public class QRCreationController {
      * synced up).
      *
      * <strong>NOTE</strong>: Because we need to match UUIDs to pages at a
-     * later date and time we need up creating new Page entries in the database
+     * later date and time we need up creating new QRCodeMapping entries in the database
      * that aren't matched to a particular pdf page.
      *
      * @see java.util.UUID
@@ -72,12 +71,12 @@ public class QRCreationController {
      *         associated with. See {@link Multimap} to find out how a multimap
      *         works
      */
-    public Multimap<Student, Page> createQRs(Collection<Student> students, int numberOfQRs) {
+    public Multimap<Student, QRCodeMapping> createQRs(Collection<Student> students, int numberOfQRs) {
         Preconditions.checkNotNull(students);
 
         int processors = Runtime.getRuntime().availableProcessors();
         ExecutorService threads = Executors.newFixedThreadPool(processors);
-        List<Future<Page>> futures =
+        List<Future<QRCodeMapping>> futures =
                 Lists.newArrayList();
 
         for (int i = 0; i < numberOfQRs; i++) {
@@ -99,13 +98,13 @@ public class QRCreationController {
             BUS.fire(new QRErrorEvent(status));
         }
 
-        ImmutableMultimap.Builder<Student, Page> studentsToPages =
+        ImmutableMultimap.Builder<Student, QRCodeMapping> studentsToPages =
                 ImmutableMultimap.builder();
 
-        for (Future<Page> futurePage : futures) {
+        for (Future<QRCodeMapping> futurePage : futures) {
             try {
-                Page page = futurePage.get();
-                studentsToPages.put(page.getStudent(), page);
+                QRCodeMapping QRCodeMapping = futurePage.get();
+                studentsToPages.put(QRCodeMapping.getStudent(), QRCodeMapping);
             } catch (InterruptedException e) {
                 QRErrorStatus status = QRErrorStatus.INTERRUPT_ERROR;
                 BUS.fire(new QRErrorEvent(status));
@@ -115,7 +114,7 @@ public class QRCreationController {
             }
         }
 
-        Multimap<Student, Page> ret = studentsToPages.build();
+        Multimap<Student, QRCodeMapping> ret = studentsToPages.build();
         pageDAO.insertAll(ret.values());
 
         return ret;

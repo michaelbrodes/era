@@ -1,0 +1,66 @@
+plugins {
+    id 'nu.studer.jooq' version '2.0.9'
+}
+
+group 'era.server'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.guava:guava:23.0'
+    compile 'com.google.code.gson:gson:2.8.2'
+    compile 'org.jooq:jooq:3.10.0'
+    compile 'com.sparkjava:spark-core:2.3'
+    compile 'org.mariadb.jdbc:mariadb-java-client:2.1.2'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    jooqRuntime 'org.mariadb.jdbc:mariadb-java-client:2.1.2'
+}
+
+jooq {
+    version = '3.10.0'
+    edition = 'OSS'
+    serverDB(sourceSets.main) {
+        jdbc {
+            driver = 'org.mariadb.jdbc.Driver'
+            url = 'jdbc:mariadb://localhost:3001/era'
+            user = 'root'
+            password = 'fee3kie0paed0ahghe1iH8reol8aepaN'
+        }
+        generator {
+            name = 'org.jooq.util.DefaultGenerator'
+            strategy {
+                name = 'org.jooq.util.DefaultGeneratorStrategy'
+            }
+            database {
+                name = 'org.jooq.util.mariadb.MariaDBDatabase'
+                inputSchema = 'era'
+            }
+            generate {
+                relations = true
+                deprecated = false
+                generatedAnnotation = true
+                records = true
+                fluentSetters = true
+            }
+            target {
+                packageName = 'era.server.database'
+                directory = 'src/main/java'
+            }
+        }
+    }
+}
+
+jar {
+    from configurations.compile.collect {
+        zipTree it
+    }
+
+    manifest.attributes "Main-Class" : "era.server.ServerApp"
+}

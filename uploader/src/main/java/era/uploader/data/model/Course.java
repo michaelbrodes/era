@@ -1,5 +1,10 @@
 package era.uploader.data.model;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNullableByDefault;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,56 +13,100 @@ import java.util.Set;
  * Course.
  */
 
+@ParametersAreNullableByDefault
 public class Course {
     /* Class Fields */
     // will be an unsigned int in the database.
-    private long id;
+    private int uniqueId;
     private String department;                              /* Department where the course is held */
     private String name;                                    /* Name of Course */
     private String semester;                                /* Semester of Course */
     private String courseNumber;                            /* Number of Course */
     private String sectionNumber;                           /* Number for the Course Section */
-    private Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
-    private Set<Assignment> assignments;
+    private Set<Student> studentsEnrolled = Sets.newHashSet(); /* Set of Students in the Class */
+    private Set<Assignment> assignments = Sets.newHashSet();
 
     /* Constructor */
+
+    /**
+     * This default constructor is deprecated because a valid course would
+     * require a Nonnull department, courseNumber, and sectionNumber. Please
+     * use constructors that have that instead
+     */
+    @Deprecated
     public Course() {
 
     }
+
     public Course(
-            String department,
+            @Nonnull String department,
             String name,
             String semester,
-            String courseNumber,
-            String sectionNumber,
+            @Nonnull String courseNumber,
+            @Nonnull String sectionNumber,
             Set<Assignment> assignments
     ) {
+        Preconditions.checkNotNull(department, "Cannot create a course with a null department");
+        Preconditions.checkNotNull(courseNumber, "Cannot create a course with a null courseNumber");
+        Preconditions.checkNotNull(sectionNumber, "Cannot create a course with a null sectionNumber");
         this.department = department;
         this.name = name;
         this.semester = semester;
         this.courseNumber = courseNumber;
         this.sectionNumber = sectionNumber;
-        this.assignments = assignments;
+        this.assignments = assignments == null ? Sets.newHashSet() : assignments;
     }
 
-    public Course(Builder builder) {
-        this.department = builder.department;
+    /**
+     * Essentially our default constructor for a course object. It is just
+     * supplied only the required fields of this object.
+     *
+     * @param department the University department that this course belongs to
+     *                   (e.g. CHEM)
+     * @param courseNumber the course number of this course
+     * @param sectionNumber the section number of this course.
+     */
+    public Course (
+            @Nonnull String department,
+            @Nonnull String courseNumber,
+            @Nonnull String sectionNumber
+    ) {
+        Preconditions.checkNotNull(department, "Cannot create a course with a null department");
+        Preconditions.checkNotNull(courseNumber, "Cannot create a course with a null courseNumber");
+        Preconditions.checkNotNull(sectionNumber, "Cannot create a course with a null sectionNumber");
+        // default as we are not in the database yet.
+        this.uniqueId = 0;
+        this.department = department;
+        this.courseNumber = courseNumber;
+        this.sectionNumber = sectionNumber;
+        this.studentsEnrolled = Sets.newHashSet();
+        this.assignments = Sets.newHashSet();
+    }
+
+    private Course(String department, String courseNumber, String sectionNumber, Builder builder) {
+        this.department = department;
+        this.courseNumber = courseNumber;
+        this.sectionNumber = sectionNumber;
         this.name = builder.name;
         this.semester = builder.semester;
-        this.courseNumber = builder.courseNumber;
-        this.sectionNumber = builder.sectionNumber;
-        this.studentsEnrolled = builder.studentsEnrolled;
-        this.assignments = builder.assignments;
-        this.id = builder.id;
+        this.studentsEnrolled = builder.studentsEnrolled == null ?
+                Sets.newHashSet() :
+                builder.studentsEnrolled;
+        this.assignments = builder.assignments == null ?
+                Sets.newHashSet() :
+                builder.assignments;
+        this.uniqueId = builder.uniqueId;
     }
 
 
     /* Getters and Setters */
+    @Nonnull
     public String getDepartment() {
         return department;
     }
 
-    public void setDepartment(String department) {
+    public void setDepartment(@Nonnull String department) {
+        Preconditions.checkNotNull(department);
         this.department = department;
     }
 
@@ -80,19 +129,23 @@ public class Course {
         this.semester = semester;
     }
 
+    @Nonnull
     public String getCourseNumber() {
         return courseNumber;
     }
 
-    public void setCourseNumber(String courseNumber) {
+    public void setCourseNumber(@Nonnull String courseNumber) {
+        Preconditions.checkNotNull(courseNumber);
         this.courseNumber = courseNumber;
     }
 
+    @Nonnull
     public String getSectionNumber() {
         return sectionNumber;
     }
 
-    public void setSectionNumber(String sectionNumber) {
+    public void setSectionNumber(@Nonnull String sectionNumber) {
+        Preconditions.checkNotNull(sectionNumber);
         this.sectionNumber = sectionNumber;
     }
 
@@ -108,6 +161,7 @@ public class Course {
     public Set<Student> getStudentsEnrolled() {
         return studentsEnrolled;
     }
+
     public Student getStudent(Student student) {
         for (Student otherStudent :
                 studentsEnrolled) {
@@ -126,12 +180,12 @@ public class Course {
         return new Builder();
     }
 
-    public long getId() {
-        return id;
+    public int getUniqueId() {
+        return uniqueId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setUniqueId(int uniqueId) {
+        this.uniqueId = uniqueId;
     }
 
     @Override
@@ -158,7 +212,7 @@ public class Course {
     }
 
     public static class Builder {
-        private long id;
+        private int uniqueId;
         private String department;                              /* Department where the course is held */
         private String name;                                    /* Name of Course */
         private String semester;                                /* Semester of Course */
@@ -167,13 +221,8 @@ public class Course {
         private Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
         private Set<Assignment> assignments;
 
-        public Builder withDatabaseId(long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder forDepartment(String department) {
-            this.department = department.toUpperCase();
+        public Builder withDatabaseId(int uniqueId) {
+            this.uniqueId = uniqueId;
             return this;
         }
 
@@ -182,16 +231,18 @@ public class Course {
             return this;
         }
 
-        public Builder forSemester(String semester) {
+        public Builder withSemester(String semester) {
             this.semester = semester.toUpperCase();
             return this;
         }
 
+        @Deprecated
         public Builder withCourseNumber(String courseNumber) {
             this.courseNumber = courseNumber.toUpperCase();
             return this;
         }
 
+        @Deprecated
         public Builder withSectionNumber(String sectionNumber) {
             this.sectionNumber = sectionNumber.toUpperCase();
             return this;
@@ -207,8 +258,16 @@ public class Course {
             return this;
         }
 
-        public Course create() {
-            return new Course(this);
+        public Course create(
+                @Nonnull String department,
+                @Nonnull String courseNumber,
+                @Nonnull String sectionNumber
+        ) {
+            Preconditions.checkNotNull(department, "Cannot create a course with a null department");
+            Preconditions.checkNotNull(courseNumber, "Cannot create a course with a null courseNumber");
+            Preconditions.checkNotNull(sectionNumber, "Cannot create a course with a null sectionNumber");
+
+            return new Course(department, courseNumber, sectionNumber, this);
         }
     }
 }

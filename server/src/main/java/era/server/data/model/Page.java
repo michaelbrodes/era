@@ -1,8 +1,6 @@
-package era.uploader.data.model;
+package era.server.data.model;
 
 import com.google.common.base.Preconditions;
-import com.google.zxing.common.BitMatrix;
-import org.apache.pdfbox.pdmodel.PDDocument;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNullableByDefault;
@@ -15,12 +13,8 @@ import javax.annotation.ParametersAreNullableByDefault;
 public class Page {
     private Student student;
     private int sequenceNumber;
-    // transient means that the BitMatrix should not be serialized over rest
-    // calls and it should not be stored in the database
-    private transient BitMatrix qrCode;
     private String uuid;
     private String tempDocumentName;
-    private transient PDDocument document;
     private Assignment assignment;
 
     private Page(@Nonnull String uuid, Builder builder) {
@@ -28,9 +22,7 @@ public class Page {
         this.uuid = uuid;
         this.student = builder.student;
         this.sequenceNumber = builder.sequenceNumber;
-        this.qrCode = builder.qrCode;
         this.assignment = builder.assignment;
-        this.document = builder.document;
         this.tempDocumentName = builder.tempDocumentName;
     }
 
@@ -64,15 +56,6 @@ public class Page {
     }
 
 
-    public BitMatrix getQrCode() {
-        return qrCode;
-    }
-
-    public void setQrCode( BitMatrix qrCode) {
-        this.qrCode = qrCode;
-    }
-
-
     public Assignment getAssignment() {
         return assignment;
     }
@@ -94,14 +77,6 @@ public class Page {
     @Override
     public int hashCode() {
         return uuid.hashCode();
-    }
-
-    public PDDocument getDocument() {
-        return document;
-    }
-
-    public void setDocument(PDDocument document) {
-        this.document = document;
     }
 
     /**
@@ -138,15 +113,8 @@ public class Page {
     public static class Builder {
         private Student student;
         private int sequenceNumber;
-        private BitMatrix qrCode;
         private Assignment assignment;
-        private PDDocument document;
         private String tempDocumentName;
-
-        public Builder withDocument(PDDocument document) {
-            this.document = document;
-            return this;
-        }
 
         public Builder byStudent(Student student) {
             this.student = student;
@@ -155,11 +123,6 @@ public class Page {
 
         public Builder withSequenceNumber(int sequenceNumber) {
             this.sequenceNumber = sequenceNumber;
-            return this;
-        }
-
-        public Builder withQRCode(BitMatrix qrCode) {
-            this.qrCode = qrCode;
             return this;
         }
 

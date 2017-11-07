@@ -1,3 +1,7 @@
+plugins {
+    id 'nu.studer.jooq' version '2.0.9'
+}
+
 group 'era.uploader'
 version '1.0-SNAPSHOT'
 
@@ -26,6 +30,40 @@ dependencies {
     compile 'org.xerial:sqlite-jdbc:3.20.0'
     compile 'org.jooq:jooq:3.10.0'
     testCompile 'junit:junit:4.12'
+    jooqRuntime 'org.xerial:sqlite-jdbc:3.20.0'
+}
+
+File databaseFile = file("uploader.db")
+
+jooq {
+    version = '3.10.0'
+    edition = 'OSS'
+    uploaderDB(sourceSets.main) {
+        jdbc {
+            driver = 'org.sqlite.JDBC'
+            url = 'jdbc:sqlite:' + databaseFile.absolutePath
+        }
+        generator {
+            name = 'org.jooq.util.DefaultGenerator'
+            strategy {
+                name = 'org.jooq.util.DefaultGeneratorStrategy'
+            }
+            database {
+                name = 'org.jooq.util.sqlite.SQLiteDatabase'
+            }
+            generate {
+                relations = true
+                deprecated = false
+                generatedAnnotation = true
+                records = true
+                fluentSetters = true
+            }
+            target {
+                packageName = 'era.uploader.data.database.jooq'
+                directory = 'src/main/java'
+            }
+        }
+    }
 }
 
 jar {

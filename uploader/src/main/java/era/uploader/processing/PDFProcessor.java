@@ -7,11 +7,11 @@ import era.uploader.common.MultimapCollector;
 import era.uploader.creation.QRErrorBus;
 import era.uploader.creation.QRErrorEvent;
 import era.uploader.creation.QRErrorStatus;
+import era.uploader.data.AssignmentDAO;
 import era.uploader.data.PageDAO;
-import era.uploader.data.database.AssignmentDAOImpl;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -36,14 +36,17 @@ public class PDFProcessor {
     private final Course course;
     private final String assignmentName;
     private final PageDAO pageDAO;
+    private final AssignmentDAO assignmentDAO;
 
     PDFProcessor(
             PageDAO pageDao,
+            AssignmentDAO assignmentDAO,
             List<String> pages,
             Course course,
             String assignmentName
     ) {
         this.pages = pages;
+        this.assignmentDAO = assignmentDAO;
         this.course = course;
         this.assignmentName = assignmentName;
         this.pageDAO = pageDao;
@@ -58,7 +61,7 @@ public class PDFProcessor {
      * pipeline are Spit a large pdf into pages -> scatter those pages with
      * {@link List#parallelStream()} -> feed them into
      * {@link QRScanner#extractQRCodeInformation(String)} to grab uuid ->
-     * match {@link #associateStudentsWithPage(Page)} -> merge student
+     * match {@link #associateStudentsWithPage(QRCodeMapping)} -> merge student
      * associated Pages into one pdf -> store in either the local database or
      * the remote database.
      *
@@ -72,6 +75,7 @@ public class PDFProcessor {
      */
     public static Collection<Assignment> process(
             PageDAO pageDAO,
+            AssignmentDAO assignmentDAO,
             Path pdf,
             Course course,
             String assignmentName
@@ -82,7 +86,7 @@ public class PDFProcessor {
         Preconditions.checkNotNull(pageDAO);
 
         List<String> pages = TASKalfaConverter.convertFile(pdf);
-        PDFProcessor processor = new PDFProcessor(pageDAO, pages, course, assignmentName);
+        PDFProcessor processor = new PDFProcessor(pageDAO, assignmentDAO, pages, course, assignmentName);
 
         //TODO at the end of processing add a message to the screen that says that processing was successful
         
@@ -104,7 +108,7 @@ public class PDFProcessor {
      */
     private Collection<Assignment> startPipeline() {
         QRScanner scanner = new QRScanner();
-        Multimap<Student, Page> collect = pages.parallelStream()
+        Multimap<Student, QRCodeMapping> collect = pages.parallelStream()
                 .map(scanner::extractQRCodeInformation)
                 .filter(Objects::nonNull)
                 .map(this::associateStudentsWithPage)
@@ -113,45 +117,45 @@ public class PDFProcessor {
         return addAssignments(collect);
     }
 
-    /**Given a singular UUID, find and update a Placeholder page into a
-     * Valid page. Create multimap object and populate with student
-     * associated with the page in the argument
+    /**Given a singular UUID, find and update a Placeholder QRCodeMapping into a
+     * Valid QRCodeMapping. Create multimap object and populate with student
+     * associated with the QRCodeMapping in the argument
      */
-    public Multimap<Student, Page> associateStudentsWithPage(Page page) {
-        Preconditions.checkNotNull(page);
-        Page pageFromDB;
+    public Multimap<Student, QRCodeMapping> associateStudentsWithPage(QRCodeMapping QRCodeMapping) {
+        Preconditions.checkNotNull(QRCodeMapping);
+        QRCodeMapping QRCodeMappingFromDB;
         // TODO: use loading cache so we don't get weird magic happening because we are accessing the db concurrently
-        pageFromDB = pageDAO.read(page.getUuid());
-        pageFromDB = merge(pageFromDB, page);
+        QRCodeMappingFromDB = pageDAO.read(QRCodeMapping.getUuid());
+        QRCodeMappingFromDB = merge(QRCodeMappingFromDB, QRCodeMapping);
 
-        Multimap<Student, Page> mmap = ArrayListMultimap.create();
+        Multimap<Student, QRCodeMapping> mmap = ArrayListMultimap.create();
 
         mmap.put (
-                pageFromDB.getStudent(),
-                pageFromDB
+                QRCodeMappingFromDB.getStudent(),
+                QRCodeMappingFromDB
         );
 
         return mmap;
     }
 
-    private Page merge(Page dbPage, Page scannedPage) {
-        dbPage.setTempDocumentName(scannedPage.getTempDocumentName());
-        dbPage.setDocument(scannedPage.getDocument());
+    private QRCodeMapping merge(QRCodeMapping dbQRCodeMapping, QRCodeMapping scannedQRCodeMapping) {
+        dbQRCodeMapping.setTempDocumentName(scannedQRCodeMapping.getTempDocumentName());
+        dbQRCodeMapping.setDocument(scannedQRCodeMapping.getDocument());
 
-        return dbPage;
+        return dbQRCodeMapping;
     }
     /**After this is called, we now have a multimap object with each page
      * mapped to a student
      */
-    public Collection<Assignment> addAssignments(Multimap<Student, Page> mmap) {
+    public Collection<Assignment> addAssignments(Multimap<Student, QRCodeMapping> mmap) {
         Set<Assignment> assignments = new HashSet<>();
-        for (Map.Entry<Student, Collection<Page>> pages :
+        for (Map.Entry<Student, Collection<QRCodeMapping>> pages :
             mmap.asMap().entrySet()
             ) {
             Student student = pages.getKey();
-            Collection<Page> pagesToAdd = pages.getValue();
+            Collection<QRCodeMapping> pagesToAdd = pages.getValue();
             assignments.add(new Assignment(assignmentName, pagesToAdd, student, course));
-            mergePDF(assignments);
+            mergeAssignmentPages(assignments);
         }
 
         return assignments;
@@ -160,13 +164,12 @@ public class PDFProcessor {
     /**After this is called, all pages for each student are now merged, and saved at the
      * appropriate location. also stores the assignment file location in the database
      */
-    public void mergePDF(Set<Assignment> assignments) {
+    public void mergeAssignmentPages(Set<Assignment> assignments) {
         PDFMergerUtility merger = new PDFMergerUtility();
-        AssignmentDAOImpl assignmentDAO = new AssignmentDAOImpl();
         for (Assignment a : assignments
              ) {
             PDDocument allPages = new PDDocument();
-            for (Page p : a.getPages()
+            for (QRCodeMapping p : a.getQRCodeMappings()
                     ) {
                 try {
                     PDDocument document;

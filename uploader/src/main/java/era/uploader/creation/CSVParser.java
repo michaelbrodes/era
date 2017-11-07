@@ -61,17 +61,12 @@ public class CSVParser {
             if (courseRecord.length >= COURSE_ID_SIZE) {
                 ret = ArrayListMultimap.create();
                 ret.put(
-                        Course.builder()
-                                .forDepartment(courseRecord[DEPARTMENT])
-                                .withCourseNumber(courseRecord[COURSE_NBR])
-                                .withSectionNumber(courseRecord[SECTION_NBR])
-                                .create(),
+                        new Course(courseRecord[DEPARTMENT], courseRecord[COURSE_NBR], courseRecord[SECTION_NBR]),
                         Student.builder()
                                 .withLastName(fields[LAST_NAME])
                                 .withFirstName(fields[FIRST_NAME])
-                                .withUserName(fields[USER_NAME])
                                 .withSchoolId(fields[SCHOOL_ID])
-                                .create()
+                                .create(fields[USER_NAME])
                 );
                 return ret;
             } else {

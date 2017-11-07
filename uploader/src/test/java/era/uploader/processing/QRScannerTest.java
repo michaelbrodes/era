@@ -1,6 +1,6 @@
 package era.uploader.processing;
 
-import era.uploader.data.model.Page;
+import era.uploader.data.model.QRCodeMapping;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,8 +13,8 @@ public class QRScannerTest {
     @Test
     public void extractQRCodeInformation() throws Exception {
         QRScanner qrScanner = new QRScanner();
-        Page scannedPage = qrScanner.extractQRCodeInformation(path);
-        Assert.assertEquals(scannedPage.getUuid(), "6ab251a5-6c4e-4688-843f-60aea570c3a6");
+        QRCodeMapping scannedQRCodeMapping = qrScanner.extractQRCodeInformation(path);
+        Assert.assertEquals(scannedQRCodeMapping.getUuid(), "6ab251a5-6c4e-4688-843f-60aea570c3a6");
     }
 
 }

@@ -128,7 +128,17 @@ xcuserdata/
 gradlew 
 gradlew.bat
 gradle/
+server/libraries
+server/modules
 
 *.iml
 .DS_Store
+*.db
 uploader/src/test/resources/split
+uploader.db
+# got to stop committing this files! 
+uploader/src/test/resources/test-pdfs
+
+# database files for server
+server/docker/db
+server/docker/.env
