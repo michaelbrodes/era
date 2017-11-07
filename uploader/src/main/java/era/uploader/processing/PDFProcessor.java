@@ -16,6 +16,7 @@ import era.uploader.data.model.Student;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.io.IOException;
@@ -37,19 +38,22 @@ public class PDFProcessor {
     private final String assignmentName;
     private final PageDAO pageDAO;
     private final AssignmentDAO assignmentDAO;
+    private final String host;
 
     PDFProcessor(
             PageDAO pageDao,
             AssignmentDAO assignmentDAO,
             List<String> pages,
             Course course,
-            String assignmentName
+            String assignmentName,
+            String host
     ) {
         this.pages = pages;
         this.assignmentDAO = assignmentDAO;
         this.course = course;
         this.assignmentName = assignmentName;
         this.pageDAO = pageDao;
+        this.host = host;
     }
 
     /**
@@ -78,15 +82,16 @@ public class PDFProcessor {
             AssignmentDAO assignmentDAO,
             Path pdf,
             Course course,
-            String assignmentName
-    ) throws IOException {
+            String assignmentName,
+            @Nullable String host
+            ) throws IOException {
         Preconditions.checkNotNull(pdf);
         Preconditions.checkNotNull(course);
         Preconditions.checkNotNull(assignmentName);
         Preconditions.checkNotNull(pageDAO);
 
         List<String> pages = TASKalfaConverter.convertFile(pdf);
-        PDFProcessor processor = new PDFProcessor(pageDAO, assignmentDAO, pages, course, assignmentName);
+        PDFProcessor processor = new PDFProcessor(pageDAO, assignmentDAO, pages, course, assignmentName, host);
 
         //TODO at the end of processing add a message to the screen that says that processing was successful
         
@@ -114,7 +119,19 @@ public class PDFProcessor {
                 .map(this::associateStudentsWithPage)
                 .collect(MultimapCollector.toMultimap());
 
-        return addAssignments(collect);
+        Collection<Assignment> assignments = addAssignments(collect);
+
+        if (host != null) {
+
+            try {
+                AssignmentUploader.uploadAssignments(assignments, host);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return assignments;
     }
 
     /**Given a singular UUID, find and update a Placeholder QRCodeMapping into a

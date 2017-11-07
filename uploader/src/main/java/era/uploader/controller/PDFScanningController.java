@@ -31,8 +31,8 @@ public class PDFScanningController {
     private final StudentDAO studentDAO = new StudentDAOImpl();
     private final AssignmentDAO assignmentDAO = new AssignmentDAOImpl(studentDAO, courseDAO);
 
-    public Collection<Assignment> scanPDF(Path pdf, Course course, String assignment) throws IOException {
-        return PDFProcessor.process(pageDAO, assignmentDAO, pdf, course, assignment);
+    public Collection<Assignment> scanPDF(Path pdf, Course course, String assignment, String host) throws IOException {
+        return PDFProcessor.process(pageDAO, assignmentDAO, pdf, course, assignment, host);
     }
 
     public Set<Course> getAllCourses() {

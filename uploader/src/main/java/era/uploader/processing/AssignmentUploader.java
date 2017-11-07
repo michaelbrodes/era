@@ -23,32 +23,34 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 public class AssignmentUploader {
 
-    static final String SERVER_ADDRESS = "localhost:3000";
 
-    public void uploadAssignments(Collection<Assignment> assignments) throws IOException {
+    public static void uploadAssignments(Collection<Assignment> assignments, String host) throws IOException {
 
         for (Assignment current: assignments) {
 
             HttpClient client = HttpClientBuilder.create().build();
 
-            HttpPost post = new HttpPost(SERVER_ADDRESS);
+            String courseId = current.getCourse().getUniqueId() + "";
+
+            host += "/api/course/" + courseId + "/assignment";
+
+            HttpPost post = new HttpPost(host);
 
             File file = new File(current.getImageFilePath());
-            String courseId = current.getCourse().getId() + "";
             String assignmentName = current.getName();
+            int assignmentId = current.getUniqueId();
             String studentId = current.getStudent().getSchoolId();
+
+            post.addHeader("X-Assignment-Id", assignmentId + "" );
+            post.addHeader("X-Assignment-Name", assignmentName);
+            post.addHeader("X-Student-Id", studentId);
+            post.addHeader("X-Assignment-File-Name", current.getImageFilePath());
 
 
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
             builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
 
-            builder.addTextBody(":courseId", courseId, ContentType.TEXT_PLAIN );
-
-            builder.addTextBody("X-Assignment-Name", assignmentName, ContentType.TEXT_PLAIN);
-
-            builder.addTextBody("X-Student-Id", studentId, ContentType.TEXT_PLAIN);
-
-            builder.addBinaryBody("X-Assignment-File-Name", file, ContentType.DEFAULT_BINARY,
+            builder.addBinaryBody("pdf", file, ContentType.DEFAULT_BINARY,
                     current.getImageFilePath());
 
             HttpEntity entity = builder.build();
@@ -56,6 +58,12 @@ public class AssignmentUploader {
             post.setEntity(entity);
 
             HttpResponse response = client.execute(post);
+
+            if(response.getStatusLine().getStatusCode() != 201){
+
+                throw new RuntimeException("Entity was not created due to " + response.getStatusLine().getReasonPhrase());
+
+            }
 
         }
     }

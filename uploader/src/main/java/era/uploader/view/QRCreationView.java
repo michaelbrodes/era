@@ -146,7 +146,7 @@ public class QRCreationView extends Application {
             if (fPath != null)
                 try {
                     Multimap<Course, Student> courseStudentMultimap = qrCtrl.generateStudents(fPath);
-                    System.out.println(courseStudentMultimap.values());
+                  //  System.out.println(courseStudentMultimap.values());
                     uManage.changeToClassMgmtView(courseStudentMultimap, gridPane);
                 } catch (IOException e) {
                 //TODO FILE NOT FOUND. How to display to user?

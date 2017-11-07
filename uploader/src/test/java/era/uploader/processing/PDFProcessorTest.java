@@ -55,7 +55,8 @@ public class PDFProcessorTest {
                 assignmentDAO,
                 testDocPath,
                 course,
-                assignmentName
+                assignmentName,
+                null
         );
 
         Assert.assertTrue(processed.size() == 1);
@@ -92,7 +93,8 @@ public class PDFProcessorTest {
                 assignmentDAO,
                 testDocPath,
                 course,
-                assignmentName
+                assignmentName,
+                null
         );
 
         Assert.assertTrue(processed.size() == 1);
@@ -109,7 +111,7 @@ public class PDFProcessorTest {
                 .create("CHEM", "111", "001");
         Student test_student = new Student("sarcher");
         test_student.setSchoolId("schoolid");
-        PDFProcessor p = new PDFProcessor(new MockPageDAOImpl(), new MockAssignmentDAOImpl(), Collections.singletonList(SINGLE_TEST), testCourse, "testAssignment");
+        PDFProcessor p = new PDFProcessor(new MockPageDAOImpl(), new MockAssignmentDAOImpl(), Collections.singletonList(SINGLE_TEST), testCourse, "testAssignment", null);
         Set<Assignment> test_assignments = new HashSet<>();
         QRCodeMapping test_QRCodeMapping = QRCodeMapping.builder().create("testuuid");
         QRCodeMapping test_QRCodeMapping2 = QRCodeMapping.builder().create("testuuid2");

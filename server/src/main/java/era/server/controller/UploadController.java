@@ -42,6 +42,8 @@ public class UploadController {
 
 
     public void handleRequest(Request request, Response response) {
+        System.out.println("In request");
+
         long courseIdLong = 0;
         long studentIdLong = 0;
         int assignmentId = 0;
