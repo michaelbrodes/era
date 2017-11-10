@@ -42,31 +42,29 @@ CREATE TABLE IF NOT EXISTS assignment (
 );
 
 DROP VIEW IF EXISTS all_assignments;
+
 CREATE VIEW all_assignments AS
 -- || is concat in SQLite which is stupid
 SELECT
-  semester.term || ' ' || semester.year AS 'semester',
-  course.name AS 'course',
-  course.department || '-' || course.course_number || '-' || course.section_number AS course_alt,
-  student.last_name || ', ' || student.first_name AS 'student',
-  assignment.name AS 'assignment',
-  assignment.image_file_path AS 'file location'
-FROM semester
-INNER JOIN course
-  ON semester.unique_id = course.semester_id
-INNER JOIN course_student
-  ON course_id = course.unique_id
-INNER JOIN student
-  ON student.unique_id = course_student.student_id
-INNER JOIN assignment
-  ON assignment.unique_id IN (
-    -- there could be more than one assignment submission (e.g. a grader
-    -- submits twice) thus we need the most recently created
-    SELECT assignment.unique_id
-    FROM assignment
-    WHERE assignment.course_id = student.unique_id AND assignment.course_id = course.unique_id
-    GROUP BY assignment.name
-    ORDER BY DATE(assignment.created_date_time) DESC
-    LIMIT 1
-  )
-ORDER BY year DESC, term ASC, course ASC, course_alt ASC, assignment ASC, student ASC;
+  assignment.name AS 'Assignment',
+  student.last_name || ', ' || student.first_name AS 'Student',
+  student.school_id AS '800 Number',
+  course.name AS 'Course',
+  course.department || '-' || course.course_number || '-' || course.section_number AS 'Child Course ID',
+  semester.term || ' ' || semester.year AS 'Semester',
+  DATE(assignment.created_date_time) AS 'Created',
+  assignment.image_file_path AS 'File Location'
+FROM assignment
+  INNER JOIN student
+    ON assignment.student_id = student.unique_id
+  INNER JOIN course
+    ON course.unique_id = assignment.course_id
+  INNER JOIN semester
+    ON semester.unique_id = course.semester_id
+GROUP BY student.unique_id, assignment.name
+-- There is no unique constraint on assignments. While we don't officially
+-- support it, we don't prevent an assignment from being submitted multiple
+-- times. Ideally we want to get the most recent submission if that is the case
+HAVING max(assignment.created_date_time) = assignment.created_date_time
+ORDER BY created_date_time DESC;
+
