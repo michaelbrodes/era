@@ -35,7 +35,7 @@ public class PDFProcessorTest {
                 .withSemester("FALL")
                 .create("CHEM", "111", "001");
         Student student = Student.builder()
-                .takingCourses(ImmutableSet.of(course))
+                .withCourses(ImmutableSet.of(course))
                 .withFirstName("Sterling")
                 .withLastName("Archer")
                 .withUniqueId(1)
@@ -43,7 +43,7 @@ public class PDFProcessorTest {
                 .create("sarcher");
         QRCodeMapping dbQRCodeMapping = QRCodeMapping.builder()
                 .withSequenceNumber(1)
-                .byStudent(student)
+                .withStudent(student)
                 .create("6ab251a5-6c4e-4688-843f-60aea570c3a6");
         String assignmentName = "Infiltrate the Kremlin";
         PageDAO pageDAO = new MockPageDAOImpl();
@@ -72,7 +72,7 @@ public class PDFProcessorTest {
                 .withSemester("FALL")
                 .create("CHEM", "111", "001");
         Student student = Student.builder()
-                .takingCourses(ImmutableSet.of(course))
+                .withCourses(ImmutableSet.of(course))
                 .withFirstName("Lana")
                 .withLastName("Kane")
                 .withUniqueId(1)
@@ -80,7 +80,7 @@ public class PDFProcessorTest {
                 .create("lkane");
         QRCodeMapping dbQRCodeMapping = QRCodeMapping.builder()
                 .withSequenceNumber(1)
-                .byStudent(student)
+                .withStudent(student)
                 .create("6ab251a5-6c4e-4688-843f-60aea570c3a6");
         String assignmentName = "Defeat ODIN";
         PageDAO pageDAO = new MockPageDAOImpl();

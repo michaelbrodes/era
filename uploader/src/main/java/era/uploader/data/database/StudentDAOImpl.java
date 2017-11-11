@@ -1,18 +1,17 @@
 package era.uploader.data.database;
 
 import era.uploader.data.StudentDAO;
-import era.uploader.data.database.jooq.tables.records.CourseRecord;
 import era.uploader.data.database.jooq.tables.records.StudentRecord;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
-import static era.uploader.data.database.jooq.Tables.STUDENT;
 import static era.uploader.data.database.jooq.Tables.COURSE_STUDENT;
+import static era.uploader.data.database.jooq.Tables.STUDENT;
 
 /**
  * Provides CRUD functionality for {@link Student} objects stored in the

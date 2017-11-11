@@ -1,7 +1,5 @@
 package era.uploader.controller;
 
-import era.uploader.creation.QRErrorStatus;
-import era.uploader.data.model.FileStatus;
 import era.uploader.processing.StatusChangeEvent;
 
 import javax.annotation.concurrent.ThreadSafe;

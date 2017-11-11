@@ -1,16 +1,20 @@
 package era.uploader.view;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Multimap;
+import era.uploader.common.IntegerOnlyBox;
 import era.uploader.controller.QRCreationController;
 import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.PageDAOImpl;
 import era.uploader.data.model.Course;
+import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -21,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Year;
 
 
 public class QRCreationView extends Application {
@@ -52,9 +57,13 @@ public class QRCreationView extends Application {
     public void start(Stage stage, GridPane gridPane) {
 
         gridPane.getChildren().clear();
-
+        ObservableList<String> terms = FXCollections.observableArrayList(
+                Semester.Term.FALL.humanReadable(),
+                Semester.Term.SPRING.humanReadable()
+        );
 
         //Initializing Button
+        ComboBox<String> termCombo = new ComboBox<>(terms);
         Button createQRButton = new Button("Create");
         Button createClassButton = new Button("Add Class");
         Button fileBrowserButton = new Button("Browse");
@@ -68,7 +77,7 @@ public class QRCreationView extends Application {
         TextField className = new TextField();
         TextField sectionNumber = new TextField();
         TextField studentNumber = new TextField();
-
+        IntegerOnlyBox semesterYear = new IntegerOnlyBox();
 
         //Initializing Labels
         Label studentSectionLabel = new Label("Single Student QR Code Generation");
@@ -77,6 +86,7 @@ public class QRCreationView extends Application {
         Label eIDLabel = new Label("e-ID: ");
         Label classNameLabel = new Label("Class Name");
         Label sectionNumberLabel = new Label("Section Number");
+        Label semesterLabel = new Label("Semester");
 
         Label orLabel = new Label("Or");
         Label classFileNameLabel = new Label("Class File Name: ");
@@ -103,12 +113,16 @@ public class QRCreationView extends Application {
         className.setPromptText("Course Number");
         sectionNumber.setPromptText("Section Number");
         classFileName.setPromptText("Class Roster File Name");
+        semesterYear.setPromptText("Year");
+        termCombo.setPromptText("Term");
 
 //        gridPane.add(orLabel, 4, 19);
         gridPane.add(classFileName, 4, 4);
         gridPane.add(fileBrowserButton, 5, 4);
         gridPane.add(createClassButton, 4, 6);
         gridPane.add(goHome, 4, 2);
+        gridPane.add(termCombo, 5, 2);
+        gridPane.add(semesterYear, 6, 2);
 
         createQRButton.requestFocus();
 
@@ -117,15 +131,15 @@ public class QRCreationView extends Application {
 
         fileBrowserButton.setOnAction((event) -> {
             File file = null;
-           file = fileChooser.showOpenDialog(mainStage);
-           if (file != null) {
-               Path fPath = file.toPath();
-               String fName = fPath.toString();
-               fullFileName = fName;
-               String[] splitFile = fName.split(File.separator);
-               fName = splitFile[splitFile.length - 1];
-               classFileName.setText(fName);
-           }
+            file = fileChooser.showOpenDialog(mainStage);
+            if (file != null) {
+                Path fPath = file.toPath();
+                String fName = fPath.toString();
+                fullFileName = fName;
+                String[] splitFile = fName.split(File.separator);
+                fName = splitFile[splitFile.length - 1];
+                classFileName.setText(fName);
+            }
         });
 
         ;
@@ -136,24 +150,38 @@ public class QRCreationView extends Application {
 
         createClassButton.setOnAction((event) -> {
             String fName;
+            Semester.Term term = null;
+            Year year = null;
             if (fullFileName == null) {
                 fName = classFileName.getText();
             } else {
                 fName = fullFileName;
             }
 
+            if (termCombo.getValue() != null
+                    && !Strings.isNullOrEmpty(termCombo.getValue())) {
+                term = Semester.Term.humanValueOf(termCombo.getValue());
+            }
+
+            Integer yearInt = semesterYear.getInt();
+            if (yearInt != null) {
+                year = Year.of(yearInt);
+            }
+
             Path fPath = Paths.get(fName);
-            if (fPath != null)
+            if (fPath != null && term != null && year != null) {
                 try {
-                    Multimap<Course, Student> courseStudentMultimap = qrCtrl.generateStudents(fPath);
-                    System.out.println(courseStudentMultimap.values());
+                    Semester semester = new Semester(term, year);
+                    Multimap<Course, Student> courseStudentMultimap =
+                            qrCtrl.generateStudents(fPath, semester);
                     uManage.changeToClassMgmtView(courseStudentMultimap, gridPane);
                 } catch (IOException e) {
-                //TODO FILE NOT FOUND. How to display to user?
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                     errorAlert.setHeaderText("File Not Found");
                     errorAlert.setContentText("The File that you specified cannot be found");
-                    errorAlert.showAndWait();                }
+                    errorAlert.showAndWait();
+                }
+            }
         });
 
 

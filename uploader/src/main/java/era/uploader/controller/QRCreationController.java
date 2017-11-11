@@ -12,6 +12,7 @@ import era.uploader.data.CourseDAO;
 import era.uploader.data.PageDAO;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
+import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -129,17 +130,18 @@ public class QRCreationController {
      * @return a map of courses to students.
      * @throws IOException We couldn't find the file you inputted.
      */
-    public Multimap<Course, Student> generateStudents(Path filePath) throws IOException {
+    public Multimap<Course, Student> generateStudents(Path filePath, Semester semester) throws IOException {
         Preconditions.checkNotNull(filePath);
         // ignore the title record
         final int firstRecord = 1;
+        final CSVParser parser = new CSVParser(semester);
 
         // The stream needs to be closed after the first reduce is done
         Multimap<Course, Student> courseToStudents;
         try (Stream<String> csvLines = Files.lines(filePath)) {
             courseToStudents = csvLines.skip(firstRecord)
                     .map((inputStudent) -> inputStudent.split(","))
-                    .map(CSVParser::parseLine)
+                    .map(parser::parseLine)
                     .filter(Objects::nonNull)
                     .collect(toMultimap());
         }

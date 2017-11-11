@@ -1,5 +1,6 @@
 plugins {
     id 'nu.studer.jooq' version '2.0.9'
+    id "org.flywaydb.flyway" version "4.2.0"
 }
 
 group 'era.uploader'
@@ -31,6 +32,13 @@ dependencies {
 }
 
 File databaseFile = file("uploader.db")
+
+flyway {
+    url = 'jdbc:sqlite:' + databaseFile.absolutePath
+    locations = [
+            'filesystem:src/main/resources/migrations'
+    ]
+}
 
 jooq {
     version = '3.10.0'
@@ -64,6 +72,7 @@ jooq {
 }
 
 jar {
+    dependsOn flywayMigrate, generateUploaderDBJooqSchemaSource
     from configurations.compile.collect {
         zipTree it
     }

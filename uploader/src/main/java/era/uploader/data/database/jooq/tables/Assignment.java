@@ -7,12 +7,6 @@ package era.uploader.data.database.jooq.tables;
 import era.uploader.data.database.jooq.DefaultSchema;
 import era.uploader.data.database.jooq.Keys;
 import era.uploader.data.database.jooq.tables.records.AssignmentRecord;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.Generated;
-
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
@@ -22,6 +16,10 @@ import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
+
+import javax.annotation.Generated;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -37,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Assignment extends TableImpl<AssignmentRecord> {
 
-    private static final long serialVersionUID = -640066539;
+    private static final long serialVersionUID = 815494568;
 
     /**
      * The reference instance of <code>assignment</code>
@@ -76,6 +74,11 @@ public class Assignment extends TableImpl<AssignmentRecord> {
      * The column <code>assignment.student_id</code>.
      */
     public final TableField<AssignmentRecord, Integer> STUDENT_ID = createField("student_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
+     * The column <code>assignment.created_date_time</code>.
+     */
+    public final TableField<AssignmentRecord, String> CREATED_DATE_TIME = createField("created_date_time", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * Create a <code>assignment</code> table reference

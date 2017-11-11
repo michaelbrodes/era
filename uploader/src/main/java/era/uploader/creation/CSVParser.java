@@ -5,6 +5,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import era.uploader.controller.QRErrorBus;
 import era.uploader.data.model.Course;
+import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
 
 import javax.annotation.Nonnull;
@@ -44,6 +45,12 @@ public class CSVParser {
 
     private static final QRErrorBus BUS = QRErrorBus.instance();
 
+    private final Semester semester;
+
+    public CSVParser(Semester semester) {
+        this.semester = semester;
+    }
+
     /**
      * Parses a single line from the CSV file and produces a singleton multimap
      * of a course to a student.
@@ -52,7 +59,7 @@ public class CSVParser {
      * @return Either a singleton multimap of a course to a student or null
      */
     @Nullable
-    public static Multimap<Course, Student> parseLine(@Nonnull String[] fields) {
+    public Multimap<Course, Student> parseLine(@Nonnull String[] fields) {
         Preconditions.checkNotNull(fields);
         Multimap<Course, Student> ret = null;
 
@@ -61,14 +68,18 @@ public class CSVParser {
             if (courseRecord.length >= COURSE_ID_SIZE) {
                 ret = ArrayListMultimap.create();
                 ret.put(
-                        new Course(courseRecord[DEPARTMENT], courseRecord[COURSE_NBR], courseRecord[SECTION_NBR]),
+                        new Course(
+                                courseRecord[DEPARTMENT],
+                                courseRecord[COURSE_NBR],
+                                courseRecord[SECTION_NBR],
+                                semester
+                        ),
                         Student.builder()
                                 .withLastName(fields[LAST_NAME])
                                 .withFirstName(fields[FIRST_NAME])
                                 .withSchoolId(fields[SCHOOL_ID])
                                 .create(fields[USER_NAME])
                 );
-                return ret;
             } else {
                 fireError(QRErrorStatus.COURSE_PARSE_ERROR, fields);
             }

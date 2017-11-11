@@ -4,22 +4,23 @@
 package era.uploader.data.database.jooq;
 
 
+import era.uploader.data.database.jooq.tables.AllAssignments;
 import era.uploader.data.database.jooq.tables.Assignment;
 import era.uploader.data.database.jooq.tables.Course;
 import era.uploader.data.database.jooq.tables.CourseStudent;
 import era.uploader.data.database.jooq.tables.QrCodeMapping;
+import era.uploader.data.database.jooq.tables.SchemaVersion;
+import era.uploader.data.database.jooq.tables.Semester;
 import era.uploader.data.database.jooq.tables.SqliteSequence;
 import era.uploader.data.database.jooq.tables.Student;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.Generated;
-
 import org.jooq.Catalog;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+
+import javax.annotation.Generated;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -35,12 +36,17 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = -1919788780;
+    private static final long serialVersionUID = 1668393727;
 
     /**
      * The reference instance of <code></code>
      */
     public static final DefaultSchema DEFAULT_SCHEMA = new DefaultSchema();
+
+    /**
+     * The table <code>all_assignments</code>.
+     */
+    public final AllAssignments ALL_ASSIGNMENTS = era.uploader.data.database.jooq.tables.AllAssignments.ALL_ASSIGNMENTS;
 
     /**
      * The table <code>assignment</code>.
@@ -61,6 +67,16 @@ public class DefaultSchema extends SchemaImpl {
      * The table <code>qr_code_mapping</code>.
      */
     public final QrCodeMapping QR_CODE_MAPPING = era.uploader.data.database.jooq.tables.QrCodeMapping.QR_CODE_MAPPING;
+
+    /**
+     * The table <code>schema_version</code>.
+     */
+    public final SchemaVersion SCHEMA_VERSION = era.uploader.data.database.jooq.tables.SchemaVersion.SCHEMA_VERSION;
+
+    /**
+     * The table <code>semester</code>.
+     */
+    public final Semester SEMESTER = era.uploader.data.database.jooq.tables.Semester.SEMESTER;
 
     /**
      * The table <code>sqlite_sequence</code>.
@@ -97,10 +113,13 @@ public class DefaultSchema extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
+            AllAssignments.ALL_ASSIGNMENTS,
             Assignment.ASSIGNMENT,
             Course.COURSE,
             CourseStudent.COURSE_STUDENT,
             QrCodeMapping.QR_CODE_MAPPING,
+            SchemaVersion.SCHEMA_VERSION,
+            Semester.SEMESTER,
             SqliteSequence.SQLITE_SEQUENCE,
             Student.STUDENT);
     }

@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import era.uploader.view.MessageObserver;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 

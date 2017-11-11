@@ -8,11 +8,11 @@ import javax.annotation.ParametersAreNullableByDefault;
 import java.util.HashSet;
 import java.util.Set;
 
-/* Class that will represent Courses which assignments will belong to. This
+/**
+ * Class that will represent Courses which assignments will belong to. This
  * will allow the instructor to associate multiple assignments to a single
  * Course.
  */
-
 @ParametersAreNullableByDefault
 public class Course {
     /* Class Fields */
@@ -20,7 +20,9 @@ public class Course {
     private int uniqueId;
     private String department;                              /* Department where the course is held */
     private String name;                                    /* Name of Course */
-    private String semester;                                /* Semester of Course */
+    @Deprecated
+    private String semesterStr;                                /* Semester of Course */
+    private Semester semester;
     private String courseNumber;                            /* Number of Course */
     private String sectionNumber;                           /* Number for the Course Section */
     private Set<Student> studentsEnrolled = Sets.newHashSet(); /* Set of Students in the Class */
@@ -51,7 +53,7 @@ public class Course {
         Preconditions.checkNotNull(sectionNumber, "Cannot create a course with a null sectionNumber");
         this.department = department;
         this.name = name;
-        this.semester = semester;
+        this.semesterStr = semester;
         this.courseNumber = courseNumber;
         this.sectionNumber = sectionNumber;
         this.assignments = assignments == null ? Sets.newHashSet() : assignments;
@@ -69,7 +71,8 @@ public class Course {
     public Course (
             @Nonnull String department,
             @Nonnull String courseNumber,
-            @Nonnull String sectionNumber
+            @Nonnull String sectionNumber,
+            @Nonnull Semester semester
     ) {
         Preconditions.checkNotNull(department, "Cannot create a course with a null department");
         Preconditions.checkNotNull(courseNumber, "Cannot create a course with a null courseNumber");
@@ -81,14 +84,20 @@ public class Course {
         this.sectionNumber = sectionNumber;
         this.studentsEnrolled = Sets.newHashSet();
         this.assignments = Sets.newHashSet();
+        this.semester = semester;
     }
 
-    private Course(String department, String courseNumber, String sectionNumber, Builder builder) {
+    private Course(
+            String department,
+            String courseNumber,
+            String sectionNumber,
+            @Nonnull Builder builder) {
         this.department = department;
         this.courseNumber = courseNumber;
         this.sectionNumber = sectionNumber;
-        this.name = builder.name;
         this.semester = builder.semester;
+        this.name = builder.name;
+        this.semesterStr = builder.semesterDeprecated;
         this.studentsEnrolled = builder.studentsEnrolled == null ?
                 Sets.newHashSet() :
                 builder.studentsEnrolled;
@@ -121,12 +130,32 @@ public class Course {
         this.name = name;
     }
 
+    /**
+     * TODO: remove this method by the end of sprint 4
+     * @deprecated this can no longer be stored in the database, please use
+     * {@link #getSemesterObj()}
+     */
+    @Deprecated
     public String getSemester() {
-        return semester;
+        return semesterStr;
     }
 
+    @Deprecated
     public void setSemester(String semester) {
+        this.semesterStr = semester;
+    }
+
+    public void setSemester(Semester semester) {
         this.semester = semester;
+    }
+
+    /**
+     * @return A non-null {@link Semester} object that this course belongs to.
+     * This getter is suffixed with <code>Obj</code> because previously we
+     * stored the semester as a String and we had to deprecate that method
+     */
+    public Semester getSemesterObj() {
+        return semester;
     }
 
     @Nonnull
@@ -149,27 +178,8 @@ public class Course {
         this.sectionNumber = sectionNumber;
     }
 
-    /* Class Methods */
-    public void addStudent(Student student) {
-        studentsEnrolled.add(student);
-    }
-
-    public void removeStudent(Student student) {
-        studentsEnrolled.remove(student);
-    }
-
     public Set<Student> getStudentsEnrolled() {
         return studentsEnrolled;
-    }
-
-    public Student getStudent(Student student) {
-        for (Student otherStudent :
-                studentsEnrolled) {
-            if (otherStudent.equals(student)) {
-                return otherStudent;
-            }
-        }
-        return null;
     }
 
     public Set<Assignment> getAssignments() {
@@ -191,31 +201,49 @@ public class Course {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Course)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         Course course = (Course) o;
 
-        if (department != null ? !department.equalsIgnoreCase(course.department) : course.department != null) return false;
-        if (semester != null ? !semester.equalsIgnoreCase(course.semester) : course.semester != null) return false;
-        if (courseNumber != null ? !courseNumber.equalsIgnoreCase(course.courseNumber) : course.courseNumber != null)
-            return false;
-        return sectionNumber != null ? sectionNumber.equals(course.sectionNumber) : course.sectionNumber == null;
+        return (uniqueId == 0 || uniqueId == course.uniqueId)
+                && department.equals(course.department)
+                && (name != null ? name.equals(course.name) : course.name == null)
+                && semester.equals(course.semester)
+                && courseNumber.equals(course.courseNumber)
+                && sectionNumber.equals(course.sectionNumber);
     }
 
     @Override
     public int hashCode() {
-        int result = department != null ? department.hashCode() : 0;
+        int result = uniqueId;
+        result = 31 * result + department.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (semester != null ? semester.hashCode() : 0);
-        result = 31 * result + (courseNumber != null ? courseNumber.hashCode() : 0);
-        result = 31 * result + (sectionNumber != null ? sectionNumber.hashCode() : 0);
+        result = 31 * result + courseNumber.hashCode();
+        result = 31 * result + sectionNumber.hashCode();
         return result;
     }
 
+    /**
+     * A Builder is a <em>design pattern</em> that allows you to specify constructor
+     * arguments with just plain setters. We use a builder here because the
+     * {@link Course} class has a great deal of potentially Nullable
+     * fields. For each nullable field an exponential amount of constructor
+     * overloads could be required. If you would like to do those constructor
+     * overloads then more power to you, but I am too lazy for that.
+     *
+     * Our convention is that each field that can be null will have a Builder
+     * setter prefixed by the word <code>with</code> and suffixed by the field
+     * name in camel case. All nonnull fields will be specified in
+     * {@link #create}.
+     */
     public static class Builder {
         private int uniqueId;
         private String department;                              /* Department where the course is held */
         private String name;                                    /* Name of Course */
-        private String semester;                                /* Semester of Course */
+        @Deprecated
+        private String semesterDeprecated;                                /* Semester of Course */
+        private Semester semester;
         private String courseNumber;                            /* Number of Course */
         private String sectionNumber;                           /* Number for the Course Section */
         private Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
@@ -231,8 +259,9 @@ public class Course {
             return this;
         }
 
+        @Deprecated
         public Builder withSemester(String semester) {
-            this.semester = semester.toUpperCase();
+            this.semesterDeprecated = semester.toUpperCase();
             return this;
         }
 
@@ -248,12 +277,17 @@ public class Course {
             return this;
         }
 
-        public Builder havingStudentsEnrolled(Set<Student> studentsEnrolled) {
+        public Builder withSemester(Semester semester) {
+            this.semester =  semester;
+            return this;
+        }
+
+        public Builder withStudents(Set<Student> studentsEnrolled) {
             this.studentsEnrolled = studentsEnrolled;
             return this;
         }
 
-        public Builder havingAssignments(Set<Assignment> assignments) {
+        public Builder withAssignments(Set<Assignment> assignments) {
             this.assignments = assignments;
             return this;
         }

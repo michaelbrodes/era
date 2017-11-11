@@ -1,7 +1,6 @@
 package era.uploader.data.database;
 
 import com.google.common.collect.Sets;
-import com.google.zxing.qrcode.encoder.QRCode;
 import era.uploader.data.PageDAO;
 import era.uploader.data.database.jooq.tables.records.QrCodeMappingRecord;
 import era.uploader.data.model.QRCodeMapping;
@@ -19,6 +18,7 @@ import static era.uploader.data.database.jooq.Tables.QR_CODE_MAPPING;
  * Provides CRUD functionality for Pages inside a database.
  */
 public class PageDAOImpl implements PageDAO, DatabaseDAO<QrCodeMappingRecord, QRCodeMapping> {
+    @Deprecated
     private final Set<QRCodeMapping> db = Sets.newHashSet();
 
     @Override
@@ -53,12 +53,16 @@ public class PageDAOImpl implements PageDAO, DatabaseDAO<QrCodeMappingRecord, QR
 
     @Override
     public QRCodeMapping read(String uuid) {
-        for  (QRCodeMapping QRCodeMapping : db) {
-            if (QRCodeMapping.getUuid().equals(uuid)) {
-                return QRCodeMapping;
-            }
+        QRCodeMapping ret;
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            ret = ctx.selectFrom(QR_CODE_MAPPING)
+                    .where(QR_CODE_MAPPING.UUID.eq(uuid))
+                    .fetchOptional()
+                    .map(this::convertToModel)
+                    .orElse(null);
         }
-        return null;
+
+        return ret;
     }
 
     /* Modify data stored in already existing QR_CODE_MAPPING in database */

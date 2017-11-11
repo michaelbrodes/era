@@ -1,7 +1,5 @@
 package era.uploader.data.model;
 
-import com.google.common.collect.Sets;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
@@ -14,7 +12,6 @@ import java.util.Set;
  * builder QR codes, and match the information inside of each code to its
  * respective student.
  */
-
 public class Student {
     /* Class Fields */
     private String firstName; /* Student's first name */
@@ -142,16 +139,25 @@ public class Student {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Student)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         Student student = (Student) o;
 
-        return uniqueId == student.uniqueId;
+        return getUniqueId() == student.getUniqueId()
+                && (getFirstName() != null ? getFirstName().equals(student.getFirstName()) : student.getFirstName() == null)
+                && (getLastName() != null ? getLastName().equals(student.getLastName()) : student.getLastName() == null)
+                && (getSchoolId() != null ? getSchoolId().equals(student.getSchoolId()) : student.getSchoolId() == null)
+                && getUserName().equals(student.getUserName());
     }
 
     @Override
     public int hashCode() {
-        return (int) uniqueId;
+        int result = getFirstName() != null ? getFirstName().hashCode() : 0;
+        result = 31 * result + (getLastName() != null ? getLastName().hashCode() : 0);
+        result = 31 * result + (getSchoolId() != null ? getSchoolId().hashCode() : 0);
+        result = 31 * result + getUserName().hashCode();
+        result = 31 * result + getUniqueId();
+        return result;
     }
 
     @Nonnull
@@ -185,11 +191,16 @@ public class Student {
 
     /**
      * A Builder is a <em>design pattern</em> that allows you to specify constructor
-     * arguments with just plain setters. The reason why a builder is used on
-     * this class is that there is a plethora of potentially nullable fields in
-     * this class, which would require an exponentially large amount of
-     * constructor overloads. You are welcome to write those constructor
-     * overloads but I am too lazy for it.
+     * arguments with just plain setters. We use a builder here because the
+     * {@link Student} class has a great deal of potentially Nullable
+     * fields. For each nullable field an exponential amount of constructor
+     * overloads could be required. If you would like to do those constructor
+     * overloads then more power to you, but I am too lazy for that.
+     *
+     * Our convention is that each field that can be null will have a Builder
+     * setter prefixed by the word <code>with</code> and suffixed by the field
+     * name in camel case. All nonnull fields will be specified in
+     * {@link #create}.
      */
     public static class Builder {
         private String firstName; /* Student's first name */
@@ -235,12 +246,12 @@ public class Student {
             return this;
         }
 
-        public Builder takingCourses(Set<Course> courses) {
+        public Builder withCourses(Set<Course> courses) {
             this.courses.addAll(courses);
             return this;
         }
 
-        public Builder takingCourse(Course course) {
+        public Builder withCourse(Course course) {
             this.courses.add(course);
             return this;
         }

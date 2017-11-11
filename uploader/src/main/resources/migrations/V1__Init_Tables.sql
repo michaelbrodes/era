@@ -9,9 +9,9 @@
 -- either use the command line sqlite3 (https://sqlite.org/download.html)
 -- client or intellij's database plugin. An example of applying a migration
 -- using the sqlite3 command client is as follows:
--- `sqlite> .read v001-InitialTables.sql`
+-- `sqlite> .read V1__Init_Tables.sql`
 -- or with the sqlite3 command itself:
--- `sqlite3 uploader.db < v001-InitialTables.sql`
+-- `sqlite3 uploader.db < V1__Init_Tables.sql`
 
 -- Corresponds to era.uploader.data.model.Student
 CREATE TABLE IF NOT EXISTS student (

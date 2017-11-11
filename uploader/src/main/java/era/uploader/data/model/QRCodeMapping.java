@@ -2,7 +2,6 @@ package era.uploader.data.model;
 
 import com.google.common.base.Preconditions;
 import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.encoder.QRCode;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import javax.annotation.Nonnull;
@@ -99,16 +98,6 @@ public class QRCodeMapping {
         this.document = document;
     }
 
-    /**
-     * A Builder is a <em>design pattern</em> that allows you to specify constructor
-     * arguments with just plain setters. The reason why a builder is used on
-     * this class is that there is a plethora of potentially nullable fields in
-     * this class, which would require an exponentially large amount of
-     * constructor overloads. You are welcome to write those constructor
-     * overloads but I am too lazy for it.
-     *
-     * @return a new {@link QRCodeMapping.Builder} used to construct a new QRCodeMapping
-     */
     public static Builder builder() {
         return new Builder();
     }
@@ -124,11 +113,16 @@ public class QRCodeMapping {
 
     /**
      * A Builder is a <em>design pattern</em> that allows you to specify constructor
-     * arguments with just plain setters. The reason why a builder is used on
-     * this class is that there is a plethora of potentially nullable fields in
-     * this class, which would require an exponentially large amount of
-     * constructor overloads. You are welcome to write those constructor
-     * overloads but I am too lazy for it.
+     * arguments with just plain setters. We use a builder here because the
+     * {@link QRCodeMapping} class has a great deal of potentially Nullable
+     * fields. For each nullable field an exponential amount of constructor
+     * overloads could be required. If you would like to do those constructor
+     * overloads then more power to you, but I am too lazy for that.
+     *
+     * Our convention is that each field that can be null will have a Builder
+     * setter prefixed by the word <code>with</code> and suffixed by the field
+     * name in camel case. All nonnull fields will be specified in
+     * {@link #create}.
      */
     public static class Builder {
         private Student student;
@@ -142,7 +136,7 @@ public class QRCodeMapping {
             return this;
         }
 
-        public Builder byStudent(Student student) {
+        public Builder withStudent(Student student) {
             this.student = student;
             return this;
         }

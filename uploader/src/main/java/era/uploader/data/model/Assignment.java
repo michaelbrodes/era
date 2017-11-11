@@ -10,12 +10,17 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * An assignment is a pdf scan of the student's actual assignment. One Course
+ * can have many assignments. Additionally one Student can also have many
+ * assignments.
+ */
 public class Assignment {
     /* Class Fields */
     private String imageFilePath;               /* Path to the PDF file with the images associated with the assignment */
     private String name;                        /* Name of the Assignment */
     private Collection<QRCodeMapping> QRCodeMappings = new HashSet<>();  /* Set of QRCodeMapping objects for each Assignment */
-    private PDDocument image;
+    private transient PDDocument image;
     private Student student;
     private Course course;
     private int course_id;
@@ -73,26 +78,22 @@ public class Assignment {
         Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(student, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(course, "Cannot create an Assignment with a null course");
-
-        this.imageFilePath = IOUtil.removeSpaces(course.getName())
-                + '_'
-                + student.getSchoolId()
-                + "_"
-                + IOUtil.removeSpaces(name)
-                + ".pdf";
         this.name = name;
         this.QRCodeMappings = QRCodeMappings == null ? Sets.newHashSet() : QRCodeMappings;
         this.student = student;
         this.course = course;
+        this.imageFilePath = generateFileLocation();
     }
 
     public Assignment(
-            String imageFilePath,
-            String name,
+            @Nonnull String imageFilePath,
+            @Nonnull String name,
             int course_id,
             int student_id,
             int uniqueId
     ) {
+        Preconditions.checkNotNull(imageFilePath, "Assignment cannot have a null imageFilePath!");
+        Preconditions.checkNotNull(name, "Assignment cannot have a null name!");
         this.imageFilePath = imageFilePath;
         this.name = name;
         this.course_id = course_id;
@@ -100,30 +101,58 @@ public class Assignment {
         this.uniqueId = uniqueId;
     }
 
+    private Assignment(
+            String name,
+            Builder builder
+    ) {
+        this.name = name;
+        this.course = builder.course;
+        this.student = builder.student;
+
+        this.imageFilePath = course == null || student == null ?
+                null :
+                generateFileLocation();
+
+        this.course_id = builder.course_id;
+        this.student_id = builder.student_id;
+        this.image = builder.image;
+        this.QRCodeMappings = builder.QRCodeMappings;
+        this.uniqueId = builder.uniqueId;
+    }
+
+    /**
+     * This generates the filename that we are going to save this assignment at.
+     * We name assignments like:
+     * "course name"-"student id (800 number at SIUE)"-"assignment name".pdf.
+     * Note that no spaces are allowed in the filename.
+     */
+    private String generateFileLocation() {
+        return IOUtil.removeSpaces(course.getName())
+                + '_'
+                + student.getSchoolId()
+                + "_"
+                + IOUtil.removeSpaces(name)
+                + ".pdf";
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Assignment)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         Assignment that = (Assignment) o;
 
-        if (getImageFilePath() != null ? !getImageFilePath().equals(that.getImageFilePath()) : that.getImageFilePath() != null)
-            return false;
-        if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) return false;
-        if (getQRCodeMappings() != null ? !getQRCodeMappings().equals(that.getQRCodeMappings()) : that.getQRCodeMappings() != null) return false;
-        return student != null ? student.equals(that.student) : that.student == null;
+        return uniqueId == that.uniqueId && name.equals(that.name) && student.equals(that.student) && course.equals(that.course);
     }
 
     @Override
     public int hashCode() {
-        int result = getImageFilePath() != null ? getImageFilePath().hashCode() : 0;
-        result = 31 * result + (getName() != null ? getName().hashCode() : 0);
-        result = 31 * result + (getQRCodeMappings() != null ? getQRCodeMappings().hashCode() : 0);
-        result = 31 * result + (student != null ? student.hashCode() : 0);
+        int result = name.hashCode();
+        result = 31 * result + student.hashCode();
+        result = 31 * result + course.hashCode();
+        result = 31 * result + uniqueId;
         return result;
     }
-
-
 
     /* Getters and Setters */
     @Nonnull
@@ -179,7 +208,6 @@ public class Assignment {
         this.QRCodeMappings = QRCodeMappings == null ? Sets.newHashSet() : QRCodeMappings;
     }
 
-    @Nonnull
     public Course getCourse() {
         return course;
     }
@@ -203,5 +231,79 @@ public class Assignment {
 
     public void setStudent(Student student) {
         this.student = student;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * A Builder is a <em>design pattern</em> that allows you to specify constructor
+     * arguments with just plain setters. We use a builder here because the
+     * {@link Assignment} class has a great deal of potentially Nullable
+     * fields. For each nullable field an exponential amount of constructor
+     * overloads could be required. If you would like to do those constructor
+     * overloads then more power to you, but I am too lazy for that.
+     *
+     * Our convention is that each field that can be null will have a Builder
+     * setter prefixed by the word <code>with</code> and suffixed by the field
+     * name in camel case. All nonnull fields will be specified in
+     * {@link #create}.
+     */
+    public static class Builder {
+        private String imageFilePath;               /* Path to the PDF file with the images associated with the assignment */
+        private Collection<QRCodeMapping> QRCodeMappings = new HashSet<>();  /* Set of QRCodeMapping objects for each Assignment */
+        private transient PDDocument image;
+        private int course_id;
+        private int student_id;
+        private int uniqueId;
+        private Student student;
+        private Course course;
+
+        public Builder withImageFilePath(String imageFilePath) {
+            this.imageFilePath = imageFilePath;
+            return this;
+        }
+
+        public Builder withQRCodeMappings(Collection<QRCodeMapping> QRCodeMappings) {
+            this.QRCodeMappings = QRCodeMappings;
+            return this;
+        }
+
+        public Builder withImage(PDDocument image) {
+            this.image = image;
+            return this;
+        }
+
+        public Builder withCourse(Course course) {
+            this.course = course;
+            return this;
+        }
+
+        public Builder withStudent(Student student) {
+            this.student = student;
+            return this;
+        }
+
+        public Builder withCourse_id(int course_id) {
+            this.course_id = course_id;
+            return this;
+        }
+
+        public Builder withStudent_id(int student_id) {
+            this.student_id = student_id;
+            return this;
+        }
+
+        public Builder withUniqueId(int uniqueId) {
+            this.uniqueId = uniqueId;
+            return this;
+        }
+
+        public Assignment create(@Nonnull String name) {
+            Preconditions.checkNotNull(name);
+            return new Assignment(name, this);
+        }
+
     }
 }

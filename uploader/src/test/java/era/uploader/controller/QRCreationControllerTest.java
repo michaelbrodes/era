@@ -8,11 +8,13 @@ import era.uploader.data.database.MockCourseDAOImpl;
 import era.uploader.data.database.MockPageDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
+import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.file.Paths;
+import java.time.Year;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -89,11 +91,12 @@ public class QRCreationControllerTest {
                 "822222222",
                 "833333333"
         );
-        Course eighteen = new Course("CHEM", "131", "018");
-        Course two = new Course("CHEM", "131", "002");
-        Course notExist = new Course("Spooky spooky ghosts", "101", "001");
+        Semester currentSemester = new Semester(Semester.Term.FALL, Year.now());
+        Course eighteen = new Course("CHEM", "131", "018", currentSemester);
+        Course two = new Course("CHEM", "131", "002", currentSemester);
+        Course notExist = new Course("Spooky spooky ghosts", "101", "001", currentSemester);
 
-        Multimap<Course, Student> coursesToStudents = ctrl.generateStudents(Paths.get(roster));
+        Multimap<Course, Student> coursesToStudents = ctrl.generateStudents(Paths.get(roster), currentSemester);
 
         Map<Course, Collection<Student>> coursesToStudentsMap = coursesToStudents.asMap();
         // 002 and 018 each have one member while 018 has two

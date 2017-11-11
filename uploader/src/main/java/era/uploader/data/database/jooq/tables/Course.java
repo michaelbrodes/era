@@ -7,14 +7,8 @@ package era.uploader.data.database.jooq.tables;
 import era.uploader.data.database.jooq.DefaultSchema;
 import era.uploader.data.database.jooq.Keys;
 import era.uploader.data.database.jooq.tables.records.CourseRecord;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.Generated;
-
 import org.jooq.Field;
-import org.jooq.Identity;
+import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Schema;
 import org.jooq.Table;
@@ -22,6 +16,10 @@ import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
+
+import javax.annotation.Generated;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -37,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Course extends TableImpl<CourseRecord> {
 
-    private static final long serialVersionUID = 1347006153;
+    private static final long serialVersionUID = -1343485721;
 
     /**
      * The reference instance of <code>course</code>
@@ -55,17 +53,12 @@ public class Course extends TableImpl<CourseRecord> {
     /**
      * The column <code>course.unique_id</code>.
      */
-    public final TableField<CourseRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+    public final TableField<CourseRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>course.name</code>.
      */
     public final TableField<CourseRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.CLOB, this, "");
-
-    /**
-     * The column <code>course.semester</code>.
-     */
-    public final TableField<CourseRecord, String> SEMESTER = createField("semester", org.jooq.impl.SQLDataType.CLOB, this, "");
 
     /**
      * The column <code>course.department</code>.
@@ -81,6 +74,11 @@ public class Course extends TableImpl<CourseRecord> {
      * The column <code>course.section_number</code>.
      */
     public final TableField<CourseRecord, String> SECTION_NUMBER = createField("section_number", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>course.semester_id</code>.
+     */
+    public final TableField<CourseRecord, Integer> SEMESTER_ID = createField("semester_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * Create a <code>course</code> table reference
@@ -123,14 +121,6 @@ public class Course extends TableImpl<CourseRecord> {
      * {@inheritDoc}
      */
     @Override
-    public Identity<CourseRecord, Integer> getIdentity() {
-        return Keys.IDENTITY_COURSE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public UniqueKey<CourseRecord> getPrimaryKey() {
         return Keys.PK_COURSE;
     }
@@ -141,6 +131,14 @@ public class Course extends TableImpl<CourseRecord> {
     @Override
     public List<UniqueKey<CourseRecord>> getKeys() {
         return Arrays.<UniqueKey<CourseRecord>>asList(Keys.PK_COURSE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ForeignKey<CourseRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<CourseRecord, ?>>asList(Keys.FK_COURSE_SEMESTER_1);
     }
 
     /**

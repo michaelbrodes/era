@@ -20,6 +20,7 @@ import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
  */
 public class AssignmentDAOImpl implements AssignmentDAO, DatabaseDAO<AssignmentRecord, Assignment> {
     private final CourseDAO courseDAO;
+    @Deprecated
     private final Set<Assignment> db = new HashSet<>();
     private final StudentDAO studentDAO;
 
@@ -93,6 +94,8 @@ public class AssignmentDAOImpl implements AssignmentDAO, DatabaseDAO<AssignmentR
         }
     }
 
+    @Override
+    @Deprecated
     public Assignment convertToModel(AssignmentRecord record) {
         return new Assignment(
                 record.getImageFilePath(),
@@ -102,7 +105,9 @@ public class AssignmentDAOImpl implements AssignmentDAO, DatabaseDAO<AssignmentR
                 studentDAO.read(record.getStudentId())
         );
     }
+
     @Override
+    @Deprecated
     public AssignmentRecord convertToRecord(Assignment model, DSLContext ctx) {
         AssignmentRecord assignment = ctx.newRecord(ASSIGNMENT);
         assignment.setCourseId(model.getCourse_id());

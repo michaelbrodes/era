@@ -8,19 +8,21 @@ import era.uploader.data.database.jooq.tables.Assignment;
 import era.uploader.data.database.jooq.tables.Course;
 import era.uploader.data.database.jooq.tables.CourseStudent;
 import era.uploader.data.database.jooq.tables.QrCodeMapping;
+import era.uploader.data.database.jooq.tables.SchemaVersion;
+import era.uploader.data.database.jooq.tables.Semester;
 import era.uploader.data.database.jooq.tables.Student;
 import era.uploader.data.database.jooq.tables.records.AssignmentRecord;
 import era.uploader.data.database.jooq.tables.records.CourseRecord;
 import era.uploader.data.database.jooq.tables.records.CourseStudentRecord;
 import era.uploader.data.database.jooq.tables.records.QrCodeMappingRecord;
+import era.uploader.data.database.jooq.tables.records.SchemaVersionRecord;
+import era.uploader.data.database.jooq.tables.records.SemesterRecord;
 import era.uploader.data.database.jooq.tables.records.StudentRecord;
-
-import javax.annotation.Generated;
-
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.AbstractKeys;
+
+import javax.annotation.Generated;
 
 
 /**
@@ -41,8 +43,6 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
-    public static final Identity<CourseRecord, Integer> IDENTITY_COURSE = Identities0.IDENTITY_COURSE;
-    public static final Identity<StudentRecord, Integer> IDENTITY_STUDENT = Identities0.IDENTITY_STUDENT;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
@@ -52,6 +52,8 @@ public class Keys {
     public static final UniqueKey<CourseRecord> PK_COURSE = UniqueKeys0.PK_COURSE;
     public static final UniqueKey<CourseStudentRecord> PK_COURSE_STUDENT = UniqueKeys0.PK_COURSE_STUDENT;
     public static final UniqueKey<QrCodeMappingRecord> PK_QR_CODE_MAPPING = UniqueKeys0.PK_QR_CODE_MAPPING;
+    public static final UniqueKey<SchemaVersionRecord> PK_SCHEMA_VERSION = UniqueKeys0.PK_SCHEMA_VERSION;
+    public static final UniqueKey<SemesterRecord> PK_SEMESTER = UniqueKeys0.PK_SEMESTER;
     public static final UniqueKey<StudentRecord> PK_STUDENT = UniqueKeys0.PK_STUDENT;
 
     // -------------------------------------------------------------------------
@@ -60,6 +62,7 @@ public class Keys {
 
     public static final ForeignKey<AssignmentRecord, CourseRecord> FK_ASSIGNMENT_COURSE_1 = ForeignKeys0.FK_ASSIGNMENT_COURSE_1;
     public static final ForeignKey<AssignmentRecord, StudentRecord> FK_ASSIGNMENT_STUDENT_1 = ForeignKeys0.FK_ASSIGNMENT_STUDENT_1;
+    public static final ForeignKey<CourseRecord, SemesterRecord> FK_COURSE_SEMESTER_1 = ForeignKeys0.FK_COURSE_SEMESTER_1;
     public static final ForeignKey<CourseStudentRecord, CourseRecord> FK_COURSE_STUDENT_COURSE_1 = ForeignKeys0.FK_COURSE_STUDENT_COURSE_1;
     public static final ForeignKey<CourseStudentRecord, StudentRecord> FK_COURSE_STUDENT_STUDENT_1 = ForeignKeys0.FK_COURSE_STUDENT_STUDENT_1;
     public static final ForeignKey<QrCodeMappingRecord, StudentRecord> FK_QR_CODE_MAPPING_STUDENT_1 = ForeignKeys0.FK_QR_CODE_MAPPING_STUDENT_1;
@@ -68,22 +71,20 @@ public class Keys {
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
 
-    private static class Identities0 extends AbstractKeys {
-        public static Identity<CourseRecord, Integer> IDENTITY_COURSE = createIdentity(Course.COURSE, Course.COURSE.UNIQUE_ID);
-        public static Identity<StudentRecord, Integer> IDENTITY_STUDENT = createIdentity(Student.STUDENT, Student.STUDENT.UNIQUE_ID);
-    }
-
     private static class UniqueKeys0 extends AbstractKeys {
         public static final UniqueKey<AssignmentRecord> PK_ASSIGNMENT = createUniqueKey(Assignment.ASSIGNMENT, "pk_assignment", Assignment.ASSIGNMENT.UNIQUE_ID);
         public static final UniqueKey<CourseRecord> PK_COURSE = createUniqueKey(Course.COURSE, "pk_course", Course.COURSE.UNIQUE_ID);
         public static final UniqueKey<CourseStudentRecord> PK_COURSE_STUDENT = createUniqueKey(CourseStudent.COURSE_STUDENT, "pk_course_student", CourseStudent.COURSE_STUDENT.COURSE_ID, CourseStudent.COURSE_STUDENT.STUDENT_ID);
         public static final UniqueKey<QrCodeMappingRecord> PK_QR_CODE_MAPPING = createUniqueKey(QrCodeMapping.QR_CODE_MAPPING, "pk_qr_code_mapping", QrCodeMapping.QR_CODE_MAPPING.UUID);
+        public static final UniqueKey<SchemaVersionRecord> PK_SCHEMA_VERSION = createUniqueKey(SchemaVersion.SCHEMA_VERSION, "pk_schema_version", SchemaVersion.SCHEMA_VERSION.INSTALLED_RANK);
+        public static final UniqueKey<SemesterRecord> PK_SEMESTER = createUniqueKey(Semester.SEMESTER, "pk_semester", Semester.SEMESTER.UNIQUE_ID);
         public static final UniqueKey<StudentRecord> PK_STUDENT = createUniqueKey(Student.STUDENT, "pk_student", Student.STUDENT.UNIQUE_ID);
     }
 
     private static class ForeignKeys0 extends AbstractKeys {
         public static final ForeignKey<AssignmentRecord, CourseRecord> FK_ASSIGNMENT_COURSE_1 = createForeignKey(era.uploader.data.database.jooq.Keys.PK_COURSE, Assignment.ASSIGNMENT, "fk_assignment_course_1", Assignment.ASSIGNMENT.COURSE_ID);
         public static final ForeignKey<AssignmentRecord, StudentRecord> FK_ASSIGNMENT_STUDENT_1 = createForeignKey(era.uploader.data.database.jooq.Keys.PK_STUDENT, Assignment.ASSIGNMENT, "fk_assignment_student_1", Assignment.ASSIGNMENT.STUDENT_ID);
+        public static final ForeignKey<CourseRecord, SemesterRecord> FK_COURSE_SEMESTER_1 = createForeignKey(era.uploader.data.database.jooq.Keys.PK_SEMESTER, Course.COURSE, "fk_course_semester_1", Course.COURSE.SEMESTER_ID);
         public static final ForeignKey<CourseStudentRecord, CourseRecord> FK_COURSE_STUDENT_COURSE_1 = createForeignKey(era.uploader.data.database.jooq.Keys.PK_COURSE, CourseStudent.COURSE_STUDENT, "fk_course_student_course_1", CourseStudent.COURSE_STUDENT.COURSE_ID);
         public static final ForeignKey<CourseStudentRecord, StudentRecord> FK_COURSE_STUDENT_STUDENT_1 = createForeignKey(era.uploader.data.database.jooq.Keys.PK_STUDENT, CourseStudent.COURSE_STUDENT, "fk_course_student_student_1", CourseStudent.COURSE_STUDENT.STUDENT_ID);
         public static final ForeignKey<QrCodeMappingRecord, StudentRecord> FK_QR_CODE_MAPPING_STUDENT_1 = createForeignKey(era.uploader.data.database.jooq.Keys.PK_STUDENT, QrCodeMapping.QR_CODE_MAPPING, "fk_qr_code_mapping_student_1", QrCodeMapping.QR_CODE_MAPPING.STUDENT_ID);

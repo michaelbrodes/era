@@ -4,10 +4,13 @@
 package era.uploader.data.database.jooq;
 
 
+import era.uploader.data.database.jooq.tables.AllAssignments;
 import era.uploader.data.database.jooq.tables.Assignment;
 import era.uploader.data.database.jooq.tables.Course;
 import era.uploader.data.database.jooq.tables.CourseStudent;
 import era.uploader.data.database.jooq.tables.QrCodeMapping;
+import era.uploader.data.database.jooq.tables.SchemaVersion;
+import era.uploader.data.database.jooq.tables.Semester;
 import era.uploader.data.database.jooq.tables.SqliteSequence;
 import era.uploader.data.database.jooq.tables.Student;
 
@@ -28,6 +31,11 @@ import javax.annotation.Generated;
 public class Tables {
 
     /**
+     * The table <code>all_assignments</code>.
+     */
+    public static final AllAssignments ALL_ASSIGNMENTS = era.uploader.data.database.jooq.tables.AllAssignments.ALL_ASSIGNMENTS;
+
+    /**
      * The table <code>assignment</code>.
      */
     public static final Assignment ASSIGNMENT = era.uploader.data.database.jooq.tables.Assignment.ASSIGNMENT;
@@ -46,6 +54,16 @@ public class Tables {
      * The table <code>qr_code_mapping</code>.
      */
     public static final QrCodeMapping QR_CODE_MAPPING = era.uploader.data.database.jooq.tables.QrCodeMapping.QR_CODE_MAPPING;
+
+    /**
+     * The table <code>schema_version</code>.
+     */
+    public static final SchemaVersion SCHEMA_VERSION = era.uploader.data.database.jooq.tables.SchemaVersion.SCHEMA_VERSION;
+
+    /**
+     * The table <code>Semester</code>.
+     */
+    public static final Semester SEMESTER = era.uploader.data.database.jooq.tables.Semester.SEMESTER;
 
     /**
      * The table <code>sqlite_sequence</code>.

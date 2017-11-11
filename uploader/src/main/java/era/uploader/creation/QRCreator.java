@@ -60,7 +60,7 @@ public class QRCreator implements Callable<QRCodeMapping> {
         return QRCodeMapping.builder()
                 .withQRCode(qrCode)
                 .withSequenceNumber(sequenceNumber)
-                .byStudent(student)
+                .withStudent(student)
                 .create(uuid);
     }
 }

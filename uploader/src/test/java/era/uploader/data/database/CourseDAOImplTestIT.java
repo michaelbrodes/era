@@ -68,7 +68,7 @@ public class CourseDAOImplTestIT {
         Course testCourse = Course.builder()
                 .withName(courseName)
                 .withSemester("FALL")
-                .havingStudentsEnrolled(ImmutableSet.of(
+                .withStudents(ImmutableSet.of(
                         Student.builder()
                             .withFirstName(archerName)
                             .withLastName("Archer")
@@ -80,7 +80,7 @@ public class CourseDAOImplTestIT {
                             .withSchoolId("800888888")
                             .create("lkane")
                 ))
-                .havingAssignments(ImmutableSet.of())
+                .withAssignments(ImmutableSet.of())
                 .create("CHEM", "111", sectionNumber);
 
         courseDAO.insert(testCourse);
