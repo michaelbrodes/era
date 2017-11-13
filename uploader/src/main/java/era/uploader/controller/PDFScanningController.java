@@ -15,6 +15,7 @@ import era.uploader.processing.PDFProcessor;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -35,7 +36,7 @@ public class PDFScanningController {
         return PDFProcessor.process(pageDAO, assignmentDAO, pdf, course, assignment, host);
     }
 
-    public Set<Course> getAllCourses() {
+    public List<Course> getAllCourses() {
         return courseDAO.getAllCourses();
     }
 }

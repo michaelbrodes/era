@@ -13,12 +13,10 @@ import java.util.Set;
 
 import static era.uploader.data.database.jooq.Tables.QR_CODE_MAPPING;
 
-
-
 /**
  * Provides CRUD functionality for Pages inside a database.
  */
-public class PageDAOImpl implements PageDAO, DatabaseDAO<QrCodeMappingRecord, QRCodeMapping> {
+public class PageDAOImpl implements PageDAO,  DatabaseDAO<QrCodeMappingRecord, QRCodeMapping> {
     private final Set<QRCodeMapping> db = Sets.newHashSet();
 
     @Override
@@ -53,12 +51,21 @@ public class PageDAOImpl implements PageDAO, DatabaseDAO<QrCodeMappingRecord, QR
 
     @Override
     public QRCodeMapping read(String uuid) {
-        for  (QRCodeMapping QRCodeMapping : db) {
-            if (QRCodeMapping.getUuid().equals(uuid)) {
-                return QRCodeMapping;
-            }
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            QrCodeMappingRecord qrCodeMapping = ctx.selectFrom(QR_CODE_MAPPING)
+                    .where(QR_CODE_MAPPING.UUID.eq(uuid))
+                    .fetchOne();
+
+            return convertToModel(qrCodeMapping);
         }
-        return null;
+    }
+
+    public void delete(String uuid) {
+        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+            ctx.deleteFrom(QR_CODE_MAPPING)
+                    .where(QR_CODE_MAPPING.UUID.eq(uuid))
+                    .execute();
+        }
     }
 
     /* Modify data stored in already existing QR_CODE_MAPPING in database */
@@ -72,13 +79,6 @@ public class PageDAOImpl implements PageDAO, DatabaseDAO<QrCodeMappingRecord, QR
         }
     }
 
-    public void delete(String uuid) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
-            ctx.deleteFrom(QR_CODE_MAPPING)
-                    .where(QR_CODE_MAPPING.UUID.eq(uuid))
-                    .execute();
-        }
-    }
     public Set<QRCodeMapping> getDb () {
         return db;
     }

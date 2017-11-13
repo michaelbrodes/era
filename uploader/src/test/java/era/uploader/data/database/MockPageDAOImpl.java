@@ -51,11 +51,11 @@ public class MockPageDAOImpl implements PageDAO, MockDAO<QRCodeMapping> {
     }
 
     public void delete(String uuid) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
-            ctx.deleteFrom(QR_CODE_MAPPING)
-                    .where(QR_CODE_MAPPING.UUID.eq(uuid))
-                    .execute();
-        }
+        QRCodeMapping qr = db.stream()
+                .filter(qrCodeMapping -> qrCodeMapping.getUuid().equals(uuid))
+                .findFirst()
+                .orElse(null);
+        db.remove(qr);
     }
 
     @Override

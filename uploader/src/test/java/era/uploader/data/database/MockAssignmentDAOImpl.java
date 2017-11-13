@@ -46,10 +46,6 @@ public class MockAssignmentDAOImpl implements AssignmentDAO{
 
     @Override
     public void delete(Assignment assignment) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
-            ctx.deleteFrom(ASSIGNMENT)
-                    .where(ASSIGNMENT.UNIQUE_ID.eq(assignment.getUniqueId()))
-                    .execute();
-        }
+        db.remove(assignment);
     }
 }
