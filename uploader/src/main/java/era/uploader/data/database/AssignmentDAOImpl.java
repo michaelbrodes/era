@@ -8,6 +8,7 @@ import era.uploader.data.database.jooq.tables.records.AssignmentRecord;
 import era.uploader.data.model.Assignment;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
 /**
  * Provides CRUD functionality for Assignments inside a database.
  */
+
 public class AssignmentDAOImpl implements AssignmentDAO, DatabaseDAO<AssignmentRecord, Assignment> {
     private final CourseDAO courseDAO;
     private final Set<Assignment> db = new HashSet<>();
@@ -102,6 +104,7 @@ public class AssignmentDAOImpl implements AssignmentDAO, DatabaseDAO<AssignmentR
                 studentDAO.read(record.getStudentId())
         );
     }
+
     @Override
     public AssignmentRecord convertToRecord(Assignment model, DSLContext ctx) {
         AssignmentRecord assignment = ctx.newRecord(ASSIGNMENT);
