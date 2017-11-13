@@ -78,6 +78,7 @@ public class Assignment {
         Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(student, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(course, "Cannot create an Assignment with a null course");
+
         this.name = name;
         this.QRCodeMappings = QRCodeMappings == null ? Sets.newHashSet() : QRCodeMappings;
         this.student = student;
@@ -215,14 +216,6 @@ public class Assignment {
     public void setCourse(@Nonnull Course course) {
         Preconditions.checkNotNull(course, "a null course cannot be stored in the database");
         this.course = course;
-    }
-
-    public int getUniqueId() {
-        return uniqueId;
-    }
-
-    public void setUniqueId(int uniqueId) {
-        this.uniqueId = uniqueId;
     }
 
     public Student getStudent() {

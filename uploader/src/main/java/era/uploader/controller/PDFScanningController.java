@@ -15,7 +15,7 @@ import era.uploader.processing.PDFProcessor;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 /**
  * This controller is responsible for taking in PDFs, extracting the UUID
@@ -26,16 +26,16 @@ import java.util.Set;
  *
  */
 public class PDFScanningController {
-    private final QRCodeMappingDAO QRCodeMappingDAO = QRCodeMappingDAOImpl.instance();
+    private final QRCodeMappingDAO qrCodeMappingDAO = QRCodeMappingDAOImpl.instance();
     private final CourseDAO courseDAO = CourseDAOImpl.instance();
     private final StudentDAO studentDAO = StudentDAOImpl.instance();
     private final AssignmentDAO assignmentDAO = AssignmentDAOImpl.instance();
 
     public Collection<Assignment> scanPDF(Path pdf, Course course, String assignment) throws IOException {
-        return PDFProcessor.process(QRCodeMappingDAO, assignmentDAO, pdf, course, assignment);
+        return PDFProcessor.process(qrCodeMappingDAO, assignmentDAO, pdf, course, assignment, host);
     }
 
-    public Set<Course> getAllCourses() {
+    public List<Course> getAllCourses() {
         return courseDAO.getAllCourses();
     }
 }

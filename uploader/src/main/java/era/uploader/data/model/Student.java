@@ -143,11 +143,7 @@ public class Student {
 
         Student student = (Student) o;
 
-        return getUniqueId() == student.getUniqueId()
-                && (getFirstName() != null ? getFirstName().equals(student.getFirstName()) : student.getFirstName() == null)
-                && (getLastName() != null ? getLastName().equals(student.getLastName()) : student.getLastName() == null)
-                && (getSchoolId() != null ? getSchoolId().equals(student.getSchoolId()) : student.getSchoolId() == null)
-                && getUserName().equals(student.getUserName());
+        return uniqueId == student.uniqueId && student.schoolId == schoolId;
     }
 
     @Override

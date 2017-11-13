@@ -33,7 +33,8 @@ public class PDFScanView extends Application {
     private boolean buttonPressed;
     private Button returnHomeButton = new Button("Home");
 
-
+    //TODO update this to something not hardcoded you schlum
+    private static final String HOST_NAME = "http://localhost:3000";
 
     public PDFScanView(UIManager uim, GridPane gridPane) {
 
@@ -112,7 +113,7 @@ public class PDFScanView extends Application {
                         case "pdf":
                             //TODO still have to attach this to a class and assignment
                             if(currentCourse != null && currentAssignment != null)
-                                pdfCtrl.scanPDF(fullPath, currentCourse, currentAssignment);
+                                pdfCtrl.scanPDF(fullPath, currentCourse, currentAssignment, HOST_NAME);
                             break;
                         default:
                             //This lets the user know that the file type that they have selected was not compatible with our
@@ -156,7 +157,7 @@ public class PDFScanView extends Application {
             Set<Course> courses = pdfCtrl.getAllCourses();
 
             //Dynamically will make the window as large as it needs with how many classes there are
-            secondStage.setHeight(courses.size() * 250);
+            secondStage.setHeight((courses.size() + 2) * 250);
             secondStage.setWidth(300);
 
             secondStage.show();
@@ -170,6 +171,8 @@ public class PDFScanView extends Application {
             RadioButton[] radioButtons = new RadioButton[courses.size()];
 
             int count = 0;
+
+            //TODO Add field to ask for host
 
             //Iterates through the courses and displays the course names on the Radio button options
             for (Course curr : courses) {
@@ -186,6 +189,15 @@ public class PDFScanView extends Application {
 
             gridPane2.add(choiceButton, 4, 3 + count);
 
+            ToggleGroup locations = new ToggleGroup();
+            RadioButton online = new RadioButton("Online Database");
+            online.setToggleGroup(locations);
+            RadioButton offline = new RadioButton("Offline Database");
+            online.setToggleGroup(locations);
+
+            gridPane2.add(online, 4, 3 + count + 3);
+            gridPane2.add(offline, 4, 7 + count);
+
             //buttonPressed = false;
 
 
@@ -193,6 +205,7 @@ public class PDFScanView extends Application {
             choiceButton.setOnAction(event -> {
                 //buttonPressed = true;
                 Toggle selectedCourse = group.getSelectedToggle();
+                Toggle selectedLocation = locations.getSelectedToggle();
                 String courseName = selectedCourse.toString();
                 String[] getCourseName = courseName.split("\\'");
                 String[] splitName = getCourseName[1].split("-");

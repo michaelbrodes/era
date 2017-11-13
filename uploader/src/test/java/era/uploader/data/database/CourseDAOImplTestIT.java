@@ -1,5 +1,6 @@
 package era.uploader.data.database;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.DAO;
@@ -16,9 +17,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.time.Year;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static era.uploader.data.database.jooq.Tables.COURSE;
 import static era.uploader.data.database.jooq.Tables.COURSE_STUDENT;
@@ -108,8 +111,73 @@ public class CourseDAOImplTestIT {
         Assert.assertNotEquals(0, testCourse.getUniqueId());
     }
 
+
+    public void insert_AnotherRow() throws Exception {
+        CourseDAO courseDAO = CourseDAOImpl.instance();
+        String courseName = "Second Intro to chemistry";
+        String sectionNumber = "002";
+        String archerName = "Student 1";
+        String lanaName = "Student 2";
+
+        Course testCourse = Course.builder()
+                .withName(courseName)
+                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
+                .withStudents(ImmutableSet.of(
+                        Student.builder()
+                                .withFirstName(archerName)
+                                .withLastName("Archer")
+                                .withSchoolId("800999990")
+                                .create("student1"),
+                        Student.builder()
+                                .withFirstName(lanaName)
+                                .withLastName("Kane")
+                                .withSchoolId("800888880")
+                                .create("student2")
+                ))
+                .havingAssignments(ImmutableSet.of())
+                .create("CHEM", "120", sectionNumber);
+
+        courseDAO.insert(testCourse);
+    }
+
     @Test
     public void insertCourseAndStudents() throws Exception {
+        CourseDAOImpl courseDAO = CourseDAOImpl.instance();
+        Course testCourse = Course.builder()
+                .withName("Intro to Chemistry")
+                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
+                .withAssignments(ImmutableSet.of())
+                .create("CHEM", "120", "001");
+
+        Course testCourse2 = Course.builder()
+                .withName("Second Intro to Chemistry")
+                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
+                .withAssignments(ImmutableSet.of())
+                .create("CHEM", "150", "002");
+
+        Student s1 = Student.builder()
+                .withFirstName("Sterling")
+                .withLastName("Archer")
+                .withSchoolId("800999999")
+                .create("sarcher");
+        Student s2 = Student.builder()
+                .withFirstName("Lana")
+                .withLastName("Kane")
+                .withSchoolId("800888888")
+                .create("lkane");
+
+        ImmutableMultimap<Course, Student> mmap = ImmutableMultimap.of(
+                testCourse, s1,
+                testCourse, s2,
+                testCourse2, s1
+        );
+        courseDAO.insertCourseAndStudents(mmap);
+
+        List<Course> courses = courseDAO.getAllCourses();
+        Assert.assertEquals(2, courses.size());
+        Assert.assertEquals(courses.get(0).getName(), "Intro to Chemistry");
+        Assert.assertEquals(courses.get(1).getName(), "Second Intro to Chemistry");
+
     }
 
     @Test
@@ -126,6 +194,16 @@ public class CourseDAOImplTestIT {
 
     @Test
     public void getAllCourses() throws Exception {
+        CourseDAO courseDAO = CourseDAOImpl.instance();
+        insert_SingleRow();
+        insert_AnotherRow();
+        List<Course> courses = courseDAO.getAllCourses();
+
+        for (Course course : courses
+             ) {
+            Assert.assertTrue(course.getName().equals("Second Intro to chemistry") ||
+                    course.getName().equals("Intro to chemistry"));
+        }
     }
 
     @Test

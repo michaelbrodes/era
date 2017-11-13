@@ -47,16 +47,17 @@ public class PDFProcessorTest {
                 .withStudent(student)
                 .create("6ab251a5-6c4e-4688-843f-60aea570c3a6");
         String assignmentName = "Infiltrate the Kremlin";
-        QRCodeMappingDAO QRCodeMappingDAO = new MockQRCodeMappingDAOImpl();
+        QRCodeMappingDAO qrCodeMappingDAO = new MockQRCodeMappingDAOImpl();
         AssignmentDAO assignmentDAO = new MockAssignmentDAOImpl();
-        QRCodeMappingDAO.insert(dbQRCodeMapping);
+        qrCodeMappingDAO.insert(dbQRCodeMapping);
 
         Collection<Assignment> processed = PDFProcessor.process(
-                QRCodeMappingDAO,
+                qrCodeMappingDAO,
                 assignmentDAO,
                 testDocPath,
                 course,
-                assignmentName
+                assignmentName,
+                null
         );
 
         Assert.assertTrue(processed.size() == 1);
@@ -93,7 +94,8 @@ public class PDFProcessorTest {
                 assignmentDAO,
                 testDocPath,
                 course,
-                assignmentName
+                assignmentName,
+                null
         );
 
         Assert.assertTrue(processed.size() == 1);
@@ -111,7 +113,7 @@ public class PDFProcessorTest {
                 .create("CHEM", "111", "001");
         Student test_student = new Student("sarcher");
         test_student.setSchoolId("schoolid");
-        PDFProcessor p = new PDFProcessor(new MockQRCodeMappingDAOImpl(), new MockAssignmentDAOImpl(), Collections.singletonList(SINGLE_TEST), testCourse, "testAssignment");
+        PDFProcessor p = new PDFProcessor(new MockQRCodeMappingDAOImpl(), new MockAssignmentDAOImpl(), Collections.singletonList(SINGLE_TEST), testCourse, "testAssignment", "testDomain");
         Set<Assignment> test_assignments = new HashSet<>();
         QRCodeMapping test_QRCodeMapping = QRCodeMapping.builder().create("testuuid");
         QRCodeMapping test_QRCodeMapping2 = QRCodeMapping.builder().create("testuuid2");

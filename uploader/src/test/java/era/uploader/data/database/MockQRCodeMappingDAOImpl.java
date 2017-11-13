@@ -3,13 +3,9 @@ package era.uploader.data.database;
 import com.google.common.collect.Sets;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.QRCodeMapping;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
 import java.util.Collection;
 import java.util.Set;
-
-import static era.uploader.data.database.jooq.Tables.QR_CODE_MAPPING;
 
 /**
  * This class is mock of {@link QRCodeMappingDAOImpl} to make unit testing methods
@@ -51,11 +47,11 @@ public class MockQRCodeMappingDAOImpl implements QRCodeMappingDAO, MockDAO<QRCod
     }
 
     public void delete(String uuid) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
-            ctx.deleteFrom(QR_CODE_MAPPING)
-                    .where(QR_CODE_MAPPING.UUID.eq(uuid))
-                    .execute();
-        }
+        QRCodeMapping qr = db.stream()
+                .filter(qrCodeMapping -> qrCodeMapping.getUuid().equals(uuid))
+                .findFirst()
+                .orElse(null);
+        db.remove(qr);
     }
 
     @Override
