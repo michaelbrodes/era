@@ -31,22 +31,56 @@ dependencies {
     jooqRuntime 'org.xerial:sqlite-jdbc:3.20.0'
 }
 
-File databaseFile = file("uploader.db")
+File dbFile = null
+
+task statOrCreateDB() << {
+    def propertiesFile = file("uploader.properties")
+    if (!propertiesFile.exists()) {
+        throw new InvalidUserDataException("Could not find file uploader.properties")
+    }
+
+    println "Checking " + propertiesFile.absolutePath + " for db.url"
+    def props = new Properties()
+    propertiesFile.withInputStream { props.load(it) }
+    def dbUrl = props.getProperty("db.url")
+    if (dbUrl == null) {
+        throw new InvalidUserDataException("No db.url property in the uploader.properties file")
+    }
+
+    println "Checking if " + dbUrl + " exists yet"
+    dbFile = file(dbUrl)
+    if (!dbFile.exists()) {
+        println "Creating a new db file at " + dbFile.absolutePath
+        if (!dbFile.createNewFile()) {
+            throw new UncheckedIOException(
+                    new IOException("Cannot create " + dbFile.absolutePath + ". Possibly bad permissions?")
+            )
+        }
+    }
+}
+
+flywayMigrate.dependsOn statOrCreateDB
+flywayBaseline.dependsOn statOrCreateDB
+flywayClean.dependsOn statOrCreateDB
+flywayInfo.dependsOn statOrCreateDB
+flywayRepair.dependsOn statOrCreateDB
+flywayValidate.dependsOn statOrCreateDB
 
 flyway {
-    url = 'jdbc:sqlite:' + databaseFile.absolutePath
+    url = 'jdbc:sqlite:' + dbFile.absolutePath
     locations = [
             'filesystem:src/main/resources/migrations'
     ]
 }
 
+generateUploaderDBJooqSchemaSource.dependsOn flywayMigrate
 jooq {
     version = '3.10.0'
     edition = 'OSS'
     uploaderDB(sourceSets.main) {
         jdbc {
             driver = 'org.sqlite.JDBC'
-            url = 'jdbc:sqlite:' + databaseFile.absolutePath
+            url = 'jdbc:sqlite:' + dbFile.absolutePath
         }
         generator {
             name = 'org.jooq.util.DefaultGenerator'
@@ -71,8 +105,8 @@ jooq {
     }
 }
 
+jar.dependsOn generateUploaderDBJooqSchemaSource
 jar {
-    dependsOn flywayMigrate, generateUploaderDBJooqSchemaSource
     from configurations.compile.collect {
         zipTree it
     }

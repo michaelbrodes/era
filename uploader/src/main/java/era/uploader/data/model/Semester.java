@@ -15,12 +15,13 @@ import java.time.Year;
  */
 @ParametersAreNonnullByDefault
 public class Semester implements Comparable<Semester> {
+
     public enum Term {
         FALL,
         SPRING;
 
         public final String humanReadable() {
-            return  this.name().substring(0, 1)
+            return this.name().substring(0, 1)
                     + this.name().substring(1).toLowerCase();
         }
 
@@ -47,6 +48,10 @@ public class Semester implements Comparable<Semester> {
         this.term = Term.valueOf(term);
         // now is the only sensible default.
         this.year = year == null ? Year.now() : Year.of(year);
+    }
+
+    public static Semester of(Term term, Year year) {
+        return new Semester(term, year);
     }
 
     public int getUniqueId() {

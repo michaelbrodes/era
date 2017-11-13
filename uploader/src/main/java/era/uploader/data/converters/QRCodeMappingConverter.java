@@ -3,19 +3,28 @@ package era.uploader.data.converters;
 import com.google.common.base.Converter;
 import era.uploader.data.database.jooq.tables.records.QrCodeMappingRecord;
 import era.uploader.data.model.QRCodeMapping;
+import org.jooq.RecordMapper;
 
 import javax.annotation.Nonnull;
 
-public class QrCodeMappingConverter extends Converter<QrCodeMappingRecord, QRCodeMapping> {
+public class QRCodeMappingConverter
+        extends Converter<QrCodeMappingRecord, QRCodeMapping>
+        implements RecordMapper<QrCodeMappingRecord, QRCodeMapping> {
+    public static final QRCodeMappingConverter INSTANCE = new QRCodeMappingConverter();
+
+    private QRCodeMappingConverter() {
+        // no op
+    }
+
     @Override
-    protected QRCodeMapping doForward(@Nonnull QrCodeMappingRecord qrCodeMappingRecord) {
+    protected final QRCodeMapping doForward(@Nonnull QrCodeMappingRecord qrCodeMappingRecord) {
         return QRCodeMapping.builder()
                 .withSequenceNumber(qrCodeMappingRecord.getSequenceNumber())
                 .create(qrCodeMappingRecord.getUuid());
     }
 
     @Override
-    protected QrCodeMappingRecord doBackward(@Nonnull QRCodeMapping qrCodeMapping) {
+    protected final QrCodeMappingRecord doBackward(@Nonnull QRCodeMapping qrCodeMapping) {
         QrCodeMappingRecord record = new QrCodeMappingRecord();
         record.setSequenceNumber(qrCodeMapping.getSequenceNumber());
         record.setUuid(qrCodeMapping.getUuid());
@@ -25,5 +34,10 @@ public class QrCodeMappingConverter extends Converter<QrCodeMappingRecord, QRCod
                         qrCodeMapping.getStudent().getUniqueId()
         );
         return record;
+    }
+
+    @Override
+    public QRCodeMapping map(QrCodeMappingRecord record) {
+        return convert(record);
     }
 }

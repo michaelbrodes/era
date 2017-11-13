@@ -19,7 +19,7 @@ public class Assignment {
     /* Class Fields */
     private String imageFilePath;               /* Path to the PDF file with the images associated with the assignment */
     private String name;                        /* Name of the Assignment */
-    private Collection<QRCodeMapping> QRCodeMappings = new HashSet<>();  /* Set of QRCodeMapping objects for each Assignment */
+    private transient Collection<QRCodeMapping> QRCodeMappings = new HashSet<>();  /* Set of QRCodeMapping objects for each Assignment */
     private transient PDDocument image;
     private Student student;
     private Course course;
