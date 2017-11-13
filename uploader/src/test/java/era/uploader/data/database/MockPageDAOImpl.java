@@ -3,13 +3,9 @@ package era.uploader.data.database;
 import com.google.common.collect.Sets;
 import era.uploader.data.PageDAO;
 import era.uploader.data.model.QRCodeMapping;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
 import java.util.Collection;
 import java.util.Set;
-
-import static era.uploader.data.database.jooq.Tables.QR_CODE_MAPPING;
 
 /**
  * This class is mock of {@link PageDAOImpl} to make unit testing methods
