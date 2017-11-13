@@ -1,14 +1,18 @@
 package era.uploader.data.database;
 
+import era.uploader.data.CourseDAO;
 import era.uploader.data.StudentDAO;
+import era.uploader.data.converters.StudentConverter;
 import era.uploader.data.database.jooq.tables.records.StudentRecord;
+import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
+import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static era.uploader.data.database.jooq.Tables.COURSE_STUDENT;
 import static era.uploader.data.database.jooq.Tables.STUDENT;
@@ -17,17 +21,20 @@ import static era.uploader.data.database.jooq.Tables.STUDENT;
  * Provides CRUD functionality for {@link Student} objects stored in the
  * database
  */
-public class StudentDAOImpl implements StudentDAO, DatabaseDAO<StudentRecord, Student> {
-    @Deprecated
-    private static int sequenceNum = 0; /* Used to make sure each Student gets their own unique id. */
-    @Deprecated
-    private Set<Student> students = new HashSet<>(); /* A set of students to act as the database table */
+public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implements StudentDAO {
+    public static StudentDAO INSTANCE;
+    private static final StudentConverter CONVERTER = StudentConverter.INSTANCE;
 
-    /* Create and Insert a new Student object into the database as
+    private StudentDAOImpl() {
+
+    }
+
+    /**
+     * Create and Insert a new Student object into the database as
      * well as any Courses the student is associated with by default
      */
     public void insert(Student student) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             student.setUniqueId(ctx.insertInto(
                     //table
                     STUDENT,
@@ -70,7 +77,7 @@ public class StudentDAOImpl implements StudentDAO, DatabaseDAO<StudentRecord, St
 
     /* Access data from existing Student object from database */
     public Student read(long id) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             StudentRecord studentRecord = ctx.selectFrom(STUDENT)
                     .where(STUDENT.UNIQUE_ID.eq((int)id))
                     .fetchOne();
@@ -81,7 +88,7 @@ public class StudentDAOImpl implements StudentDAO, DatabaseDAO<StudentRecord, St
 
     /* Modify data stored in already existing Student in database */
     public void update(Student changedStudent) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             ctx.update(STUDENT)
                     .set(STUDENT.FIRST_NAME, changedStudent.getFirstName())
                     .set(STUDENT.LAST_NAME, changedStudent.getLastName())
@@ -95,7 +102,7 @@ public class StudentDAOImpl implements StudentDAO, DatabaseDAO<StudentRecord, St
 
     /* Delete existing Student object in database */
     public void delete(long id) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             ctx.deleteFrom(STUDENT)
                     .where(STUDENT.UNIQUE_ID.eq((int)id))
                     .execute();
@@ -104,15 +111,52 @@ public class StudentDAOImpl implements StudentDAO, DatabaseDAO<StudentRecord, St
     }
 
     @Override
-    public Student convertToModel(StudentRecord record) {
-        Student newStudent = new Student(
-                record.getFirstName(),
-                record.getLastName(),
-                record.getSchoolId(),
-                record.getUsername(),
-                record.getUniqueId());
-        return newStudent;
+    public Collection<Student> fromCourse(Course course) {
+        try (DSLContext ctx = connect()) {
+            return ctx.selectFrom(COURSE_STUDENT)
+                    .where(COURSE_STUDENT.COURSE_ID.eq(course.getUniqueId()))
+                    .fetch()
+                    .stream()
+                    .map((junction) -> ctx.selectFrom(STUDENT)
+                                .where(STUDENT.UNIQUE_ID.eq(junction.getStudentId()))
+                                .fetchOne())
+                    .map(CONVERTER::convert)
+                    .collect(Collectors.toList());
+        }
     }
+
+    @Override
+    public Student fromQRMapping(QRCodeMapping mapping) {
+        try (DSLContext ctx = connect()) {
+            return ctx.selectFrom(STUDENT)
+                    .where(STUDENT.UNIQUE_ID.eq(mapping.getStudentId()))
+                    .fetchOne()
+                    .into(Student.class);
+        }
+    }
+
+    @Override
+    public Student fromAssignment(Assignment assignment) {
+        try (DSLContext ctx = connect()) {
+            return ctx.selectFrom(STUDENT)
+                    .where(STUDENT.UNIQUE_ID.eq(assignment.getStudent_id()))
+                    .fetchOne()
+                    .into(Student.class);
+        }
+    }
+
+    @Override
+    public Student convertToModel(StudentRecord record) {
+        Optional<Student> newStudent = Optional.ofNullable(
+                CONVERTER.convert(record)
+        );
+        CourseDAO courseDAO = CourseDAOImpl.instance();
+        newStudent.ifPresent((student) -> student.setCourses(
+                courseDAO.fromStudent(student)
+        ));
+        return newStudent.orElse(null);
+    }
+
     @Override
     public StudentRecord convertToRecord(Student model, DSLContext ctx) {
         StudentRecord studentRecord = ctx.newRecord(STUDENT);
@@ -125,5 +169,22 @@ public class StudentDAOImpl implements StudentDAO, DatabaseDAO<StudentRecord, St
             studentRecord.setUniqueId(model.getUniqueId());
         }
         return studentRecord;
+    }
+
+    @Override
+    public StudentRecord convertToRecord(Student model) {
+        return CONVERTER.reverse().convert(model);
+    }
+
+    public static StudentDAO instance() {
+        if (INSTANCE == null) {
+            synchronized (QRCodeMappingDAOImpl.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new StudentDAOImpl();
+                }
+            }
+        }
+
+        return INSTANCE;
     }
 }

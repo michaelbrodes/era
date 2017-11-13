@@ -1,7 +1,7 @@
 package era.uploader.data.database;
 
 import com.google.common.collect.Sets;
-import era.uploader.data.PageDAO;
+import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.QRCodeMapping;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -12,13 +12,13 @@ import java.util.Set;
 import static era.uploader.data.database.jooq.Tables.QR_CODE_MAPPING;
 
 /**
- * This class is mock of {@link PageDAOImpl} to make unit testing methods
+ * This class is mock of {@link QRCodeMappingDAOImpl} to make unit testing methods
  * using CRUD functionality easier - you don't have to generate a new SQLite
  * database per each test. <strong>This is not a unit test for
- * {@link PageDAOImpl}</strong>. You should test the that DAO against the
+ * {@link QRCodeMappingDAOImpl}</strong>. You should test the that DAO against the
  * real database using a corresponding integration test.
  */
-public class MockPageDAOImpl implements PageDAO, MockDAO<QRCodeMapping> {
+public class MockQRCodeMappingDAOImpl implements QRCodeMappingDAO, MockDAO<QRCodeMapping> {
     private final Set<QRCodeMapping> db = Sets.newHashSet();
 
     @Override

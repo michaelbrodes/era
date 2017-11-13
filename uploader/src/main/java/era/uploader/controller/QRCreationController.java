@@ -9,7 +9,7 @@ import era.uploader.creation.QRCreator;
 import era.uploader.creation.QRErrorEvent;
 import era.uploader.creation.QRErrorStatus;
 import era.uploader.data.CourseDAO;
-import era.uploader.data.PageDAO;
+import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Semester;
@@ -40,13 +40,13 @@ import static era.uploader.common.MultimapCollector.toMultimap;
 @ParametersAreNonnullByDefault
 public class QRCreationController {
     private static final QRErrorBus BUS = QRErrorBus.instance();
-    private final PageDAO pageDAO;
+    private final QRCodeMappingDAO QRCodeMappingDAO;
     private final CourseDAO courseDAO;
 
-    public QRCreationController(PageDAO pageDAO, CourseDAO courseDAO) {
-        Preconditions.checkNotNull(pageDAO);
+    public QRCreationController(QRCodeMappingDAO QRCodeMappingDAO, CourseDAO courseDAO) {
+        Preconditions.checkNotNull(QRCodeMappingDAO);
         Preconditions.checkNotNull(courseDAO);
-        this.pageDAO = pageDAO;
+        this.QRCodeMappingDAO = QRCodeMappingDAO;
         this.courseDAO = courseDAO;
     }
 
@@ -116,7 +116,7 @@ public class QRCreationController {
         }
 
         Multimap<Student, QRCodeMapping> ret = studentsToPages.build();
-        pageDAO.insertAll(ret.values());
+        QRCodeMappingDAO.insertAll(ret.values());
 
         return ret;
     }

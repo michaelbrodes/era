@@ -10,6 +10,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -23,6 +24,7 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@Ignore
 public class QRDisplayIT {
     public static final String path = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "QRTest_1.png";
 

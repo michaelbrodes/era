@@ -24,14 +24,18 @@ import org.jooq.impl.DefaultConfiguration;
 import org.jooq.impl.DefaultRecordMapper;
 import org.sqlite.SQLiteDataSource;
 
+import javax.annotation.Nullable;
 import javax.sql.DataSource;
 
 /**
- * This the direct parent interface of all {@link DAO}s in the database
+ * This the direct parent class of all {@link DAO}s in the database
  * package. Each DAO should provide conversion from the JOOQ Record
  * object and the corresponding model it is providing CRUD for.
+ *
+ * Most of the conversion logic should be done by classes in the
+ * {@link era.uploader.data.converters} package.
  */
-public abstract class DatabaseDAO<RECORD extends Record, MODEL> implements DAO {
+abstract class DatabaseDAO<RECORD extends Record, MODEL> implements DAO {
     private static final ConnectionPool POOL = ConnectionPool.instance();
     private static final DataSource SOURCE;
     static {
@@ -40,10 +44,36 @@ public abstract class DatabaseDAO<RECORD extends Record, MODEL> implements DAO {
         SOURCE = source;
     }
 
-    public abstract MODEL convertToModel(RECORD record);
+    /**
+     * Converts a generic {@link Record} object to a generic POJO from the
+     * {@link era.uploader.data.model} package. Null will be converted to null.
+     * Most of the logic will be done in a
+     * {@link com.google.common.base.Converter#doForward(Object)} of a
+     * corresponding converter object in the
+     * {@link era.uploader.data.converters} package.
+     *
+     * @param record a nullable {@link Record} object.
+     * @return a nullable POJO from {@link era.uploader.data.model} that
+     * corresponds to the inputted RECORD
+     */
+    @Nullable
+    public abstract MODEL convertToModel(@Nullable RECORD record);
     @Deprecated
     public abstract RECORD convertToRecord(MODEL model, DSLContext ctx);
-    public abstract RECORD convertToRecord(MODEL model);
+
+    /**
+     * Converts a generic model object from {@link era.uploader.data.model} to
+     * a generic JOOQ {@link Record}. Null will be converted to null.
+     * Most of the logic will be done in a
+     * {@link com.google.common.base.Converter#doBackward(Object)} of a
+     * corresponding converter object in the
+     * {@link era.uploader.data.converters} package.
+     *
+     * @param model a nullable POJO from {@link era.uploader.data.model}.
+     * @return a nullable JOOQ record.
+     */
+    @Nullable
+    public abstract RECORD convertToRecord(@Nullable MODEL model);
 
     /**
      * Creates a new {@link DSLContext} with a configuration that uses
@@ -52,7 +82,6 @@ public abstract class DatabaseDAO<RECORD extends Record, MODEL> implements DAO {
      * {@link era.uploader.data.converters} package as its record mapper
      */
     public DSLContext connect() {
-//        return DSL.using(CONNECTION_STR);
         return DSL.using(
                 new DefaultConfiguration()
                     .set(SOURCE)

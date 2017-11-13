@@ -1,6 +1,9 @@
 package era.uploader.data;
 
 import era.uploader.data.model.Assignment;
+import era.uploader.data.model.Course;
+
+import java.util.Collection;
 
 public interface AssignmentDAO extends DAO {
     void storeAssignment(Assignment assignment);
@@ -8,4 +11,6 @@ public interface AssignmentDAO extends DAO {
     Assignment read(long id);
     void delete(Assignment assignment);
     void update(Assignment changedAssignment); /* Change data from existing course object */
+
+    Collection<Assignment> fromCourse(Course model);
 }

@@ -4,37 +4,47 @@ package era.uploader.data.database;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.StudentDAO;
+import era.uploader.data.converters.AssignmentConverter;
 import era.uploader.data.database.jooq.tables.records.AssignmentRecord;
 import era.uploader.data.model.Assignment;
+import era.uploader.data.model.Course;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
 
 /**
  * Provides CRUD functionality for Assignments inside a database.
  */
-public class AssignmentDAOImpl implements AssignmentDAO, DatabaseDAO<AssignmentRecord, Assignment> {
-    private final CourseDAO courseDAO;
-    @Deprecated
-    private final Set<Assignment> db = new HashSet<>();
-    private final StudentDAO studentDAO;
+public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment> implements AssignmentDAO {
+    private static final AssignmentConverter CONVERTER = AssignmentConverter.INSTANCE;
+    private static AssignmentDAO INSTANCE;
 
-    public AssignmentDAOImpl(StudentDAO studentDAO, CourseDAO courseDAO) {
-        this.courseDAO = courseDAO;
-        this.studentDAO = studentDAO;
+    private AssignmentDAOImpl() {
     }
+
+    public static AssignmentDAO instance() {
+        if (INSTANCE == null) {
+            synchronized (AssignmentDAOImpl.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new AssignmentDAOImpl();
+                }
+            }
+        }
+
+        return INSTANCE;
+    }
+
     public void storeAssignment(Assignment assignment) {
-        db.add(assignment);
+        insert(assignment);
     }
 
     @Override
     public Assignment insert(Assignment assignment) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             assignment.setUniqueId(ctx.insertInto(
                     //table
                     ASSIGNMENT,
@@ -62,7 +72,7 @@ public class AssignmentDAOImpl implements AssignmentDAO, DatabaseDAO<AssignmentR
 
     @Override
     public Assignment read(long id) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             AssignmentRecord assignmentRecord = ctx.selectFrom(ASSIGNMENT)
                     .where(ASSIGNMENT.UNIQUE_ID.eq((int) id))
                     .fetchOne();
@@ -74,7 +84,7 @@ public class AssignmentDAOImpl implements AssignmentDAO, DatabaseDAO<AssignmentR
     /* Modify data stored in already existing Course in database */
     @Override
     public void update(Assignment changedAssignment) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             ctx.update(ASSIGNMENT)
                     .set(ASSIGNMENT.COURSE_ID, changedAssignment.getCourse().getUniqueId())
                     .set(ASSIGNMENT.IMAGE_FILE_PATH, changedAssignment.getImageFilePath())
@@ -86,8 +96,20 @@ public class AssignmentDAOImpl implements AssignmentDAO, DatabaseDAO<AssignmentR
     }
 
     @Override
+    public Collection<Assignment> fromCourse(Course model) {
+        try (DSLContext ctx = connect()) {
+            return ctx.selectFrom(ASSIGNMENT)
+                    .where(ASSIGNMENT.COURSE_ID.eq(model.getUniqueId()))
+                    .fetch()
+                    .stream()
+                    .map(this::convertToModel)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    @Override
     public void delete(Assignment assignment) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             ctx.deleteFrom(ASSIGNMENT)
                     .where(ASSIGNMENT.UNIQUE_ID.eq(assignment.getUniqueId()))
                     .execute();
@@ -95,19 +117,18 @@ public class AssignmentDAOImpl implements AssignmentDAO, DatabaseDAO<AssignmentR
     }
 
     @Override
-    @Deprecated
     public Assignment convertToModel(AssignmentRecord record) {
-        return new Assignment(
-                record.getImageFilePath(),
-                record.getName(),
-                courseDAO.read(record.getCourseId()),
-                Collections.emptyList(),
-                studentDAO.read(record.getStudentId())
-        );
+        Optional<Assignment> model = Optional.ofNullable(CONVERTER.convert(record));
+        final CourseDAO courseDAO = CourseDAOImpl.instance();
+        final StudentDAO studentDAO = StudentDAOImpl.instance();
+        model.ifPresent((assignment) -> {
+            assignment.setCourse(courseDAO.fromAssignment(assignment));
+            assignment.setStudent(studentDAO.fromAssignment(assignment));
+        });
+        return model.orElse(null);
     }
 
     @Override
-    @Deprecated
     public AssignmentRecord convertToRecord(Assignment model, DSLContext ctx) {
         AssignmentRecord assignment = ctx.newRecord(ASSIGNMENT);
         assignment.setCourseId(model.getCourse_id());
@@ -120,5 +141,10 @@ public class AssignmentDAOImpl implements AssignmentDAO, DatabaseDAO<AssignmentR
         }
 
         return assignment;
+    }
+
+    @Override
+    public AssignmentRecord convertToRecord(Assignment model) {
+        return CONVERTER.reverse().convert(model);
     }
 }

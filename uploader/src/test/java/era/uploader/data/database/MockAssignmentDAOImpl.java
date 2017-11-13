@@ -3,16 +3,18 @@ package era.uploader.data.database;
 import com.google.common.collect.Sets;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.model.Assignment;
+import era.uploader.data.model.Course;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
+import java.util.Collection;
 import java.util.Set;
 
 import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
 
 public class MockAssignmentDAOImpl implements AssignmentDAO{
-    Set<Assignment> db = Sets.newHashSet();
-    static int idCounter = 0;
+    private Set<Assignment> db = Sets.newHashSet();
+    private static int idCounter = 0;
 
     @Override
     public void storeAssignment(Assignment assignment) {
@@ -42,6 +44,11 @@ public class MockAssignmentDAOImpl implements AssignmentDAO{
         Assignment prevAssignment = read(changedAssignment.getUniqueId());
         db.remove(prevAssignment);
         db.add(changedAssignment);
+    }
+
+    @Override
+    public Collection<Assignment> fromCourse(Course model) {
+        return model.getAssignments();
     }
 
     @Override

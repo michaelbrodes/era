@@ -1,6 +1,7 @@
 package era.uploader.data;
 
 import com.google.common.collect.Multimap;
+import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 
@@ -18,4 +19,8 @@ public interface CourseDAO extends DAO {
     void delete(long id);                               /* Delete existing course object */
 
     Set<Course> getAllCourses();
+
+    Set<Course> fromStudent(Student student);
+
+    Course fromAssignment(Assignment assignment);
 }

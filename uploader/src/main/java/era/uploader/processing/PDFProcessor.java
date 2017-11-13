@@ -8,7 +8,7 @@ import era.uploader.creation.QRErrorBus;
 import era.uploader.creation.QRErrorEvent;
 import era.uploader.creation.QRErrorStatus;
 import era.uploader.data.AssignmentDAO;
-import era.uploader.data.PageDAO;
+import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
@@ -35,11 +35,11 @@ public class PDFProcessor {
     private final List<String> pages;
     private final Course course;
     private final String assignmentName;
-    private final PageDAO pageDAO;
+    private final QRCodeMappingDAO QRCodeMappingDAO;
     private final AssignmentDAO assignmentDAO;
 
     PDFProcessor(
-            PageDAO pageDao,
+            QRCodeMappingDAO QRCodeMappingDao,
             AssignmentDAO assignmentDAO,
             List<String> pages,
             Course course,
@@ -49,7 +49,7 @@ public class PDFProcessor {
         this.assignmentDAO = assignmentDAO;
         this.course = course;
         this.assignmentName = assignmentName;
-        this.pageDAO = pageDao;
+        this.QRCodeMappingDAO = QRCodeMappingDao;
     }
 
     /**
@@ -74,7 +74,7 @@ public class PDFProcessor {
      * @throws IOException couldn't find the pdf from the path specified.
      */
     public static Collection<Assignment> process(
-            PageDAO pageDAO,
+            QRCodeMappingDAO QRCodeMappingDAO,
             AssignmentDAO assignmentDAO,
             Path pdf,
             Course course,
@@ -83,10 +83,10 @@ public class PDFProcessor {
         Preconditions.checkNotNull(pdf);
         Preconditions.checkNotNull(course);
         Preconditions.checkNotNull(assignmentName);
-        Preconditions.checkNotNull(pageDAO);
+        Preconditions.checkNotNull(QRCodeMappingDAO);
 
         List<String> pages = TASKalfaConverter.convertFile(pdf);
-        PDFProcessor processor = new PDFProcessor(pageDAO, assignmentDAO, pages, course, assignmentName);
+        PDFProcessor processor = new PDFProcessor(QRCodeMappingDAO, assignmentDAO, pages, course, assignmentName);
 
         //TODO at the end of processing add a message to the screen that says that processing was successful
         
@@ -125,7 +125,7 @@ public class PDFProcessor {
         Preconditions.checkNotNull(QRCodeMapping);
         QRCodeMapping QRCodeMappingFromDB;
         // TODO: use loading cache so we don't get weird magic happening because we are accessing the db concurrently
-        QRCodeMappingFromDB = pageDAO.read(QRCodeMapping.getUuid());
+        QRCodeMappingFromDB = QRCodeMappingDAO.read(QRCodeMapping.getUuid());
         QRCodeMappingFromDB = merge(QRCodeMappingFromDB, QRCodeMapping);
 
         Multimap<Student, QRCodeMapping> mmap = ArrayListMultimap.create();

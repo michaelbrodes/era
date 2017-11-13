@@ -1,8 +1,12 @@
 package era.uploader.data.database;
 
 import era.uploader.data.StudentDAO;
+import era.uploader.data.model.Assignment;
+import era.uploader.data.model.Course;
+import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,5 +57,20 @@ public class MockStudentDAOImpl implements MockDAO<Student>, StudentDAO {
     public void delete(long id) {
         Student student = read(id);
         getDb().remove(student);
+    }
+
+    @Override
+    public Collection<Student> fromCourse(Course course) {
+        return course.getStudentsEnrolled();
+    }
+
+    @Override
+    public Student fromQRMapping(QRCodeMapping mapping) {
+        return mapping.getStudent();
+    }
+
+    @Override
+    public Student fromAssignment(Assignment assignment) {
+        return assignment.getStudent();
     }
 }

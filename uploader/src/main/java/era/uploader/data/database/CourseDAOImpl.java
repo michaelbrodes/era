@@ -1,7 +1,10 @@
 package era.uploader.data.database;
 
 import com.google.common.collect.Multimap;
+import era.uploader.data.AssignmentDAO;
 import era.uploader.data.CourseDAO;
+import era.uploader.data.StudentDAO;
+import era.uploader.data.converters.CourseConverter;
 import era.uploader.data.database.jooq.tables.records.CourseRecord;
 import era.uploader.data.database.jooq.tables.records.SemesterRecord;
 import era.uploader.data.model.Assignment;
@@ -17,7 +20,9 @@ import org.jooq.impl.DSL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
 import static era.uploader.data.database.jooq.Tables.COURSE;
@@ -29,15 +34,19 @@ import static era.uploader.data.database.jooq.Tables.STUDENT;
  * Provides CRUD functionality for {@link Course} objects stored in the
  * database. A course has many {@link Student}s and many {@link Grader}s.
  */
-public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Course> {
+public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements CourseDAO {
+    private static final CourseConverter CONVERTER = CourseConverter.INSTANCE;
+    private static CourseDAO INSTANCE;
     @Deprecated
     private Set<Course> courses = new HashSet<>(); /* A set of Courses to act as the database table */
-    private static final StudentDAOImpl STUDENT_DAO = new StudentDAOImpl();
+
+    private CourseDAOImpl() {
+    }
 
     /* Create and Insert a new Course object into the database */
     @Override
     public Course insert(Course course) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             final Semester semesterToResolve = course.getSemesterObj();
             Condition filterer = DSL.and(
                     SEMESTER.TERM.eq(semesterToResolve.getTermString()),
@@ -171,7 +180,7 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
     /* Access data from existing Course object from database */
     @Override
     public Course read(long id) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             CourseRecord courseRecord = ctx.selectFrom(COURSE)
                     .where(COURSE.UNIQUE_ID.eq((int) id))
                     .fetchOne();
@@ -183,7 +192,7 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
     /* Modify data stored in already existing Course in database */
     @Override
     public void update(Course changedCourse) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             Semester semester = changedCourse.getSemesterObj();
 
             // one is not a valid database id
@@ -221,7 +230,7 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
     /* Delete existing Course object in database */
     @Override
     public void delete(long id) {
-        try (DSLContext ctx = DSL.using(CONNECTION_STR)) {
+        try (DSLContext ctx = connect()) {
             ctx.deleteFrom(COURSE)
                     .where(COURSE.UNIQUE_ID.eq((int) id))
                     .execute();
@@ -235,12 +244,40 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
     }
 
     @Override
-    @Deprecated
+    public Set<Course> fromStudent(Student student) {
+        try(DSLContext ctx = connect()) {
+            return ctx.selectFrom(COURSE_STUDENT)
+                    .where(COURSE_STUDENT.STUDENT_ID.eq(student.getUniqueId()))
+                    .fetch()
+                    .stream()
+                    .map((junction) -> ctx.selectFrom(COURSE)
+                            .where(COURSE.UNIQUE_ID.eq(junction.getCourseId()))
+                            .fetchOne())
+                    .map(CONVERTER::convert)
+                    .collect(Collectors.toSet());
+        }
+    }
+
+    @Override
+    public Course fromAssignment(Assignment assignment) {
+        try (DSLContext ctx = connect()) {
+            return ctx.selectFrom(COURSE)
+                    .where(COURSE.UNIQUE_ID.eq(assignment.getCourse_id()))
+                    .fetchOne()
+                    .into(Course.class);
+        }
+    }
+
+    @Override
     public Course convertToModel(CourseRecord record) {
-        return Course.builder()
-                .withName(record.getName())
-                .withDatabaseId(record.getUniqueId())
-                .create(record.getDepartment(), record.getCourseNumber(), record.getSectionNumber());
+        Optional<Course> course = Optional.ofNullable(CONVERTER.convert(record));
+        final StudentDAO studentDAO = StudentDAOImpl.instance();
+        final AssignmentDAO assignmentDAO = AssignmentDAOImpl.instance();
+        course.ifPresent((model) -> {
+            model.getStudentsEnrolled().addAll(studentDAO.fromCourse(model));
+            model.getAssignments().addAll(assignmentDAO.fromCourse(model));
+        });
+        return course.orElse(null);
     }
 
     @Override
@@ -256,5 +293,22 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
             course.setUniqueId(model.getUniqueId());
         }
         return course;
+    }
+
+    @Override
+    public CourseRecord convertToRecord(Course model) {
+        return CONVERTER.reverse().convert(model);
+    }
+
+    public static CourseDAO instance() {
+        if (INSTANCE == null) {
+            synchronized (CourseDAO.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new CourseDAOImpl();
+                }
+            }
+        }
+
+        return INSTANCE;
     }
 }

@@ -21,11 +21,13 @@ public class QRCodeMapping {
     private String uuid;
     private String tempDocumentName;
     private transient PDDocument document;
+    private Integer studentId;
 
     private QRCodeMapping(@Nonnull String uuid, Builder builder) {
         Preconditions.checkNotNull(uuid);
         this.uuid = uuid;
         this.student = builder.student;
+        this.studentId = builder.studentId;
         this.sequenceNumber = builder.sequenceNumber;
         this.qrCode = builder.qrCode;
         this.document = builder.document;
@@ -110,6 +112,10 @@ public class QRCodeMapping {
         this.tempDocumentName = tempDocumentName;
     }
 
+    public Integer getStudentId() {
+        return studentId;
+    }
+
 
     /**
      * A Builder is a <em>design pattern</em> that allows you to specify constructor
@@ -126,6 +132,7 @@ public class QRCodeMapping {
      */
     public static class Builder {
         private Student student;
+        private Integer studentId;
         private int sequenceNumber;
         private BitMatrix qrCode;
         private PDDocument document;
@@ -138,6 +145,11 @@ public class QRCodeMapping {
 
         public Builder withStudent(Student student) {
             this.student = student;
+            return this;
+        }
+
+        public Builder withStudentId(Integer studentId) {
+            this.studentId = studentId;
             return this;
         }
 

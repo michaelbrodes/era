@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.DAO;
 import era.uploader.data.model.Course;
+import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -15,11 +16,14 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Connection;
+import java.time.Year;
 import java.util.Arrays;
+import java.util.List;
 
 import static era.uploader.data.database.jooq.Tables.COURSE;
 import static era.uploader.data.database.jooq.Tables.COURSE_STUDENT;
 import static era.uploader.data.database.jooq.Tables.STUDENT;
+import static era.uploader.data.database.jooq.tables.Semester.SEMESTER;
 
 /**
  * An <em>integration test</em> to insure that the CRUD functionality of the
@@ -34,22 +38,21 @@ import static era.uploader.data.database.jooq.Tables.STUDENT;
 @Ignore
 public class CourseDAOImplTestIT {
     private static Connection dbConnection;
+    private static final List<String> TABLE_LIST = Arrays.asList(
+            SEMESTER.getName(),
+            STUDENT.getName(),
+            COURSE.getName(),
+            COURSE_STUDENT.getName()
+    );
+
     @BeforeClass
     public static void setUpClass() throws Exception {
-        dbConnection = IntegrationTests.clearAndConnect(Arrays.asList(
-                STUDENT.getName(),
-                COURSE.getName(),
-                COURSE_STUDENT.getName()
-        ));
+        dbConnection = IntegrationTests.clearAndConnect(TABLE_LIST);
     }
 
     @Before
     public void setUp() {
-        IntegrationTests.clearTables(dbConnection, Arrays.asList(
-                STUDENT.getName(),
-                COURSE.getName(),
-                COURSE_STUDENT.getName()
-        ));
+        IntegrationTests.clearTables(dbConnection, TABLE_LIST);
     }
 
     @AfterClass
@@ -59,7 +62,7 @@ public class CourseDAOImplTestIT {
 
     @Test
     public void insert_SingleRow() throws Exception {
-        CourseDAO courseDAO = new CourseDAOImpl();
+        CourseDAO courseDAO = CourseDAOImpl.instance();
         String courseName = "Intro to chemistry";
         String sectionNumber = "001";
         String archerName = "Sterling";
@@ -67,7 +70,7 @@ public class CourseDAOImplTestIT {
 
         Course testCourse = Course.builder()
                 .withName(courseName)
-                .withSemester("FALL")
+                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
                 .withStudents(ImmutableSet.of(
                         Student.builder()
                             .withFirstName(archerName)

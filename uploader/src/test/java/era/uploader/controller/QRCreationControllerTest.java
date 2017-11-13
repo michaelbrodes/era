@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import era.uploader.common.IOUtil;
 import era.uploader.data.database.MockCourseDAOImpl;
-import era.uploader.data.database.MockPageDAOImpl;
+import era.uploader.data.database.MockQRCodeMappingDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Semester;
@@ -29,7 +29,7 @@ public class QRCreationControllerTest {
 
     @Before
     public void setUp() {
-        MockPageDAOImpl pageDAO = new MockPageDAOImpl();
+        MockQRCodeMappingDAOImpl pageDAO = new MockQRCodeMappingDAOImpl();
         MockCourseDAOImpl courseDAO = new MockCourseDAOImpl();
         ctrl = new QRCreationController(pageDAO, courseDAO);
     }

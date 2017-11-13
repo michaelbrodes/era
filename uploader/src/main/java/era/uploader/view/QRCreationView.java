@@ -5,7 +5,7 @@ import com.google.common.collect.Multimap;
 import era.uploader.common.IntegerOnlyBox;
 import era.uploader.controller.QRCreationController;
 import era.uploader.data.database.CourseDAOImpl;
-import era.uploader.data.database.PageDAOImpl;
+import era.uploader.data.database.QRCodeMappingDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
@@ -38,13 +38,13 @@ public class QRCreationView extends Application {
 //    public QRCreationView() {
 //        UIManager uManage = new UIManager(mainStage);
 //        mainStage = uManage.getPrimaryStage();
-//        qrCtrl = new QRCreationController(new PageDAOImpl(), new CourseDAOImpl());
+//        qrCtrl = new QRCreationController(new QRCodeMappingDAOImpl(), new CourseDAOImpl());
 //    }
 
     public QRCreationView(UIManager uim) {
         uManage = uim;
         mainStage = uManage.getPrimaryStage();
-        qrCtrl = new QRCreationController(new PageDAOImpl(), new CourseDAOImpl());
+        qrCtrl = new QRCreationController(QRCodeMappingDAOImpl.instance(), CourseDAOImpl.instance());
     }
 
 
