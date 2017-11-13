@@ -13,12 +13,10 @@ import era.uploader.data.model.Student;
 import jdk.nashorn.internal.runtime.regexp.JoniRegExp;
 import org.jooq.DSLContext;
 import org.jooq.Record6;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
 import static era.uploader.data.database.jooq.Tables.COURSE;
@@ -29,8 +27,6 @@ import static era.uploader.data.database.jooq.Tables.STUDENT;
  * database. A course has many {@link Student}s and many {@link Grader}s.
  */
 public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Course> {
-    @Deprecated
-    private Set<Course> courses = new HashSet<>(); /* A set of Courses to act as the database table */
     private static final StudentDAOImpl STUDENT_DAO = new StudentDAOImpl();
 
     /* Create and Insert a new Course object into the database */
@@ -61,27 +57,34 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
             );
 
             for (Student student : course.getStudentsEnrolled()) {
-                student.setUniqueId(ctx.insertInto (
-                        // table
-                        STUDENT,
-                        // columns
-                        STUDENT.FIRST_NAME,
-                        STUDENT.LAST_NAME,
-                        STUDENT.USERNAME,
-                        STUDENT.SCHOOL_ID,
-                        STUDENT.EMAIL
-                   )
-                   .values (
-                           student.getFirstName(),
-                           student.getLastName(),
-                           student.getUserName(),
-                           student.getSchoolId(),
-                           student.getEmail()
-                   )
-                        .returning(
-                                STUDENT.UNIQUE_ID
-                        )
-                   .fetchOne().getUniqueId());
+                StudentRecord studentRecord = ctx.selectFrom(STUDENT).
+                        where(STUDENT.SCHOOL_ID.eq(student.getSchoolId())).fetchOne();
+                if (studentRecord == null) {
+                    student.setUniqueId(ctx.insertInto(
+                            // table
+                            STUDENT,
+                            // columns
+                            STUDENT.FIRST_NAME,
+                            STUDENT.LAST_NAME,
+                            STUDENT.USERNAME,
+                            STUDENT.SCHOOL_ID,
+                            STUDENT.EMAIL
+                    )
+                            .values(
+                                    student.getFirstName(),
+                                    student.getLastName(),
+                                    student.getUserName(),
+                                    student.getSchoolId(),
+                                    student.getEmail()
+                            )
+                            .returning(
+                                    STUDENT.UNIQUE_ID
+                            )
+                            .fetchOne().getUniqueId());
+                }
+                else {
+                    student.setUniqueId(studentRecord.getUniqueId());
+                }
 
                 ctx.insertInto(
                         // table
@@ -130,7 +133,12 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
             }
         }
 
-        courses.addAll(coursesToStudents.keys());
+        //courses.addAll(coursesToStudents.keys());
+        for (Course course : coursesToStudents.keySet()
+             ) {
+            insert(course);
+        }
+
     }
 
     /* Access data from existing Course object from database */
@@ -172,7 +180,25 @@ public class CourseDAOImpl implements CourseDAO, DatabaseDAO<CourseRecord, Cours
     }
 
     @Override
-    public Set<Course> getAllCourses() {
+    public List<Course> getAllCourses() {
+        List<Course> courses = new ArrayList<>();
+        Set<CourseRecord> courseRecords = new HashSet<>();
+        try(DSLContext ctx = DSL.using(CONNECTION_STR)) {
+             courses = ctx.selectFrom(COURSE).fetch().map(this::convertToModel);
+            for (Course course : courses
+                 ) {
+                List<Integer> student_ids = new ArrayList<>();
+                student_ids.addAll(ctx.selectFrom(COURSE_STUDENT)
+                        .where(COURSE_STUDENT.COURSE_ID.eq(course.getUniqueId()))
+                        .fetch()
+                        .map(CourseStudentRecord::getStudentId));
+                course.getStudentsEnrolled()
+                        .addAll(ctx.selectFrom(STUDENT)
+                                .where(STUDENT.UNIQUE_ID.in(student_ids))
+                                .fetch()
+                                .map(STUDENT_DAO::convertToModel));
+            }
+        }
         return courses;
     }
 

@@ -5,6 +5,7 @@ import era.uploader.data.CourseDAO;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -37,7 +38,7 @@ public class CourseService implements CourseDAO {
     }
 
     @Override
-    public Set<Course> getAllCourses() {
+    public List<Course> getAllCourses() {
         return null;
     }
 }
