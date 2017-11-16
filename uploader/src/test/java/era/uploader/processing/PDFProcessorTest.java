@@ -20,6 +20,7 @@ import org.junit.Test;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.Collection;
 import java.util.Collections;
@@ -121,7 +122,7 @@ public class PDFProcessorTest {
         QRCodeMapping test_QRCodeMapping2 = QRCodeMapping.builder().create("testuuid2");
         test_QRCodeMapping.setDocument(testDoc);
         test_QRCodeMapping2.setDocument(testDoc);
-        Assignment a = new Assignment("src/test/resources/split/tests.pdf", "assignment_name", testCourse, ImmutableSet.of(test_QRCodeMapping, test_QRCodeMapping2), test_student);
+        Assignment a = new Assignment("src/test/resources/split/tests.pdf", "assignment_name", testCourse, ImmutableSet.of(test_QRCodeMapping, test_QRCodeMapping2), test_student, LocalDateTime.now());
         test_assignments.add(a);
         p.mergeAssignmentPages(test_assignments);
         Assert.assertTrue(new File("src/test/resources/split/tests.pdf").exists());

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -171,7 +172,7 @@ public class PDFProcessor {
             ) {
             Student student = pages.getKey();
             Collection<QRCodeMapping> pagesToAdd = pages.getValue();
-            assignments.add(new Assignment(assignmentName, pagesToAdd, student, course));
+            assignments.add(new Assignment(assignmentName, pagesToAdd, student, course, LocalDateTime.now()));
             mergeAssignmentPages(assignments);
         }
 

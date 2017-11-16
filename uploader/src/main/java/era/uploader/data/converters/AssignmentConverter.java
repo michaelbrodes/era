@@ -6,6 +6,8 @@ import era.uploader.data.model.Assignment;
 import org.jooq.RecordMapper;
 
 import javax.annotation.Nonnull;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class AssignmentConverter
         extends Converter<AssignmentRecord, Assignment>
@@ -23,6 +25,7 @@ public class AssignmentConverter
                 .withStudent_id(assignmentRecord.getStudentId())
                 .withImageFilePath(assignmentRecord.getImageFilePath())
                 .withUniqueId(assignmentRecord.getUniqueId())
+                .withCreatedDateTime(LocalDateTime.parse(assignmentRecord.getCreatedDateTime()))
                 .create(assignmentRecord.getName());
     }
 
@@ -33,6 +36,9 @@ public class AssignmentConverter
         assignmentRecord.setImageFilePath(assignment.getImageFilePath());
         assignmentRecord.setName(assignment.getName());
         assignmentRecord.setStudentId(assignment.getStudent_id());
+        assignmentRecord.setCreatedDateTime(
+                assignment.getCreatedDateTimeString()
+        );
 
         if (assignment.getUniqueId() != 0) {
             assignmentRecord.setUniqueId(assignment.getUniqueId());

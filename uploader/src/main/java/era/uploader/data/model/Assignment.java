@@ -6,6 +6,8 @@ import era.uploader.common.IOUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import javax.annotation.Nonnull;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,6 +23,7 @@ public class Assignment {
     private String name;                        /* Name of the Assignment */
     private transient Collection<QRCodeMapping> QRCodeMappings = new HashSet<>();  /* Set of QRCodeMapping objects for each Assignment */
     private transient PDDocument image;
+    private LocalDateTime createdDateTime;
     private Student student;
     private Course course;
     private int course_id;
@@ -46,13 +49,16 @@ public class Assignment {
             @Nonnull String name,
             @Nonnull Course course,
             Collection<QRCodeMapping> QRCodeMappings,
-            @Nonnull Student student
+            @Nonnull Student student,
+            @Nonnull LocalDateTime createdDateTime
     ) {
         Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(imageFilePath, "Cannot create an Assignment with a null imageFilePath");
         Preconditions.checkNotNull(student, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(course, "Cannot create an Assignment with a null course");
+        Preconditions.checkNotNull(createdDateTime, "Created date time cannot be null");
 
+        this.createdDateTime = createdDateTime;
         this.imageFilePath = imageFilePath;
         this.name = name;
         this.QRCodeMappings = QRCodeMappings == null ? Sets.newHashSet() : QRCodeMappings;
@@ -68,16 +74,20 @@ public class Assignment {
      * @param course the course that this assignment belongs to
      * @param QRCodeMappings the QRCodeMappings that make up this assignment
      * @param student the student who turned this assignment in
+     * @param createdDateTime the date and time that the assignment has been
+     *                        created
      */
     public Assignment(
             @Nonnull String name,
             Collection<QRCodeMapping> QRCodeMappings,
             @Nonnull Student student,
-            @Nonnull Course course
+            @Nonnull Course course,
+            @Nonnull LocalDateTime createdDateTime
     ) {
         Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(student, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(course, "Cannot create an Assignment with a null course");
+        Preconditions.checkNotNull(createdDateTime, "Cannot create an Assignment with a null create date");
 
         this.name = name;
         this.QRCodeMappings = QRCodeMappings == null ? Sets.newHashSet() : QRCodeMappings;
@@ -104,11 +114,13 @@ public class Assignment {
 
     private Assignment(
             String name,
+            LocalDateTime createdDateTime,
             Builder builder
     ) {
         this.name = name;
         this.course = builder.course;
         this.student = builder.student;
+        this.createdDateTime = createdDateTime;
 
         this.imageFilePath = course == null || student == null ?
                 null :
@@ -238,6 +250,21 @@ public class Assignment {
         return new Builder();
     }
 
+    @Nonnull
+    public LocalDateTime getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    @Nonnull
+    public String getCreatedDateTimeString() {
+        return createdDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    public void setCreatedDateTime(@Nonnull LocalDateTime createdDateTime) {
+        Preconditions.checkNotNull(createdDateTime, "Created date time cannot be null");
+        this.createdDateTime = createdDateTime;
+    }
+
     /**
      * A Builder is a <em>design pattern</em> that allows you to specify constructor
      * arguments with just plain setters. We use a builder here because the
@@ -260,6 +287,7 @@ public class Assignment {
         private int uniqueId;
         private Student student;
         private Course course;
+        private LocalDateTime createDateTime;
 
         public Builder withImageFilePath(String imageFilePath) {
             this.imageFilePath = imageFilePath;
@@ -301,9 +329,17 @@ public class Assignment {
             return this;
         }
 
+        public Builder withCreatedDateTime(LocalDateTime createDateTime) {
+            this.createDateTime = createDateTime;
+            return this;
+        }
+
         public Assignment create(@Nonnull String name) {
             Preconditions.checkNotNull(name);
-            return new Assignment(name, this);
+            if (createDateTime == null) {
+                createDateTime = LocalDateTime.now();
+            }
+            return new Assignment(name, createDateTime, this);
         }
 
     }

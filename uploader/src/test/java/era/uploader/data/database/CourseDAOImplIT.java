@@ -9,6 +9,7 @@ import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,16 +31,22 @@ import static era.uploader.data.database.jooq.tables.Semester.SEMESTER;
 
 /**
  * An <em>integration test</em> to insure that the CRUD functionality of the
- * DAO is working correctly with an actual database. It looks for a sample
- * database in the test resources directory, deletes all it's contents, and
- * then runs the unit tests in this class.
+ * DAO is working correctly with an actual database. It connects to
+ * uploader.db, deletes all it's contents, and then runs the unit tests in this
+ * class.
+ *
+ * <strong>NEVER</strong> run this test on a production database. That means
+ * <strong>DR JONES DON'T RUN THIS TEST</strong> unless the database you are
+ * using doesn't have useful information
+ *
+ * TODO: make sure to let Dr. Jones know not to run this test or just don't ship this test at all
  *
  * This class is ignored because we shouldn't run it each time we compile,
  * instead it should be ran <strong>only</strong> when we are testing the
  * behavior of the database directly
  */
 @Ignore
-public class CourseDAOImplTestIT {
+public class CourseDAOImplIT {
     private static Connection dbConnection;
     private static final List<String> TABLE_LIST = Arrays.asList(
             SEMESTER.getName(),
@@ -55,6 +62,12 @@ public class CourseDAOImplTestIT {
 
     @Before
     public void setUp() {
+        IntegrationTests.clearTables(dbConnection, TABLE_LIST);
+    }
+
+    @After
+    public void tearDown() {
+        // in case we error out we don't want our test state in the database.
         IntegrationTests.clearTables(dbConnection, TABLE_LIST);
     }
 

@@ -252,8 +252,7 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
 
     @Override
     public List<Course> getAllCourses() {
-        List<Course> courses = new ArrayList<>();
-        Set<CourseRecord> courseRecords = new HashSet<>();
+        List<Course> courses;
         StudentDAOImpl studentDAO = StudentDAOImpl.instance();
         try(DSLContext ctx = DSL.using(CONNECTION_STR)) {
              courses = ctx.selectFrom(COURSE).fetch().map(this::convertToModel);

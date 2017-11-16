@@ -2,6 +2,7 @@ package era.uploader.data.database;
 
 import com.google.common.collect.Sets;
 import era.uploader.data.AssignmentDAO;
+import era.uploader.data.database.jooq.tables.records.AllAssignmentsRecord;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 
@@ -45,6 +46,11 @@ public class MockAssignmentDAOImpl implements AssignmentDAO{
     @Override
     public Collection<Assignment> fromCourse(Course model) {
         return model.getAssignments();
+    }
+
+    @Override
+    public Collection<AllAssignmentsRecord> getAllAssignments() {
+        return null;
     }
 
     @Override

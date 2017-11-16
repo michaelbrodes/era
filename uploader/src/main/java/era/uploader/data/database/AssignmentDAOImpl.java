@@ -1,19 +1,26 @@
 package era.uploader.data.database;
 
 
+import era.uploader.common.Threads;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.StudentDAO;
 import era.uploader.data.converters.AssignmentConverter;
+import era.uploader.data.database.jooq.tables.AllAssignments;
+import era.uploader.data.database.jooq.tables.records.AllAssignmentsRecord;
 import era.uploader.data.database.jooq.tables.records.AssignmentRecord;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import org.jooq.DSLContext;
+import org.jooq.Result;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static era.uploader.data.database.jooq.Tables.ALL_ASSIGNMENTS;
 import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
 
 /**
@@ -21,25 +28,26 @@ import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
  */
 public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment> implements AssignmentDAO {
     private static final AssignmentConverter CONVERTER = AssignmentConverter.INSTANCE;
-    private static AssignmentDAO INSTANCE;
+    private static AssignmentDAOImpl INSTANCE;
 
     private AssignmentDAOImpl() {
     }
 
     public static AssignmentDAO instance() {
-        if (INSTANCE == null) {
-            synchronized (AssignmentDAOImpl.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new AssignmentDAOImpl();
-                }
-            }
-        }
-
+        INSTANCE = Threads.doubleCheck(INSTANCE, AssignmentDAOImpl::new, AssignmentDAOImpl.class);
         return INSTANCE;
     }
 
     public void storeAssignment(Assignment assignment) {
         insert(assignment);
+    }
+
+    @Override
+    @Nonnull
+    public Collection<AllAssignmentsRecord> getAllAssignments() {
+        try (DSLContext ctx = connect()) {
+            return ctx.selectFrom(ALL_ASSIGNMENTS).fetch();
+        }
     }
 
     @Override
@@ -52,13 +60,15 @@ public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment>
                     ASSIGNMENT.NAME,
                     ASSIGNMENT.IMAGE_FILE_PATH,
                     ASSIGNMENT.COURSE_ID,
-                    ASSIGNMENT.STUDENT_ID
+                    ASSIGNMENT.STUDENT_ID,
+                    ASSIGNMENT.CREATED_DATE_TIME
                     )
                     .values(
                             assignment.getName(),
                             assignment.getImageFilePath(),
                             assignment.getCourse().getUniqueId(),
-                            assignment.getStudent().getUniqueId()
+                            assignment.getStudent().getUniqueId(),
+                            assignment.getCreatedDateTimeString()
                     )
                     .returning(
                             ASSIGNMENT.UNIQUE_ID
@@ -90,6 +100,7 @@ public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment>
                     .set(ASSIGNMENT.IMAGE_FILE_PATH, changedAssignment.getImageFilePath())
                     .set(ASSIGNMENT.NAME, changedAssignment.getName())
                     .set(ASSIGNMENT.STUDENT_ID, changedAssignment.getStudent().getUniqueId())
+                    .set(ASSIGNMENT.CREATED_DATE_TIME, changedAssignment.getCreatedDateTimeString())
                     .where(ASSIGNMENT.UNIQUE_ID.eq(changedAssignment.getUniqueId()))
                     .execute();
         }
@@ -102,7 +113,7 @@ public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment>
                     .where(ASSIGNMENT.COURSE_ID.eq(model.getUniqueId()))
                     .fetch()
                     .stream()
-                    .map(this::convertToModel)
+                    .map(CONVERTER::convert)
                     .collect(Collectors.toList());
         }
     }
