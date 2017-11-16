@@ -35,7 +35,7 @@ public class AssignmentConverter
         assignmentRecord.setStudentId(assignment.getStudent_id());
 
         if (assignment.getUniqueId() != 0) {
-            assignment.setUniqueId(assignment.getUniqueId());
+            assignmentRecord.setUniqueId(assignment.getUniqueId());
         }
         return assignmentRecord;
     }

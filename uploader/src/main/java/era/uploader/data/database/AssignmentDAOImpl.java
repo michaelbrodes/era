@@ -129,21 +129,6 @@ public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment>
     }
 
     @Override
-    public AssignmentRecord convertToRecord(Assignment model, DSLContext ctx) {
-        AssignmentRecord assignment = ctx.newRecord(ASSIGNMENT);
-        assignment.setCourseId(model.getCourse_id());
-        assignment.setImageFilePath(model.getImageFilePath());
-        assignment.setName(model.getName());
-        assignment.setStudentId(model.getStudent_id());
-
-        if (model.getUniqueId() != 0) {
-            assignment.setUniqueId(model.getUniqueId());
-        }
-
-        return assignment;
-    }
-
-    @Override
     public AssignmentRecord convertToRecord(Assignment model) {
         return CONVERTER.reverse().convert(model);
     }

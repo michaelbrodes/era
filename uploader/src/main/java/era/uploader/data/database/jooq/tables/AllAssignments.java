@@ -6,6 +6,9 @@ package era.uploader.data.database.jooq.tables;
 
 import era.uploader.data.database.jooq.DefaultSchema;
 import era.uploader.data.database.jooq.tables.records.AllAssignmentsRecord;
+
+import javax.annotation.Generated;
+
 import org.jooq.Field;
 import org.jooq.Name;
 import org.jooq.Schema;
@@ -13,8 +16,6 @@ import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
-
-import javax.annotation.Generated;
 
 
 /**

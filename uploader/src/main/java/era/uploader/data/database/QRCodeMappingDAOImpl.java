@@ -18,8 +18,6 @@ import static era.uploader.data.database.jooq.Tables.QR_CODE_MAPPING;
  * Provides CRUD functionality for Pages inside a database.
  */
 public class QRCodeMappingDAOImpl extends DatabaseDAO<QrCodeMappingRecord, QRCodeMapping> implements QRCodeMappingDAO {
-    @Deprecated
-    private final Set<QRCodeMapping> db = Sets.newHashSet();
     private static final QRCodeMappingConverter CONVERTER =
             QRCodeMappingConverter.INSTANCE;
     private static QRCodeMappingDAO INSTANCE;
@@ -99,20 +97,6 @@ public class QRCodeMappingDAOImpl extends DatabaseDAO<QrCodeMappingRecord, QRCod
             );
         });
         return newQRCodeMapping.orElse(null);
-    }
-
-    @Override
-    public QrCodeMappingRecord convertToRecord(QRCodeMapping model, DSLContext ctx) {
-        QrCodeMappingRecord qrCodeMapping = ctx.newRecord(QR_CODE_MAPPING);
-        qrCodeMapping.setSequenceNumber(model.getSequenceNumber());
-        qrCodeMapping.setStudentId(model.getStudent().getUniqueId());
-
-        if (model.getUuid().equals("")) {
-            qrCodeMapping.setUuid(model.getUuid());
-        }
-
-        // unique id cannot be 0 because that is an invalid database id
-        return qrCodeMapping;
     }
 
     @Override

@@ -10,6 +10,7 @@ import era.uploader.data.database.MockQRCodeMappingDAOImpl;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
+import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.Assert;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Year;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,7 +35,7 @@ public class PDFProcessorTest {
         Path testDocPath = Paths.get(IOUtil.convertToLocal(MULTI_TEST));
         Course course = Course.builder()
                 .withName("Intro to Chemistry")
-                .withSemester("FALL")
+                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
                 .create("CHEM", "111", "001");
         Student student = Student.builder()
                 .withCourses(ImmutableSet.of(course))
@@ -71,7 +73,7 @@ public class PDFProcessorTest {
         Path testDocPath = Paths.get(IOUtil.convertToLocal(SINGLE_TEST));
         Course course = Course.builder()
                 .withName("Intro to Chemistry")
-                .withSemester("FALL")
+                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
                 .create("CHEM", "111", "001");
         Student student = Student.builder()
                 .withCourses(ImmutableSet.of(course))

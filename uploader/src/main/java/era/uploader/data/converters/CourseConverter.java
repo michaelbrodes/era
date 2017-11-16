@@ -41,9 +41,9 @@ public class CourseConverter
         courseRecord.setCourseNumber(course.getCourseNumber());
         courseRecord.setDepartment(course.getDepartment());
         courseRecord.setSemesterId(
-                course.getSemesterObj().getUniqueId() < 1 ?
+                course.getSemester().getUniqueId() < 1 ?
                         null :
-                        course.getSemesterObj().getUniqueId()
+                        course.getSemester().getUniqueId()
         );
         courseRecord.setSectionNumber(course.getSectionNumber());
 

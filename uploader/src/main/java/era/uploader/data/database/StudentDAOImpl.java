@@ -22,7 +22,7 @@ import static era.uploader.data.database.jooq.Tables.STUDENT;
  * database
  */
 public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implements StudentDAO {
-    public static StudentDAO INSTANCE;
+    public static StudentDAOImpl INSTANCE;
     private static final StudentConverter CONVERTER = StudentConverter.INSTANCE;
 
     private StudentDAOImpl() {
@@ -158,25 +158,11 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
     }
 
     @Override
-    public StudentRecord convertToRecord(Student model, DSLContext ctx) {
-        StudentRecord studentRecord = ctx.newRecord(STUDENT);
-        studentRecord.setEmail(model.getEmail());
-        studentRecord.setFirstName(model.getFirstName());
-        studentRecord.setLastName(model.getLastName());
-        studentRecord.setSchoolId(model.getSchoolId());
-        studentRecord.setUsername(model.getUserName());
-        if (model.getUniqueId() != 0) {
-            studentRecord.setUniqueId(model.getUniqueId());
-        }
-        return studentRecord;
-    }
-
-    @Override
     public StudentRecord convertToRecord(Student model) {
         return CONVERTER.reverse().convert(model);
     }
 
-    public static StudentDAO instance() {
+    public static StudentDAOImpl instance() {
         if (INSTANCE == null) {
             synchronized (QRCodeMappingDAOImpl.class) {
                 if (INSTANCE == null) {

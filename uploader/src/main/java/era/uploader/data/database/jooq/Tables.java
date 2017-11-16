@@ -61,7 +61,7 @@ public class Tables {
     public static final SchemaVersion SCHEMA_VERSION = era.uploader.data.database.jooq.tables.SchemaVersion.SCHEMA_VERSION;
 
     /**
-     * The table <code>Semester</code>.
+     * The table <code>semester</code>.
      */
     public static final Semester SEMESTER = era.uploader.data.database.jooq.tables.Semester.SEMESTER;
 

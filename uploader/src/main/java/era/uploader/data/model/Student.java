@@ -2,6 +2,7 @@ package era.uploader.data.model;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+import era.uploader.common.UploaderProperties;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,16 +24,6 @@ public class Student {
     private Set<Course> courses = Sets.newHashSet();
 
     /* Constructors */
-
-    /**
-     * Deprecated because all Student objects should have a userName. Use
-     * {@link Student(String)} instead.
-     */
-    @Deprecated
-    public Student() {
-
-    }
-
     /**
      * This is basically our default constructor because it just takes the
      * only required field.
@@ -74,16 +65,6 @@ public class Student {
         this.schoolId = schoolId;
         this.userName = userName;
         this.uniqueId = uniqueId;
-    }
-
-    @Deprecated
-    public Student(Builder builder) {
-        this.courses = builder.courses;
-        this.firstName = builder.firstName;
-        this.schoolId = builder.schoolId;
-        this.lastName = builder.lastName;
-        this.uniqueId = builder.uniqueId;
-        this.userName = builder.userName;
     }
 
     private Student(@Nonnull String userName, Builder builder) {
@@ -178,11 +159,13 @@ public class Student {
     /**
      * A getter for the email of a student. It defaults to an SIUE type email.
      *
-     * @return an SIUE type email
+     * @return an email based off of {@link #userName}
      */
     @Nonnull
     public String getEmail() {
-        return userName + "@siue.edu";
+        return userName
+                + "@"
+                + UploaderProperties.instance().getEmailSuffix();
     }
 
     /**
@@ -202,7 +185,6 @@ public class Student {
         private String firstName; /* Student's first name */
         private String lastName;  /* Student's last name */
         private String schoolId;  /* Identifier for each student provided by the school */
-        private String userName;
         private int uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
         // every course that the student belongs to
         private Set<Course> courses = Sets.newHashSet();
@@ -218,17 +200,6 @@ public class Student {
 
         public Builder withLastName(String lastName) {
             this.lastName = lastName;
-            return this;
-        }
-
-        /**
-         * Sets the userName that will be used to create the Student. This is
-         * deprecated because userName is required when creating a student
-         * object. All required parameters will be in the create method
-         */
-        @Deprecated
-        public Builder withUserName(String userName) {
-            this.userName = userName;
             return this;
         }
 
@@ -250,11 +221,6 @@ public class Student {
         public Builder withCourse(Course course) {
             this.courses.add(course);
             return this;
-        }
-
-        @Deprecated
-        public Student create() {
-            return new Student(this);
         }
 
         public Student create(@Nonnull String userName) {

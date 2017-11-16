@@ -1,21 +1,27 @@
 package era.uploader.data.database;
 
+import era.uploader.common.Threads;
+import era.uploader.common.UploaderProperties;
 import org.jooq.ConnectionProvider;
 import org.jooq.exception.DataAccessException;
 import org.sqlite.JDBC;
-import org.sqlite.SQLiteConfig;
 import org.sqlite.javax.SQLiteConnectionPoolDataSource;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Properties;
+import java.util.Optional;
 
+/**
+ * Every SQLite database connection will require a file access and setting up
+ * SQLite itself. This is rather expensive if you have a lot of queries in
+ * close succession. This is a wrapper for
+ * {@link SQLiteConnectionPoolDataSource} that implements
+ * {@link ConnectionProvider} that pools as few of these database connections
+ * as possible.
+ */
 public class ConnectionPool implements ConnectionProvider {
     private static ConnectionPool INSTANCE;
     private final SQLiteConnectionPoolDataSource delegate;
@@ -27,43 +33,34 @@ public class ConnectionPool implements ConnectionProvider {
     }
 
     public static String getDBUrl() {
-        File propFile = new File("uploader.properties");
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileReader(propFile));
-        } catch (IOException e) {
-            System.err.println("Cannot stat " + propFile.getAbsolutePath());
+        UploaderProperties props = UploaderProperties.instance();
+        Optional<String> dbUrl = UploaderProperties.instance().getDbUrl();
+        if (!dbUrl.isPresent()) {
+            System.err.println(props.getFile().getAbsolutePath()
+                    + " doesn't have a \"db.url\" property");
             System.exit(1);
         }
 
-        String dbUrl = properties.getProperty("db.url");
-        if (dbUrl == null) {
-            System.err.println(propFile.getAbsolutePath()+ " doesn't have a \"db.url\" property");
-            System.exit(1);
-        }
-
-        Path dbPath = Paths.get(dbUrl);
+        Path dbPath = Paths.get(dbUrl.get());
 
         if(!Files.exists(dbPath)) {
             System.err.println("Database " + dbUrl + " does not exist");
             System.exit(1);
         }
 
-        if (!JDBC.isValidURL(dbUrl)) {
-            dbUrl = JDBC.PREFIX + dbPath.toAbsolutePath().toString();
+        if (!JDBC.isValidURL(dbUrl.get())) {
+            dbUrl = Optional.of(JDBC.PREFIX + dbPath.toAbsolutePath().toString());
         }
 
-        return dbUrl;
+        return dbUrl.orElse(null);
     }
 
     public static ConnectionPool instance() {
-        if (INSTANCE == null) {
-            synchronized (ConnectionPool.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new ConnectionPool();
-                }
-            }
-        }
+        INSTANCE = Threads.doubleCheck(
+                INSTANCE,
+                ConnectionPool::new,
+                ConnectionPool.class
+        );
 
         return INSTANCE;
     }

@@ -134,7 +134,7 @@ public class CourseDAOImplTestIT {
                                 .withSchoolId("800888880")
                                 .create("student2")
                 ))
-                .havingAssignments(ImmutableSet.of())
+                .withAssignments(ImmutableSet.of())
                 .create("CHEM", "120", sectionNumber);
 
         courseDAO.insert(testCourse);
@@ -142,7 +142,7 @@ public class CourseDAOImplTestIT {
 
     @Test
     public void insertCourseAndStudents() throws Exception {
-        CourseDAOImpl courseDAO = CourseDAOImpl.instance();
+        CourseDAO courseDAO = CourseDAOImpl.instance();
         Course testCourse = Course.builder()
                 .withName("Intro to Chemistry")
                 .withSemester(Semester.of(Semester.Term.FALL, Year.now()))

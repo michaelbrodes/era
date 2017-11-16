@@ -16,12 +16,12 @@ import era.uploader.data.model.Student;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
-import org.jooq.Record6;
-import org.jooq.Table;
 import org.jooq.impl.DSL;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -40,8 +40,6 @@ import static era.uploader.data.database.jooq.Tables.STUDENT;
 public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements CourseDAO {
     private static final CourseConverter CONVERTER = CourseConverter.INSTANCE;
     private static CourseDAO INSTANCE;
-    @Deprecated
-    private Set<Course> courses = new HashSet<>(); /* A set of Courses to act as the database table */
 
     private CourseDAOImpl() {
     }
@@ -50,7 +48,7 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
     @Override
     public Course insert(Course course) {
         try (DSLContext ctx = connect()) {
-            final Semester semesterToResolve = course.getSemesterObj();
+            final Semester semesterToResolve = course.getSemester();
             Condition filterer = DSL.and(
                     SEMESTER.TERM.eq(semesterToResolve.getTermString()),
                     SEMESTER.YEAR.eq(semesterToResolve.getYearInt())
@@ -207,7 +205,7 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
     @Override
     public void update(Course changedCourse) {
         try (DSLContext ctx = connect()) {
-            Semester semester = changedCourse.getSemesterObj();
+            Semester semester = changedCourse.getSemester();
 
             // one is not a valid database id
             if (semester.getUniqueId() < 1) {
@@ -256,20 +254,23 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
     public List<Course> getAllCourses() {
         List<Course> courses = new ArrayList<>();
         Set<CourseRecord> courseRecords = new HashSet<>();
+        StudentDAOImpl studentDAO = StudentDAOImpl.instance();
         try(DSLContext ctx = DSL.using(CONNECTION_STR)) {
              courses = ctx.selectFrom(COURSE).fetch().map(this::convertToModel);
-            for (Course course : courses
-                 ) {
+            for (Course course : courses) {
                 List<Integer> student_ids = new ArrayList<>();
-                student_ids.addAll(ctx.selectFrom(COURSE_STUDENT)
-                        .where(COURSE_STUDENT.COURSE_ID.eq(course.getUniqueId()))
-                        .fetch()
-                        .map(CourseStudentRecord::getStudentId));
+                student_ids.addAll(
+                        ctx.selectFrom(COURSE_STUDENT)
+                            .where(COURSE_STUDENT.COURSE_ID.eq(course.getUniqueId()))
+                            .fetch()
+                            .getValues(COURSE_STUDENT.STUDENT_ID)
+                );
                 course.getStudentsEnrolled()
                         .addAll(ctx.selectFrom(STUDENT)
                                 .where(STUDENT.UNIQUE_ID.in(student_ids))
                                 .fetch()
-                                .map(STUDENT_DAO::convertToModel));
+                                .map(studentDAO::convertToModel)
+                        );
             }
         }
         return courses;
@@ -310,21 +311,6 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
             model.getAssignments().addAll(assignmentDAO.fromCourse(model));
         });
         return course.orElse(null);
-    }
-
-    @Override
-    @Deprecated
-    public CourseRecord convertToRecord(Course model, DSLContext ctx) {
-        CourseRecord course = ctx.newRecord(COURSE);
-        course.setCourseNumber(model.getCourseNumber());
-        course.setDepartment(model.getDepartment());
-        course.setName(model.getName());
-        course.setSectionNumber(model.getSectionNumber());
-        // unique id cannot be 0 because that is an invalid database id
-        if (model.getUniqueId() != 0) {
-            course.setUniqueId(model.getUniqueId());
-        }
-        return course;
     }
 
     @Override

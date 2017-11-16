@@ -34,30 +34,32 @@ dependencies {
     jooqRuntime 'org.xerial:sqlite-jdbc:3.20.0'
 }
 
-File dbFile = null
+File dbFile = file("uploader.db")
 
-task statOrCreateDB() << {
-    def propertiesFile = file("uploader.properties")
-    if (!propertiesFile.exists()) {
-        throw new InvalidUserDataException("Could not find file uploader.properties")
-    }
+task statOrCreateDB() {
+    doLast {
+        def propertiesFile = file("uploader.properties")
+        if (!propertiesFile.exists()) {
+            throw new InvalidUserDataException("Could not find file uploader.properties")
+        }
 
-    println "Checking " + propertiesFile.absolutePath + " for db.url"
-    def props = new Properties()
-    propertiesFile.withInputStream { props.load(it) }
-    def dbUrl = props.getProperty("db.url")
-    if (dbUrl == null) {
-        throw new InvalidUserDataException("No db.url property in the uploader.properties file")
-    }
+        println "Checking " + propertiesFile.absolutePath + " for db.url"
+        def props = new Properties()
+        propertiesFile.withInputStream { props.load(it) }
+        def dbUrl = props.getProperty("db.url")
+        if (dbUrl == null) {
+            throw new InvalidUserDataException("No db.url property in the uploader.properties file")
+        }
 
-    println "Checking if " + dbUrl + " exists yet"
-    dbFile = file(dbUrl)
-    if (!dbFile.exists()) {
-        println "Creating a new db file at " + dbFile.absolutePath
-        if (!dbFile.createNewFile()) {
-            throw new UncheckedIOException(
-                    new IOException("Cannot create " + dbFile.absolutePath + ". Possibly bad permissions?")
-            )
+        println "Checking if " + dbUrl + " exists yet"
+        dbFile = file(dbUrl)
+        if (!dbFile.exists()) {
+            println "Creating a new db file at " + dbFile.absolutePath
+            if (!dbFile.createNewFile()) {
+                throw new UncheckedIOException(
+                        new IOException("Cannot create " + dbFile.absolutePath + ". Possibly bad permissions?")
+                )
+            }
         }
     }
 }
@@ -76,7 +78,6 @@ flyway {
     ]
 }
 
-generateUploaderDBJooqSchemaSource.dependsOn flywayMigrate
 jooq {
     version = '3.10.0'
     edition = 'OSS'
@@ -108,7 +109,6 @@ jooq {
     }
 }
 
-jar.dependsOn generateUploaderDBJooqSchemaSource
 jar {
     from configurations.compile.collect {
         zipTree it

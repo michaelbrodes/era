@@ -7,6 +7,12 @@ package era.uploader.data.database.jooq.tables;
 import era.uploader.data.database.jooq.DefaultSchema;
 import era.uploader.data.database.jooq.Keys;
 import era.uploader.data.database.jooq.tables.records.SemesterRecord;
+
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Generated;
+
 import org.jooq.Field;
 import org.jooq.Name;
 import org.jooq.Schema;
@@ -15,10 +21,6 @@ import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
-
-import javax.annotation.Generated;
-import java.util.Arrays;
-import java.util.List;
 
 
 /**
@@ -37,7 +39,7 @@ public class Semester extends TableImpl<SemesterRecord> {
     private static final long serialVersionUID = 1891606338;
 
     /**
-     * The reference instance of <code>Semester</code>
+     * The reference instance of <code>semester</code>
      */
     public static final Semester SEMESTER = new Semester();
 
@@ -50,36 +52,36 @@ public class Semester extends TableImpl<SemesterRecord> {
     }
 
     /**
-     * The column <code>Semester.unique_id</code>.
+     * The column <code>semester.unique_id</code>.
      */
     public final TableField<SemesterRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
-     * The column <code>Semester.term</code>.
+     * The column <code>semester.term</code>.
      */
     public final TableField<SemesterRecord, String> TERM = createField("term", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
 
     /**
-     * The column <code>Semester.year</code>.
+     * The column <code>semester.year</code>.
      */
     public final TableField<SemesterRecord, Integer> YEAR = createField("year", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * Create a <code>Semester</code> table reference
+     * Create a <code>semester</code> table reference
      */
     public Semester() {
-        this(DSL.name("Semester"), null);
+        this(DSL.name("semester"), null);
     }
 
     /**
-     * Create an aliased <code>Semester</code> table reference
+     * Create an aliased <code>semester</code> table reference
      */
     public Semester(String alias) {
         this(DSL.name(alias), SEMESTER);
     }
 
     /**
-     * Create an aliased <code>Semester</code> table reference
+     * Create an aliased <code>semester</code> table reference
      */
     public Semester(Name alias) {
         this(alias, SEMESTER);

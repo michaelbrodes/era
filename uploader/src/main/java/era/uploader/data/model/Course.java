@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNullableByDefault;
+import java.time.Year;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,8 +21,6 @@ public class Course {
     private int uniqueId;
     private String department;                              /* Department where the course is held */
     private String name;                                    /* Name of Course */
-    @Deprecated
-    private String semesterStr;                                /* Semester of Course */
     private Semester semester;
     private String courseNumber;                            /* Number of Course */
     private String sectionNumber;                           /* Number for the Course Section */
@@ -29,17 +28,6 @@ public class Course {
     private Set<Assignment> assignments = Sets.newHashSet();
 
     /* Constructor */
-
-    /**
-     * This default constructor is deprecated because a valid course would
-     * require a Nonnull department, courseNumber, and sectionNumber. Please
-     * use constructors that have that instead
-     */
-    @Deprecated
-    public Course() {
-
-    }
-
     public Course(
             @Nonnull String department,
             String name,
@@ -53,7 +41,9 @@ public class Course {
         Preconditions.checkNotNull(sectionNumber, "Cannot create a course with a null sectionNumber");
         this.department = department;
         this.name = name;
-        this.semesterStr = semester;
+        this.semester = semester != null ?
+                Semester.of(Semester.Term.valueOf(semester), Year.now()) :
+                null;
         this.courseNumber = courseNumber;
         this.sectionNumber = sectionNumber;
         this.assignments = assignments == null ? Sets.newHashSet() : assignments;
@@ -97,7 +87,6 @@ public class Course {
         this.sectionNumber = sectionNumber;
         this.semester = builder.semester;
         this.name = builder.name;
-        this.semesterStr = builder.semesterDeprecated;
         this.studentsEnrolled = builder.studentsEnrolled == null ?
                 Sets.newHashSet() :
                 builder.studentsEnrolled;
@@ -130,31 +119,11 @@ public class Course {
         this.name = name;
     }
 
-    /**
-     * TODO: remove this method by the end of sprint 4
-     * @deprecated this can no longer be stored in the database, please use
-     * {@link #getSemesterObj()}
-     */
-    @Deprecated
-    public String getSemester() {
-        return semesterStr;
-    }
-
-    @Deprecated
-    public void setSemester(String semester) {
-        this.semesterStr = semester;
-    }
-
     public void setSemester(Semester semester) {
         this.semester = semester;
     }
 
-    /**
-     * @return A non-null {@link Semester} object that this course belongs to.
-     * This getter is suffixed with <code>Obj</code> because previously we
-     * stored the semester as a String and we had to deprecate that method
-     */
-    public Semester getSemesterObj() {
+    public Semester getSemester() {
         return semester;
     }
 
@@ -239,13 +208,8 @@ public class Course {
      */
     public static class Builder {
         private int uniqueId;
-        private String department;                              /* Department where the course is held */
         private String name;                                    /* Name of Course */
-        @Deprecated
-        private String semesterDeprecated;                                /* Semester of Course */
         private Semester semester;
-        private String courseNumber;                            /* Number of Course */
-        private String sectionNumber;                           /* Number for the Course Section */
         private Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
         private Set<Assignment> assignments;
 
@@ -256,24 +220,6 @@ public class Course {
 
         public Builder withName(String name) {
             this.name = name;
-            return this;
-        }
-
-        @Deprecated
-        public Builder withSemester(String semester) {
-            this.semesterDeprecated = semester.toUpperCase();
-            return this;
-        }
-
-        @Deprecated
-        public Builder withCourseNumber(String courseNumber) {
-            this.courseNumber = courseNumber.toUpperCase();
-            return this;
-        }
-
-        @Deprecated
-        public Builder withSectionNumber(String sectionNumber) {
-            this.sectionNumber = sectionNumber.toUpperCase();
             return this;
         }
 

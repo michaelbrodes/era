@@ -7,11 +7,13 @@ package era.uploader.data.database.jooq;
 import era.uploader.data.database.jooq.tables.CourseStudent;
 import era.uploader.data.database.jooq.tables.QrCodeMapping;
 import era.uploader.data.database.jooq.tables.SchemaVersion;
+import era.uploader.data.database.jooq.tables.Student;
+
+import javax.annotation.Generated;
+
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.AbstractKeys;
-
-import javax.annotation.Generated;
 
 
 /**
@@ -35,6 +37,7 @@ public class Indexes {
     public static final Index SQLITE_AUTOINDEX_QR_CODE_MAPPING_1 = Indexes0.SQLITE_AUTOINDEX_QR_CODE_MAPPING_1;
     public static final Index SCHEMA_VERSION_S_IDX = Indexes0.SCHEMA_VERSION_S_IDX;
     public static final Index SQLITE_AUTOINDEX_SCHEMA_VERSION_1 = Indexes0.SQLITE_AUTOINDEX_SCHEMA_VERSION_1;
+    public static final Index SQLITE_AUTOINDEX_STUDENT_1 = Indexes0.SQLITE_AUTOINDEX_STUDENT_1;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
@@ -45,5 +48,6 @@ public class Indexes {
         public static Index SQLITE_AUTOINDEX_QR_CODE_MAPPING_1 = createIndex("sqlite_autoindex_qr_code_mapping_1", QrCodeMapping.QR_CODE_MAPPING, new OrderField[] { QrCodeMapping.QR_CODE_MAPPING.UUID }, true);
         public static Index SCHEMA_VERSION_S_IDX = createIndex("schema_version_s_idx", SchemaVersion.SCHEMA_VERSION, new OrderField[] { SchemaVersion.SCHEMA_VERSION.SUCCESS }, false);
         public static Index SQLITE_AUTOINDEX_SCHEMA_VERSION_1 = createIndex("sqlite_autoindex_schema_version_1", SchemaVersion.SCHEMA_VERSION, new OrderField[] { SchemaVersion.SCHEMA_VERSION.INSTALLED_RANK }, true);
+        public static Index SQLITE_AUTOINDEX_STUDENT_1 = createIndex("sqlite_autoindex_student_1", Student.STUDENT, new OrderField[] { Student.STUDENT.SCHOOL_ID }, true);
     }
 }

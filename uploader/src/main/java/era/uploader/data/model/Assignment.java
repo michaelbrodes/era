@@ -226,6 +226,14 @@ public class Assignment {
         this.student = student;
     }
 
+    public void setUniqueId(int uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
+    public int getUniqueId() {
+        return this.uniqueId;
+    }
+
     public static Builder builder() {
         return new Builder();
     }

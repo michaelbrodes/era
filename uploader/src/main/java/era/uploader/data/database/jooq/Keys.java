@@ -18,11 +18,12 @@ import era.uploader.data.database.jooq.tables.records.QrCodeMappingRecord;
 import era.uploader.data.database.jooq.tables.records.SchemaVersionRecord;
 import era.uploader.data.database.jooq.tables.records.SemesterRecord;
 import era.uploader.data.database.jooq.tables.records.StudentRecord;
+
+import javax.annotation.Generated;
+
 import org.jooq.ForeignKey;
 import org.jooq.UniqueKey;
 import org.jooq.impl.AbstractKeys;
-
-import javax.annotation.Generated;
 
 
 /**

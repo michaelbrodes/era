@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 public class PDFScanView extends Application {
@@ -154,7 +155,7 @@ public class PDFScanView extends Application {
 
             //Getting all the courses
             //TODO HIDE THE PREVIOUS WINDOW. WHY WILL THIS NOT WORK
-            Set<Course> courses = pdfCtrl.getAllCourses();
+            List<Course> courses = pdfCtrl.getAllCourses();
 
             //Dynamically will make the window as large as it needs with how many classes there are
             secondStage.setHeight((courses.size() + 2) * 250);

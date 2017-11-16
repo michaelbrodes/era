@@ -58,8 +58,6 @@ abstract class DatabaseDAO<RECORD extends Record, MODEL> implements DAO {
      */
     @Nullable
     public abstract MODEL convertToModel(@Nullable RECORD record);
-    @Deprecated
-    public abstract RECORD convertToRecord(MODEL model, DSLContext ctx);
 
     /**
      * Converts a generic model object from {@link era.uploader.data.model} to
