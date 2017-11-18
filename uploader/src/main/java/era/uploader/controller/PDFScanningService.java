@@ -25,7 +25,7 @@ import java.util.Optional;
  * database. This controller will rely heavily on the
  * {@link era.uploader.processing} package.
  */
-public class PDFScanningController {
+public class PDFScanningService {
     private final QRCodeMappingDAO qrCodeMappingDAO = QRCodeMappingDAOImpl.instance();
     private final CourseDAO courseDAO = CourseDAOImpl.instance();
     private final StudentDAO studentDAO = StudentDAOImpl.instance();

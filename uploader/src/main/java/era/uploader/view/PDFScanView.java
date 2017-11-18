@@ -1,6 +1,6 @@
 package era.uploader.view;
 
-import era.uploader.controller.PDFScanningController;
+import era.uploader.controller.PDFScanningService;
 import era.uploader.data.model.Course;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -19,13 +19,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 
 public class PDFScanView extends Application {
 
     private GridPane gridPane;
     private UIManager uManage;
-    private PDFScanningController pdfCtrl;
+    private PDFScanningService pdfCtrl;
     private Stage mainStage;
     private String fullFileName;
     private Path fullPath;
@@ -42,7 +41,7 @@ public class PDFScanView extends Application {
         uManage = uim;
         mainStage = uManage.getPrimaryStage();
         this.gridPane = gridPane;
-        pdfCtrl = new PDFScanningController();
+        pdfCtrl = new PDFScanningService();
 
     }
 

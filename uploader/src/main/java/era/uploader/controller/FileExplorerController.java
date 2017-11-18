@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.database.AssignmentDAOImpl;
 import era.uploader.view.UIManager;
+import era.uploader.view.UINavigator;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -72,6 +73,16 @@ public class FileExplorerController {
     }
 
     public void scanPDF(MouseEvent mouseEvent) {
+
+        UINavigator nav = new UINavigator(allAssignments.getScene());
+
+        try {
+
+            nav.changeToScan();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 }

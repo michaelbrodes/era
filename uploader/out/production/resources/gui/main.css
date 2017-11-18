@@ -1,0 +1,6 @@
+.main-heading {
+    -fx-font: bold 2em monospace;
+    -fx-alignment: top-left;
+    -fx-padding: 125%;
+    -fx-text-alignment: center;
+}
