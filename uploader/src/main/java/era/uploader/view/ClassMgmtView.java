@@ -69,7 +69,7 @@ public class ClassMgmtView extends Application {
         gridPane.add(classIDLabel, 2, 3);
 
         int count = 4;
-        for (Map.Entry<Course, Collection<Student>> courseToStudents :
+        for (Map.Entry<Course, Collection<Student>> courseToStudents:
                 courseStudentMultimap.asMap().entrySet()) {
             String course = courseToStudents.getKey().getDepartment() + ""
                     + courseToStudents.getKey().getCourseNumber() + "-"
