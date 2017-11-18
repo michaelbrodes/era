@@ -5,9 +5,13 @@ import era.uploader.UploaderApp;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class UIManager extends Application {
 
@@ -92,4 +96,8 @@ public class UIManager extends Application {
         primaryStage.hide();
     }
 
+    public void changeToLoadingScreen() throws IOException{
+        Parent processingLoadGUI = FXMLLoader.load(getClass().getResource("/gui/PDFProgressGUI.fxml"));
+        mainScene.setRoot(processingLoadGUI);
+    }
 }
