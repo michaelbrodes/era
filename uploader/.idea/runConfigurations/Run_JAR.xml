@@ -2,7 +2,8 @@
   <configuration default="false" name="Run JAR" type="JarApplication" factoryName="JAR Application">
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <option name="JAR_PATH" value="$PROJECT_DIR$/build/libs/uploader-1.0-SNAPSHOT.jar" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="VM_PARAMETERS" value="-Dorg.jooq.no-logo=true " />
+    <option name="WORKING_DIRECTORY" value="C:\Dev\era\uploader" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
     <envs />

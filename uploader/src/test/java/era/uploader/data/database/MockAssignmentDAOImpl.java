@@ -6,7 +6,9 @@ import era.uploader.data.database.jooq.tables.records.AllAssignmentsRecord;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 public class MockAssignmentDAOImpl implements AssignmentDAO{
@@ -49,8 +51,9 @@ public class MockAssignmentDAOImpl implements AssignmentDAO{
     }
 
     @Override
+    @Nonnull
     public Collection<AllAssignmentsRecord> getAllAssignments() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

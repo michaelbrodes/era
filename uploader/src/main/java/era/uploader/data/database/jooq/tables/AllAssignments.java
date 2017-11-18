@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AllAssignments extends TableImpl<AllAssignmentsRecord> {
 
-    private static final long serialVersionUID = -1551897862;
+    private static final long serialVersionUID = -1074717767;
 
     /**
      * The reference instance of <code>all_assignments</code>
@@ -58,9 +58,9 @@ public class AllAssignments extends TableImpl<AllAssignmentsRecord> {
     public final TableField<AllAssignmentsRecord, Object> STUDENT = createField("Student", org.jooq.impl.DefaultDataType.getDefaultDataType(""), this, "");
 
     /**
-     * The column <code>all_assignments.800 Number</code>.
+     * The column <code>all_assignments.Eight Hundred Number</code>.
      */
-    public final TableField<AllAssignmentsRecord, String> _800_NUMBER = createField("800 Number", org.jooq.impl.SQLDataType.CLOB, this, "");
+    public final TableField<AllAssignmentsRecord, String> EIGHT_HUNDRED_NUMBER = createField("Eight Hundred Number", org.jooq.impl.SQLDataType.CLOB, this, "");
 
     /**
      * The column <code>all_assignments.Course</code>.

@@ -4,6 +4,7 @@ import era.uploader.data.database.jooq.tables.records.AllAssignmentsRecord;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 
 public interface AssignmentDAO extends DAO {
@@ -24,5 +25,6 @@ public interface AssignmentDAO extends DAO {
      * @return Every single assignment joined with meta-data, and outputted
      * reverse chronological order.
      */
+    @Nonnull
     Collection<AllAssignmentsRecord> getAllAssignments();
 }

@@ -2,13 +2,12 @@ package era.uploader;
 
 import era.uploader.view.UIManager;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class UploaderApp extends Application {
 
@@ -16,48 +15,17 @@ public class UploaderApp extends Application {
         launch(args);
     }
 
-    private Stage primaryStage;
-    public GridPane root;
-    public Scene mainScene;
-
     @Override
-    public void start(Stage pStage) {
+    public void start(Stage primaryStage) throws IOException {
         System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
-        primaryStage = pStage;
-        primaryStage = new Stage();
-        root = new GridPane();
-        mainScene = new Scene(root, 600, 600);
-        primaryStage.setScene(mainScene);
-        primaryStage.show();
-
-        root.setMinSize(800, 600);
-        root.setPadding(new Insets(10,10,10,10));
-
-        root.setVgap(10);
-        root.setHgap(10);
+        // if Class#getResource cannot resolve the resource it will throw an NPE
+        // The resource is guessed to be at /src/main/resources/gui/file-explorer.fxml
+        Parent root = FXMLLoader.load(getClass().getResource("/gui/file-explorer.fxml"));
+        Scene mainScene = new Scene(root, 1000, 600);
 
         UIManager uManage = new UIManager(mainScene, primaryStage, root);
 
-        Button qrCreateButton = new Button("Create Class");
-        Button pdfUploadButton = new Button("Scan PDF");
-
-
-        Label eraLabel = new Label();
-        eraLabel.setText("Electronically Returned Assignments");
-
-        root.add(eraLabel, 2, 2);
-        root.add(qrCreateButton, 2, 4);
-        root.add(pdfUploadButton, 3, 4);
-
-
-        qrCreateButton.setOnAction(event -> {
-            uManage.changeToCreateView(root);
-        });
-
-        pdfUploadButton.setOnAction((ActionEvent event) -> {
-            uManage.changeToUploadPDFView(root);
-        });
-
-
+        primaryStage.setScene(mainScene);
+        primaryStage.show();
     }
 }

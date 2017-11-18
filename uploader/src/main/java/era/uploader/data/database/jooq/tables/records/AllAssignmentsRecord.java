@@ -27,7 +27,7 @@ import org.jooq.impl.TableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AllAssignmentsRecord extends TableRecordImpl<AllAssignmentsRecord> implements Record8<String, Object, String, String, Object, Object, Object, String> {
 
-    private static final long serialVersionUID = -1973045246;
+    private static final long serialVersionUID = -1467660433;
 
     /**
      * Setter for <code>all_assignments.Assignment</code>.
@@ -70,17 +70,17 @@ public class AllAssignmentsRecord extends TableRecordImpl<AllAssignmentsRecord> 
     }
 
     /**
-     * Setter for <code>all_assignments.800 Number</code>.
+     * Setter for <code>all_assignments.Eight Hundred Number</code>.
      */
-    public AllAssignmentsRecord set_800Number(String value) {
+    public AllAssignmentsRecord setEightHundredNumber(String value) {
         set(2, value);
         return this;
     }
 
     /**
-     * Getter for <code>all_assignments.800 Number</code>.
+     * Getter for <code>all_assignments.Eight Hundred Number</code>.
      */
-    public String get_800Number() {
+    public String getEightHundredNumber() {
         return (String) get(2);
     }
 
@@ -231,7 +231,7 @@ public class AllAssignmentsRecord extends TableRecordImpl<AllAssignmentsRecord> 
      */
     @Override
     public Field<String> field3() {
-        return AllAssignments.ALL_ASSIGNMENTS._800_NUMBER;
+        return AllAssignments.ALL_ASSIGNMENTS.EIGHT_HUNDRED_NUMBER;
     }
 
     /**
@@ -299,7 +299,7 @@ public class AllAssignmentsRecord extends TableRecordImpl<AllAssignmentsRecord> 
      */
     @Override
     public String component3() {
-        return get_800Number();
+        return getEightHundredNumber();
     }
 
     /**
@@ -367,7 +367,7 @@ public class AllAssignmentsRecord extends TableRecordImpl<AllAssignmentsRecord> 
      */
     @Override
     public String value3() {
-        return get_800Number();
+        return getEightHundredNumber();
     }
 
     /**
@@ -437,7 +437,7 @@ public class AllAssignmentsRecord extends TableRecordImpl<AllAssignmentsRecord> 
      */
     @Override
     public AllAssignmentsRecord value3(String value) {
-        set_800Number(value);
+        setEightHundredNumber(value);
         return this;
     }
 
@@ -519,12 +519,12 @@ public class AllAssignmentsRecord extends TableRecordImpl<AllAssignmentsRecord> 
     /**
      * Create a detached, initialised AllAssignmentsRecord
      */
-    public AllAssignmentsRecord(String assignment, Object student, String _800Number, String course, Object childCourseId, Object semester, Object created, String fileLocation) {
+    public AllAssignmentsRecord(String assignment, Object student, String eightHundredNumber, String course, Object childCourseId, Object semester, Object created, String fileLocation) {
         super(AllAssignments.ALL_ASSIGNMENTS);
 
         set(0, assignment);
         set(1, student);
-        set(2, _800Number);
+        set(2, eightHundredNumber);
         set(3, course);
         set(4, childCourseId);
         set(5, semester);

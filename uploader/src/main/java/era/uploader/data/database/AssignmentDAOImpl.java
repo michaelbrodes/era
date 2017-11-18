@@ -6,17 +6,14 @@ import era.uploader.data.AssignmentDAO;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.StudentDAO;
 import era.uploader.data.converters.AssignmentConverter;
-import era.uploader.data.database.jooq.tables.AllAssignments;
 import era.uploader.data.database.jooq.tables.records.AllAssignmentsRecord;
 import era.uploader.data.database.jooq.tables.records.AssignmentRecord;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import org.jooq.DSLContext;
-import org.jooq.Result;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -40,14 +37,6 @@ public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment>
 
     public void storeAssignment(Assignment assignment) {
         insert(assignment);
-    }
-
-    @Override
-    @Nonnull
-    public Collection<AllAssignmentsRecord> getAllAssignments() {
-        try (DSLContext ctx = connect()) {
-            return ctx.selectFrom(ALL_ASSIGNMENTS).fetch();
-        }
     }
 
     @Override
@@ -115,6 +104,14 @@ public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment>
                     .stream()
                     .map(CONVERTER::convert)
                     .collect(Collectors.toList());
+        }
+    }
+
+    @Override
+    @Nonnull
+    public Collection<AllAssignmentsRecord> getAllAssignments() {
+        try (DSLContext ctx = connect()) {
+            return ctx.selectFrom(ALL_ASSIGNMENTS).fetch();
         }
     }
 

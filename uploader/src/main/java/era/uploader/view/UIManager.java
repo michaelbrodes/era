@@ -5,9 +5,12 @@ import era.uploader.UploaderApp;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 import javafx.application.Application;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class UIManager extends Application {
 
@@ -18,10 +21,10 @@ public class UIManager extends Application {
     private ClassMgmtView classView;
     private PDFScanView pdfScanView;
     private Stage primaryStage;
-    public GridPane root;
+    public Parent root;
     public Scene mainScene;
 
-    public UIManager(Scene scene, Stage pStage, GridPane gridPane) {
+    public UIManager(Scene scene, Stage pStage, Parent gridPane) {
 
         createView = new QRCreationView(this);
         uploadView = new UploadView(this);
@@ -84,7 +87,11 @@ public class UIManager extends Application {
 
     public void changeToHomeView() {
         mainWindow = new UploaderApp();
-        mainWindow.start(primaryStage);
+        try {
+            mainWindow.start(primaryStage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         primaryStage.show();
     }
 

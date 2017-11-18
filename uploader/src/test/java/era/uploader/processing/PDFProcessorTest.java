@@ -30,6 +30,7 @@ import java.util.Set;
 public class PDFProcessorTest {
     private static final String SINGLE_TEST = "src/test/resources/single-page_300dpi.pdf";
     private static final String MULTI_TEST = "src/test/resources/test-pdfs/300dpi.pdf";
+    private static final String MULTI_MULTI_TEST = "src/test/resources/test-pdfs/era_test_320.pdf";
 
     @Test
     public void process_fivePageInput() throws Exception {
@@ -67,6 +68,45 @@ public class PDFProcessorTest {
         Assignment assignment = Iterators.getOnlyElement(processed.iterator());
         Assert.assertEquals(assignmentName, assignment.getName());
         Assert.assertTrue(assignment.getQRCodeMappings().size() == 5);
+    }
+
+    @Test
+    @Ignore
+    public void process_10MBInput() throws Exception {
+        Path testDocPath = Paths.get(IOUtil.convertToLocal(MULTI_MULTI_TEST));
+        Course course = Course.builder()
+                .withName("Intro to Chemistry")
+                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
+                .create("CHEM", "111", "001");
+        Student student = Student.builder()
+                .withCourses(ImmutableSet.of(course))
+                .withFirstName("Sterling")
+                .withLastName("Archer")
+                .withUniqueId(1)
+                .withSchoolId("800888888")
+                .create("sarcher");
+        QRCodeMapping dbQRCodeMapping = QRCodeMapping.builder()
+                .withSequenceNumber(1)
+                .withStudent(student)
+                .create("6ab251a5-6c4e-4688-843f-60aea570c3a6");
+        String assignmentName = "Infiltrate the Kremlin";
+        QRCodeMappingDAO qrCodeMappingDAO = new MockQRCodeMappingDAOImpl();
+        AssignmentDAO assignmentDAO = new MockAssignmentDAOImpl();
+        qrCodeMappingDAO.insert(dbQRCodeMapping);
+
+        Collection<Assignment> processed = PDFProcessor.process(
+                qrCodeMappingDAO,
+                assignmentDAO,
+                testDocPath,
+                course,
+                assignmentName,
+                null
+        );
+
+        Assert.assertTrue(processed.size() == 1);
+        Assignment assignment = Iterators.getOnlyElement(processed.iterator());
+        Assert.assertEquals(assignmentName, assignment.getName());
+        Assert.assertTrue(assignment.getQRCodeMappings().size() == 320);
     }
 
     @Test
