@@ -2,18 +2,23 @@ package era.uploader.processing;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import era.uploader.controller.StatusChangeBus;
+import era.uploader.data.database.jooq.Keys;
 import era.uploader.data.model.FileStatus;
 import era.uploader.data.model.QRCodeMapping;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import sun.awt.SunHints;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -29,7 +34,7 @@ import java.util.Random;
  * are scanned in as 300 DPI and have a QR code on the top right.
  */
 @ParametersAreNonnullByDefault
-public class TASKalfaConverter implements Converter<Path, List<String>> {
+public class TASKalfaConverter implements Converter<Path, Map<Integer, String>> {
     private static final int FIRST_PAGE = 1;
     private static final int PAGES_IN_SPLIT = 1;
 
@@ -43,10 +48,10 @@ public class TASKalfaConverter implements Converter<Path, List<String>> {
      */
     @Override
     @Nonnull
-    public List<String> convert(Path file) throws IOException {
+    public Map<Integer, String> convert(Path file) throws IOException {
         Preconditions.checkNotNull(file);
         Splitter pdfSplitter = new Splitter();
-        List<String> ret;
+        Map<Integer, String> mappedFiles = new LinkedHashMap<>();
 
         try {
             PDDocument inputPDF = PDDocument.load(file.toFile());
@@ -66,7 +71,12 @@ public class TASKalfaConverter implements Converter<Path, List<String>> {
                 tmpFiles.add(pdf.getAbsolutePath());
                 document.close();
             }
-            ret = tmpFiles.build();
+
+            List<String> fileNames = tmpFiles.build();
+            for (int i = 0; i < fileNames.size(); i++){
+                    mappedFiles.put(i, fileNames.get(i));
+            }
+
             inputPDF.close();
         } catch (IOException e) {
             StatusChangeBus
@@ -75,11 +85,11 @@ public class TASKalfaConverter implements Converter<Path, List<String>> {
             throw e;
         }
 
-        return ret;
+        return mappedFiles;
     }
 
     @Nonnull
-    static List<String> convertFile(Path file) throws IOException {
+    static Map<Integer, String> convertFile(Path file) throws IOException {
         return new TASKalfaConverter().convert(file);
     }
 }

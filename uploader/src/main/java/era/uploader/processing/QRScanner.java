@@ -21,12 +21,14 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Map;
 
 class QRScanner {
 
     private MultiFormatReader multiForm;
-
-    QRScanner (){
+    private final ScanningProgress progress;
+    QRScanner (ScanningProgress progress){
+        this.progress = progress;
         multiForm = new MultiFormatReader();
         multiForm.setHints(ImmutableMap.of(
                 DecodeHintType.POSSIBLE_FORMATS, Collections.singletonList(BarcodeFormat.QR_CODE)
@@ -38,10 +40,10 @@ class QRScanner {
 
     private static final QRErrorBus BUS = QRErrorBus.instance();
 
-    QRCodeMapping extractQRCodeInformation(String documentName){
+    QRCodeMapping extractQRCodeInformation(Map.Entry<Integer,String> idToDocument){
         String tmpFinalResult;
         try{
-            PDDocument document = PDDocument.load(new File(documentName));
+            PDDocument document = PDDocument.load(new File(idToDocument.getValue()));
             PDFRenderer renderer = new PDFRenderer(document);
 
             BufferedImage pdf = renderer.renderImageWithDPI(0, 300);
@@ -63,8 +65,9 @@ class QRScanner {
             BUS.fire(new QRErrorEvent(QRErrorStatus.UUID_ERROR));
             return null;
         }
+        progress.incrementCount();
         return QRCodeMapping.builder()
-                .withTempDocumentName(documentName)
+                .withTempDocumentName(idToDocument.getValue())
                 .create(tmpFinalResult);
     }//convertPDFtoBufferedImage
 }

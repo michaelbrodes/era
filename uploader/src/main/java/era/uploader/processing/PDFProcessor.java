@@ -34,7 +34,7 @@ import java.util.Set;
 @ParametersAreNonnullByDefault
 public class PDFProcessor {
     private static final QRErrorBus BUS = QRErrorBus.instance();
-    private final List<String> pages;
+    private final Map<Integer, String> pages;
     private final Course course;
     private final String assignmentName;
     private final QRCodeMappingDAO QRCodeMappingDAO;
@@ -44,7 +44,7 @@ public class PDFProcessor {
     PDFProcessor(
             QRCodeMappingDAO QRCodeMappingDao,
             AssignmentDAO assignmentDAO,
-            List<String> pages,
+            Map<Integer, String> pages,
             Course course,
             String assignmentName,
             String host
@@ -91,7 +91,7 @@ public class PDFProcessor {
         Preconditions.checkNotNull(assignmentName);
         Preconditions.checkNotNull(QRCodeMappingDAO);
 
-        List<String> pages = TASKalfaConverter.convertFile(pdf);
+        Map<Integer, String> pages = TASKalfaConverter.convertFile(pdf);
         PDFProcessor processor = new PDFProcessor(QRCodeMappingDAO, assignmentDAO, pages, course, assignmentName, host);
 
         //TODO at the end of processing add a message to the screen that says that processing was successful
@@ -113,8 +113,10 @@ public class PDFProcessor {
      * @return the assignment submissions we generated during this run.
      */
     private Collection<Assignment> startPipeline() {
-        QRScanner scanner = new QRScanner();
-        Multimap<Student, QRCodeMapping> collect = pages.parallelStream()
+        ScanningProgress progress = new ScanningProgress();
+        progress.setPdfFileSize(pages.size());
+        QRScanner scanner = new QRScanner(progress);
+        Multimap<Student, QRCodeMapping> collect = pages.entrySet().parallelStream()
                 .map(scanner::extractQRCodeInformation)
                 .filter(Objects::nonNull)
                 .map(this::associateStudentsWithPage)
