@@ -1,9 +1,11 @@
-package era.uploader.creation;
+package era.uploader.service;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import era.uploader.controller.QRErrorBus;
+import era.uploader.creation.QRErrorEvent;
+import era.uploader.creation.QRErrorStatus;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
@@ -11,18 +13,6 @@ import era.uploader.data.model.Student;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/**
- * Parses a Single line in a student roster CSV. The line must match the
- * following grammar:
- *
- * {@code
- * S -> line;
- * line -> &gt;Last Name&lt;,&gt;First Name&lt;,&gt;Username (EID at Edwardsville)&lt;,&gt;Student ID (800 Number at Edwardsville)&lt;CourseId
- * CourseId -> &gt;Department (e.g. CHEM)&lt;-&gt;CourseNumber&lt;-&gt;Section Number&lt;(-.*)*|(,.*)*
- * }
- *
- * All junk after the section number is discarded.
- */
 public class CSVParser {
     /*
     The following constants are positions of specific Student or Course fields

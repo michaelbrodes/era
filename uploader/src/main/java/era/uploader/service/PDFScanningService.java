@@ -1,4 +1,4 @@
-package era.uploader.controller;
+package era.uploader.service;
 
 import era.uploader.common.UploaderProperties;
 import era.uploader.data.AssignmentDAO;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * This controller is responsible for taking in PDFs, extracting the UUID
+ * This service is responsible for taking in PDFs, extracting the UUID
  * embedded in them, and mapping those UUIDs to placeholder pages in the
  * database. This controller will rely heavily on the
  * {@link era.uploader.processing} package.

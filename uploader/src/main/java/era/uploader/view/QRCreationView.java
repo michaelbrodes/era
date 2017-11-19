@@ -3,7 +3,8 @@ package era.uploader.view;
 import com.google.common.base.Strings;
 import com.google.common.collect.Multimap;
 import era.uploader.common.IntegerOnlyBox;
-import era.uploader.controller.QRCreationController;
+import era.uploader.service.CourseCreationService;
+import era.uploader.service.QRCreationService;
 import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.QRCodeMappingDAOImpl;
 import era.uploader.data.model.Course;
@@ -32,19 +33,21 @@ public class QRCreationView extends Application {
 
     private UIManager uManage;
     private Stage mainStage;
-    private QRCreationController qrCtrl;
+    private QRCreationService qrService;
+    private CourseCreationService courseService;
     private String fullFileName;
 
 //    public QRCreationView() {
 //        UIManager uManage = new UIManager(mainStage);
 //        mainStage = uManage.getPrimaryStage();
-//        qrCtrl = new QRCreationController(new QRCodeMappingDAOImpl(), new CourseDAOImpl());
+//        qrService = new QRCreationService(new QRCodeMappingDAOImpl(), new CourseDAOImpl());
 //    }
 
     public QRCreationView(UIManager uim) {
         uManage = uim;
         mainStage = uManage.getPrimaryStage();
-        qrCtrl = new QRCreationController(QRCodeMappingDAOImpl.instance(), CourseDAOImpl.instance());
+        qrService = new QRCreationService(QRCodeMappingDAOImpl.instance(), CourseDAOImpl.instance());
+        courseService = new CourseCreationService(CourseDAOImpl.instance());
     }
 
 
@@ -173,7 +176,7 @@ public class QRCreationView extends Application {
                 try {
                     Semester semester = new Semester(term, year);
                     Multimap<Course, Student> courseStudentMultimap =
-                            qrCtrl.generateStudents(fPath, semester);
+                            courseService.createCourses(fPath, semester);
                     uManage.changeToClassMgmtView(courseStudentMultimap, gridPane);
                 } catch (IOException e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);

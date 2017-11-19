@@ -1,4 +1,4 @@
-package era.uploader.controller;
+package era.uploader.data.model;
 
 import com.google.common.base.Preconditions;
 import era.uploader.data.database.jooq.tables.records.AllAssignmentsRecord;
@@ -7,6 +7,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNullableByDefault;
 
+/**
+ * A javafx model representing all the information that a user would like to
+ * know about an assignment. This is based off of the
+ * {@link era.uploader.data.database.jooq.tables.AllAssignments} database
+ * view.
+ */
 @ParametersAreNullableByDefault
 public class AssignmentMetaData {
     private final SimpleStringProperty assignment = new SimpleStringProperty("");
@@ -18,9 +24,6 @@ public class AssignmentMetaData {
     private final SimpleStringProperty created = new SimpleStringProperty("");
     private final SimpleStringProperty location = new SimpleStringProperty("");
 
-    public AssignmentMetaData() {
-
-    }
     /**
      * Can't use builder because javafx is weird, so here is a constructor
      * with all fields

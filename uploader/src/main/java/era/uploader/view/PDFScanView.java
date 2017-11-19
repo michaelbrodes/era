@@ -1,6 +1,6 @@
 package era.uploader.view;
 
-import era.uploader.controller.PDFScanningService;
+import era.uploader.service.PDFScanningService;
 import era.uploader.data.model.Course;
 import javafx.application.Application;
 import javafx.scene.Scene;

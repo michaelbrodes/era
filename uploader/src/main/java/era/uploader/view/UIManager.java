@@ -103,7 +103,7 @@ public class UIManager extends Application {
     }
 
     public void changeToLoadingScreen() throws IOException{
-        Parent processingLoadGUI = FXMLLoader.load(getClass().getResource("/gui/PDFProgressGUI.fxml"));
+        Parent processingLoadGUI = FXMLLoader.load(getClass().getResource("/gui/pdf-progress.fxml"));
         mainScene.setRoot(processingLoadGUI);
     }
 }

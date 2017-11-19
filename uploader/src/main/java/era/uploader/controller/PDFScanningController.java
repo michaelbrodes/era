@@ -2,9 +2,9 @@ package era.uploader.controller;
 
 import com.google.common.collect.Maps;
 import era.uploader.data.model.Course;
+import era.uploader.service.PDFScanningService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;

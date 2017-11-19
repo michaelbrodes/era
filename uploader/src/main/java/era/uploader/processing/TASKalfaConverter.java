@@ -2,14 +2,11 @@ package era.uploader.processing;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import era.uploader.controller.StatusChangeBus;
-import era.uploader.data.database.jooq.Keys;
 import era.uploader.data.model.FileStatus;
 import era.uploader.data.model.QRCodeMapping;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import sun.awt.SunHints;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;

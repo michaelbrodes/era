@@ -3,7 +3,7 @@ package era.uploader.controller;
 import com.google.common.base.Preconditions;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.database.AssignmentDAOImpl;
-import era.uploader.view.UIManager;
+import era.uploader.data.model.AssignmentMetaData;
 import era.uploader.view.UINavigator;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,10 +19,17 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The FileExplorer is the GUI component that displays all assignments in the
+ * system. It basically just executes a select statement against
+ * {@link era.uploader.data.database.jooq.tables.AllAssignments} and outputs
+ * the result to the screen in the form of a {@link TableView} of
+ * {@link AssignmentMetaData}
+ */
 public class FileExplorerController {
-    @FXML private TableView<AssignmentMetaData> allAssignments;
+    @FXML
+    private TableView<AssignmentMetaData> allAssignments;
     private static final AssignmentDAO ASSIGNMENT_DAO = AssignmentDAOImpl.instance();
-    private ObservableList<AssignmentMetaData> assignments;
 
     @FXML
     void initialize() {
@@ -40,7 +47,7 @@ public class FileExplorerController {
 
             return row;
         });
-        assignments = allAssignments.getItems();
+        ObservableList<AssignmentMetaData> assignments = allAssignments.getItems();
         assignments.addAll(loadFromDB());
     }
 
@@ -72,17 +79,15 @@ public class FileExplorerController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Switch to the pdf scanning view.
+     */
     public void scanPDF(MouseEvent mouseEvent) {
-
         UINavigator nav = new UINavigator(allAssignments.getScene());
-
         try {
-
             nav.changeToScan();
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 }
