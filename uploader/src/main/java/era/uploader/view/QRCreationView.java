@@ -145,7 +145,6 @@ public class QRCreationView extends Application {
             }
         });
 
-        ;
         goHome.setOnAction(event -> {
             uManage.changeToHomeView();
         });

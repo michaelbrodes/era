@@ -1,5 +1,6 @@
 package era.uploader.processing;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import era.uploader.common.IOUtil;
@@ -156,7 +157,7 @@ public class PDFProcessorTest {
                 .create("CHEM", "111", "001");
         Student test_student = new Student("sarcher");
         test_student.setSchoolId("schoolid");
-        PDFProcessor p = new PDFProcessor(new MockQRCodeMappingDAOImpl(), new MockAssignmentDAOImpl(), Collections.singletonList(SINGLE_TEST), testCourse, "testAssignment", "testDomain");
+        PDFProcessor p = new PDFProcessor(new MockQRCodeMappingDAOImpl(), new MockAssignmentDAOImpl(), ImmutableMap.of(0, SINGLE_TEST), testCourse, "testAssignment", "testDomain");
         Set<Assignment> test_assignments = new HashSet<>();
         QRCodeMapping test_QRCodeMapping = QRCodeMapping.builder().create("testuuid");
         QRCodeMapping test_QRCodeMapping2 = QRCodeMapping.builder().create("testuuid2");

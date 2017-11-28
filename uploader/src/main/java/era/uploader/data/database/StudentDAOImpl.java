@@ -1,5 +1,6 @@
 package era.uploader.data.database;
 
+import com.google.common.base.Preconditions;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.StudentDAO;
 import era.uploader.data.converters.StudentConverter;
@@ -10,6 +11,9 @@ import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 import org.jooq.DSLContext;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,6 +25,7 @@ import static era.uploader.data.database.jooq.Tables.STUDENT;
  * Provides CRUD functionality for {@link Student} objects stored in the
  * database
  */
+@ParametersAreNonnullByDefault
 public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implements StudentDAO {
     public static StudentDAOImpl INSTANCE;
     private static final StudentConverter CONVERTER = StudentConverter.INSTANCE;
@@ -33,7 +38,8 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
      * Create and Insert a new Student object into the database as
      * well as any Courses the student is associated with by default
      */
-    public void insert(Student student) {
+    public void insert(@Nonnull Student student) {
+        Preconditions.checkNotNull(student, "Cannot insert a null student");
         try (DSLContext ctx = connect()) {
             student.setUniqueId(ctx.insertInto(
                     //table
@@ -76,6 +82,7 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
      }
 
     /* Access data from existing Student object from database */
+    @Nullable
     public Student read(long id) {
         try (DSLContext ctx = connect()) {
             StudentRecord studentRecord = ctx.selectFrom(STUDENT)
@@ -87,7 +94,8 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
     }
 
     /* Modify data stored in already existing Student in database */
-    public void update(Student changedStudent) {
+    public void update(@Nonnull Student changedStudent) {
+        Preconditions.checkNotNull(changedStudent, "cannot update a null student");
         try (DSLContext ctx = connect()) {
             ctx.update(STUDENT)
                     .set(STUDENT.FIRST_NAME, changedStudent.getFirstName())
@@ -111,7 +119,8 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
     }
 
     @Override
-    public Collection<Student> fromCourse(Course course) {
+    public Collection<Student> fromCourse(@Nonnull Course course) {
+        Preconditions.checkNotNull(course, "cannot grab a student from a null course");
         try (DSLContext ctx = connect()) {
             return ctx.selectFrom(COURSE_STUDENT)
                     .where(COURSE_STUDENT.COURSE_ID.eq(course.getUniqueId()))
@@ -126,7 +135,8 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
     }
 
     @Override
-    public Student fromQRMapping(QRCodeMapping mapping) {
+    public Student fromQRMapping(@Nonnull QRCodeMapping mapping) {
+        Preconditions.checkNotNull(mapping, "Cannot grab a student from a null qrCodeMapping");
         try (DSLContext ctx = connect()) {
             return ctx.selectFrom(STUDENT)
                     .where(STUDENT.UNIQUE_ID.eq(mapping.getStudentId()))
@@ -136,7 +146,8 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
     }
 
     @Override
-    public Student fromAssignment(Assignment assignment) {
+    public Student fromAssignment(@Nonnull Assignment assignment) {
+        Preconditions.checkNotNull(assignment, "Cannot grab a student from a null assignment");
         try (DSLContext ctx = connect()) {
             return ctx.selectFrom(STUDENT)
                     .where(STUDENT.UNIQUE_ID.eq(assignment.getStudent_id()))
@@ -146,7 +157,8 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
     }
 
     @Override
-    public Student convertToModel(StudentRecord record) {
+    @Nullable
+    public Student convertToModel(@Nullable StudentRecord record) {
         Optional<Student> newStudent = Optional.ofNullable(
                 CONVERTER.convert(record)
         );
@@ -158,7 +170,8 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
     }
 
     @Override
-    public StudentRecord convertToRecord(Student model) {
+    @Nullable
+    public StudentRecord convertToRecord(@Nullable Student model) {
         return CONVERTER.reverse().convert(model);
     }
 

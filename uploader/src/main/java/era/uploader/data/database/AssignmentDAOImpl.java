@@ -13,6 +13,7 @@ import era.uploader.data.model.Course;
 import org.jooq.DSLContext;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -70,6 +71,7 @@ public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment>
     }
 
     @Override
+    @Nullable
     public Assignment read(long id) {
         try (DSLContext ctx = connect()) {
             AssignmentRecord assignmentRecord = ctx.selectFrom(ASSIGNMENT)

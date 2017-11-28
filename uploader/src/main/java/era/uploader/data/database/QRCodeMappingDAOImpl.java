@@ -1,6 +1,6 @@
 package era.uploader.data.database;
 
-import com.google.common.collect.Sets;
+import com.google.common.base.Preconditions;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.StudentDAO;
 import era.uploader.data.converters.QRCodeMappingConverter;
@@ -8,15 +8,18 @@ import era.uploader.data.database.jooq.tables.records.QrCodeMappingRecord;
 import era.uploader.data.model.QRCodeMapping;
 import org.jooq.DSLContext;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 import static era.uploader.data.database.jooq.Tables.QR_CODE_MAPPING;
 
 /**
  * Provides CRUD functionality for Pages inside a database.
  */
+@ParametersAreNonnullByDefault
 public class QRCodeMappingDAOImpl extends DatabaseDAO<QrCodeMappingRecord, QRCodeMapping> implements QRCodeMappingDAO {
     private static final QRCodeMappingConverter CONVERTER =
             QRCodeMappingConverter.INSTANCE;
@@ -27,7 +30,8 @@ public class QRCodeMappingDAOImpl extends DatabaseDAO<QrCodeMappingRecord, QRCod
     }
 
     @Override
-    public void insert(QRCodeMapping QRCodeMapping) {
+    public void insert(@Nonnull QRCodeMapping QRCodeMapping) {
+        Preconditions.checkNotNull(QRCodeMapping, "cannot insert null qrCodeMapping");
         try (DSLContext ctx = connect()) {
             QRCodeMapping.setUuid(ctx.insertInto(
                     //table
@@ -50,14 +54,17 @@ public class QRCodeMappingDAOImpl extends DatabaseDAO<QrCodeMappingRecord, QRCod
     }
 
     @Override
-    public void insertAll(Collection<QRCodeMapping> QRCodeMappings) {
+    public void insertAll(@Nonnull Collection<QRCodeMapping> QRCodeMappings) {
+        Preconditions.checkNotNull(QRCodeMappings, "cannot insert null qrCodeMappings");
         for (QRCodeMapping QRCodeMapping : QRCodeMappings) {
             insert(QRCodeMapping);
         }
     }
 
     @Override
-    public QRCodeMapping read(String uuid) {
+    @Nullable
+    public QRCodeMapping read(@Nonnull String uuid) {
+        Preconditions.checkNotNull(uuid, "cannot read null uuid");
         try (DSLContext ctx = connect()) {
             QrCodeMappingRecord qrCodeMapping = ctx.selectFrom(QR_CODE_MAPPING)
                     .where(QR_CODE_MAPPING.UUID.eq(uuid))
@@ -68,6 +75,7 @@ public class QRCodeMappingDAOImpl extends DatabaseDAO<QrCodeMappingRecord, QRCod
     }
 
     public void delete(String uuid) {
+        Preconditions.checkNotNull(uuid, "cannot read a null uuid");
         try (DSLContext ctx = connect()) {
             ctx.deleteFrom(QR_CODE_MAPPING)
                     .where(QR_CODE_MAPPING.UUID.eq(uuid))
@@ -76,7 +84,8 @@ public class QRCodeMappingDAOImpl extends DatabaseDAO<QrCodeMappingRecord, QRCod
     }
 
     /* Modify data stored in already existing QR_CODE_MAPPING in database */
-    public void update(QRCodeMapping changedQRCodeMapping) {
+    public void update(@Nonnull QRCodeMapping changedQRCodeMapping) {
+        Preconditions.checkNotNull(changedQRCodeMapping, "Cannot update a null changedQrCodeMapping");
         try (DSLContext ctx = connect()) {
             ctx.update(QR_CODE_MAPPING)
                     .set(QR_CODE_MAPPING.SEQUENCE_NUMBER, changedQRCodeMapping.getSequenceNumber())
@@ -87,7 +96,8 @@ public class QRCodeMappingDAOImpl extends DatabaseDAO<QrCodeMappingRecord, QRCod
     }
 
     @Override
-    public QRCodeMapping convertToModel(QrCodeMappingRecord record) {
+    @Nullable
+    public QRCodeMapping convertToModel(@Nullable QrCodeMappingRecord record) {
         Optional<QRCodeMapping> newQRCodeMapping = Optional
                 .ofNullable(CONVERTER.convert(record));
         final StudentDAO studentDAO = StudentDAOImpl.instance();
@@ -100,7 +110,8 @@ public class QRCodeMappingDAOImpl extends DatabaseDAO<QrCodeMappingRecord, QRCod
     }
 
     @Override
-    public QrCodeMappingRecord convertToRecord(QRCodeMapping qrCodeMapping) {
+    @Nullable
+    public QrCodeMappingRecord convertToRecord(@Nullable QRCodeMapping qrCodeMapping) {
         return CONVERTER.reverse().convert(qrCodeMapping);
     }
 

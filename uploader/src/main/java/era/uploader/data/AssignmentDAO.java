@@ -5,11 +5,13 @@ import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 
 public interface AssignmentDAO extends DAO {
     void storeAssignment(Assignment assignment);
     Assignment insert(Assignment assignment);
+    @Nullable
     Assignment read(long id);                               /* Access data from course object */
     void update(Assignment changedAssignment); /* Change data from existing course object */
     void delete(Assignment assignment);

@@ -16,6 +16,7 @@ public class Threads {
      * <em>again</em> to make sure we weren't blocked by the synchronization
      * mutex and if that passes we finally create the instance with creator.
      */
+    @SuppressWarnings("ConstantConditions")
     public static <T> T doubleCheck(
             T instance,
             Supplier<T> creator,

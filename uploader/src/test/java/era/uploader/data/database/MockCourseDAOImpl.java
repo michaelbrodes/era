@@ -6,6 +6,7 @@ import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,14 +29,14 @@ public class MockCourseDAOImpl implements CourseDAO, MockDAO<Course> {
 
     /* Create and Insert a new Course object into the database */
     @Override
-    public Course insert(Course course) {
+    public Course insert(@Nonnull Course course) {
         courses.add(course);
         course.setUniqueId(++idCount);
         return course;
     }
 
     @Override
-    public void insertCourseAndStudents(Multimap<Course, Student> coursesToStudents) {
+    public void insertCourseAndStudents(@Nonnull Multimap<Course, Student> coursesToStudents) {
         courses.addAll(coursesToStudents.keys());
         for(Map.Entry<Course, Collection<Student>> studentsInCourse:
                 coursesToStudents.asMap().entrySet()) {
@@ -57,7 +58,7 @@ public class MockCourseDAOImpl implements CourseDAO, MockDAO<Course> {
     }
 
     @Override
-    public void update(Course changedCourse) {
+    public void update(@Nonnull Course changedCourse) {
         Course prevCourse = read(changedCourse.getUniqueId());
         courses.remove(changedCourse);
         courses.add(changedCourse);
@@ -69,13 +70,14 @@ public class MockCourseDAOImpl implements CourseDAO, MockDAO<Course> {
         courses.remove(course);
     }
 
+    @Nonnull
     @Override
     public List<Course> getAllCourses() {
         return new ArrayList<>(courses);
     }
 
     @Override
-    public Set<Course> fromStudent(Student student) {
+    public Set<Course> fromStudent(@Nonnull Student student) {
         return student.getCourses();
     }
 
@@ -84,8 +86,9 @@ public class MockCourseDAOImpl implements CourseDAO, MockDAO<Course> {
         return courses;
     }
 
+    @Nonnull
     @Override
-    public Course fromAssignment(Assignment assignment) {
+    public Course fromAssignment(@Nonnull Assignment assignment) {
         return assignment.getCourse();
     }
 }

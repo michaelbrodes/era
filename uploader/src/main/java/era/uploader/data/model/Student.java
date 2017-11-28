@@ -124,7 +124,7 @@ public class Student {
 
         Student student = (Student) o;
 
-        return uniqueId == student.uniqueId && student.schoolId == schoolId;
+        return uniqueId == student.uniqueId && student.schoolId.equals(schoolId);
     }
 
     @Override

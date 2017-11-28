@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 
@@ -28,7 +29,7 @@ public class TASKalfaConverterTest {
         MockStatusObserver observer = new MockStatusObserver();
         bus.register(observer);
 
-        List<String> pages = TASKalfaConverter.convertFile(pdf);
+        Map<Integer, String> pages = TASKalfaConverter.convertFile(pdf);
 
         assertEquals(5, pages.size());
         Thread.sleep(500);
@@ -42,7 +43,7 @@ public class TASKalfaConverterTest {
         MockStatusObserver observer = new MockStatusObserver();
         bus.register(observer);
 
-        List<String> pages = TASKalfaConverter.convertFile(pdf);
+        Map<Integer, String> pages = TASKalfaConverter.convertFile(pdf);
 
         assertEquals(5, pages.size());
         assertTrue(observer.sentMessages.isEmpty());
@@ -55,7 +56,7 @@ public class TASKalfaConverterTest {
         MockStatusObserver observer = new MockStatusObserver();
         bus.register(observer);
         boolean notFound = false;
-        List<String> pages = null;
+        Map<Integer, String> pages = null;
 
         try {
             pages = TASKalfaConverter.convertFile(pdf);
@@ -64,7 +65,6 @@ public class TASKalfaConverterTest {
         }
 
         assertTrue(notFound);
-        assertNull(pages);
         assertNotNull(observer.checkMessage());
     }
 
@@ -72,7 +72,7 @@ public class TASKalfaConverterTest {
     @Ignore
     public void convert_OutputSplit() throws Exception {
         Path pdf = Paths.get(IOUtil.convertToLocal("src/test/resources/test-pdfs/300dpi.pdf"));
-        List<String> pages = TASKalfaConverter.convertFile(pdf);
+        Map<Integer, String> pages = TASKalfaConverter.convertFile(pdf);
         for (int i = 0; i < pages.size(); i++) {
             File file = new File(IOUtil.convertToLocal("src/test/resources/split/" + i + ".pdf"));
             try {

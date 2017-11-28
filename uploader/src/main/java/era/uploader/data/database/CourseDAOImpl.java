@@ -1,5 +1,7 @@
 package era.uploader.data.database;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.CourseDAO;
@@ -18,9 +20,11 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +41,7 @@ import static era.uploader.data.database.jooq.Tables.STUDENT;
  * Provides CRUD functionality for {@link Course} objects stored in the
  * database. A course has many {@link Student}s and many {@link Grader}s.
  */
+@ParametersAreNonnullByDefault
 public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements CourseDAO {
     private static final CourseConverter CONVERTER = CourseConverter.INSTANCE;
     private static CourseDAO INSTANCE;
@@ -44,9 +49,16 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
     private CourseDAOImpl() {
     }
 
-    /* Create and Insert a new Course object into the database */
+    /**
+     * Create and Insert a new Course object into the database
+     */
     @Override
-    public Course insert(Course course) {
+    @Nonnull
+    public Course insert(@Nonnull Course course) {
+        Preconditions.checkNotNull(course, "Cannot insert a null course");
+        Preconditions.checkNotNull(course.getSemester(), "Cannot resolve a null semester");
+        Preconditions.checkNotNull(course.getStudentsEnrolled(), "Cannot insert null students");
+        Preconditions.checkNotNull(course.getAssignments(), "Cannot insert null students");
         try (DSLContext ctx = connect()) {
             final Semester semesterToResolve = course.getSemester();
             Condition filterer = DSL.and(
@@ -150,7 +162,6 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
             }
 
             for (Assignment assignment : course.getAssignments()) {
-                //TODO: Ask michael why we arent setting the 'Assignment' uniqueId here
                 ctx.insertInto(
                            // table
                            ASSIGNMENT,
@@ -170,9 +181,27 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
         return course;
     }
 
-    //TODO IMPLEMENT DATABASE HERE
+    /**
+     * This method takes in a multimap of courses to students. A multimap means
+     * that a {@link Course} can be a key of many {@link Student}s. Just think
+     * of this as grouping students by their course.
+     *
+     * This method first goes over that multimap and attaches the grouped
+     * students to the course they are grouped by. Then it iterates over the
+     * keys of the multimap, and inserts them all.
+     *
+     * @param coursesToStudents Students grouped by the course they belong to.
+     */
     @Override
-    public void insertCourseAndStudents(Multimap<Course, Student> coursesToStudents) {
+    public void insertCourseAndStudents(@Nonnull Multimap<Course, Student> coursesToStudents) {
+        Preconditions.checkNotNull(coursesToStudents, "Cannot insert null multimap");
+        for (Course course: squashMap(coursesToStudents)) {
+            insert(course);
+        }
+    }
+
+    @VisibleForTesting
+    Collection<Course> squashMap(Multimap<Course, Student> coursesToStudents) {
         for (Map.Entry<Course, Collection<Student>> studentsInCourse :
                 coursesToStudents.asMap().entrySet()) {
             Course course = studentsInCourse.getKey();
@@ -183,14 +212,12 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
             }
         }
 
-        for (Course course : coursesToStudents.keySet()) {
-            insert(course);
-        }
-
+        return coursesToStudents.keySet();
     }
 
     /* Access data from existing Course object from database */
     @Override
+    @Nullable
     public Course read(long id) {
         try (DSLContext ctx = connect()) {
             CourseRecord courseRecord = ctx.selectFrom(COURSE)
@@ -203,7 +230,8 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
 
     /* Modify data stored in already existing Course in database */
     @Override
-    public void update(Course changedCourse) {
+    public void update(@Nonnull Course changedCourse) {
+        Preconditions.checkNotNull(changedCourse, "Can't update a null course.");
         try (DSLContext ctx = connect()) {
             Semester semester = changedCourse.getSemester();
 
@@ -239,7 +267,9 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
         }
     }
 
-    /* Delete existing Course object in database */
+    /**
+     *  Delete existing Course object in database
+     */
     @Override
     public void delete(long id) {
         try (DSLContext ctx = connect()) {
@@ -250,7 +280,11 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
 
     }
 
+    /**
+     * Get all courses currently in the system.
+     */
     @Override
+    @Nonnull
     public List<Course> getAllCourses() {
         List<Course> courses;
         StudentDAOImpl studentDAO = StudentDAOImpl.instance();
@@ -276,7 +310,7 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
     }
 
     @Override
-    public Set<Course> fromStudent(Student student) {
+    public Set<Course> fromStudent(@Nonnull Student student) {
         try(DSLContext ctx = connect()) {
             return ctx.selectFrom(COURSE_STUDENT)
                     .where(COURSE_STUDENT.STUDENT_ID.eq(student.getUniqueId()))
@@ -291,7 +325,7 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
     }
 
     @Override
-    public Course fromAssignment(Assignment assignment) {
+    public Course fromAssignment(@Nonnull Assignment assignment) {
         try (DSLContext ctx = connect()) {
             return ctx.selectFrom(COURSE)
                     .where(COURSE.UNIQUE_ID.eq(assignment.getCourse_id()))
@@ -301,7 +335,7 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
     }
 
     @Override
-    public Course convertToModel(CourseRecord record) {
+    public Course convertToModel(@Nullable CourseRecord record) {
         Optional<Course> course = Optional.ofNullable(CONVERTER.convert(record));
         final StudentDAO studentDAO = StudentDAOImpl.instance();
         final AssignmentDAO assignmentDAO = AssignmentDAOImpl.instance();
@@ -313,10 +347,11 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
     }
 
     @Override
-    public CourseRecord convertToRecord(Course model) {
+    public CourseRecord convertToRecord(@Nullable Course model) {
         return CONVERTER.reverse().convert(model);
     }
 
+    @Nonnull
     public static CourseDAO instance() {
         if (INSTANCE == null) {
             synchronized (CourseDAO.class) {

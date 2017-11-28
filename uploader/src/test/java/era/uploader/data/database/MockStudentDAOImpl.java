@@ -6,6 +6,7 @@ import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,7 +29,7 @@ public class MockStudentDAOImpl implements MockDAO<Student>, StudentDAO {
 
     /* Create and Insert a new Student object into the database */
     @Override
-    public void insert(Student student) {
+    public void insert(@Nonnull Student student) {
         students.add(student);
         sequenceNum++;
         student.setUniqueId(sequenceNum);
@@ -47,7 +48,7 @@ public class MockStudentDAOImpl implements MockDAO<Student>, StudentDAO {
     }
 
     @Override
-    public void update(Student changedStudent) {
+    public void update(@Nonnull Student changedStudent) {
         Student prevStudent = read(changedStudent.getUniqueId());
         getDb().remove(prevStudent);
         getDb().add(changedStudent);
@@ -60,17 +61,17 @@ public class MockStudentDAOImpl implements MockDAO<Student>, StudentDAO {
     }
 
     @Override
-    public Collection<Student> fromCourse(Course course) {
+    public Collection<Student> fromCourse(@Nonnull Course course) {
         return course.getStudentsEnrolled();
     }
 
     @Override
-    public Student fromQRMapping(QRCodeMapping mapping) {
+    public Student fromQRMapping(@Nonnull QRCodeMapping mapping) {
         return mapping.getStudent();
     }
 
     @Override
-    public Student fromAssignment(Assignment assignment) {
+    public Student fromAssignment(@Nonnull Assignment assignment) {
         return assignment.getStudent();
     }
 }

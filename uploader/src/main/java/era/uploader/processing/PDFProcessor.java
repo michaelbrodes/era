@@ -65,7 +65,7 @@ public class PDFProcessor {
      * of sorts, while also keeping logic modularized. The stages of the
      * pipeline are Spit a large pdf into pages -> scatter those pages with
      * {@link List#parallelStream()} -> feed them into
-     * {@link QRScanner#extractQRCodeInformation(String)} to grab uuid ->
+     * {@link QRScanner#extractQRCodeInformation(Map.Entry)} to grab uuid ->
      * match {@link #associateStudentsWithPage(QRCodeMapping)} -> merge student
      * associated Pages into one pdf -> store in either the local database or
      * the remote database.

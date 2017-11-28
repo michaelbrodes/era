@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.QRCodeMapping;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Set;
 
@@ -18,28 +19,28 @@ public class MockQRCodeMappingDAOImpl implements QRCodeMappingDAO, MockDAO<QRCod
     private final Set<QRCodeMapping> db = Sets.newHashSet();
 
     @Override
-    public void insert(QRCodeMapping QRCodeMapping) {
+    public void insert(@Nonnull QRCodeMapping QRCodeMapping) {
         if (!getDb().add(QRCodeMapping)) {
             throw new IllegalArgumentException("QRCodeMapping wasn't unique");
         }
     }
 
     @Override
-    public void insertAll(Collection<QRCodeMapping> QRCodeMappings) {
+    public void insertAll(@Nonnull Collection<QRCodeMapping> QRCodeMappings) {
         for (QRCodeMapping QRCodeMapping : QRCodeMappings) {
             insert(QRCodeMapping);
         }
     }
 
     @Override
-    public void update(QRCodeMapping changedQRCodeMapping) {
+    public void update(@Nonnull QRCodeMapping changedQRCodeMapping) {
         QRCodeMapping prevQRMapping = read(changedQRCodeMapping.getUuid());
         db.remove(prevQRMapping);
         db.add(changedQRCodeMapping);
     }
 
     @Override
-    public QRCodeMapping read(String uuid) {
+    public QRCodeMapping read(@Nonnull String uuid) {
         return db.stream()
                 .filter(page -> page.getUuid().equals(uuid))
                 .findFirst()

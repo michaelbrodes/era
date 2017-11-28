@@ -1,10 +1,13 @@
 package era.uploader.processing;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import era.uploader.data.model.QRCodeMapping;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.Map;
 
 public class QRScannerTest {
 
@@ -12,8 +15,10 @@ public class QRScannerTest {
 
     @Test
     public void extractQRCodeInformation() throws Exception {
-        QRScanner qrScanner = new QRScanner();
-        QRCodeMapping scannedQRCodeMapping = qrScanner.extractQRCodeInformation(path);
+        QRScanner qrScanner = new QRScanner(new ScanningProgress());
+        ImmutableMap<Integer, String> idsToDocuments = ImmutableMap.of(0, path);
+        Map.Entry<Integer, String> idToDocument = Iterables.getOnlyElement(idsToDocuments.entrySet());
+        QRCodeMapping scannedQRCodeMapping = qrScanner.extractQRCodeInformation(idToDocument);
         Assert.assertEquals(scannedQRCodeMapping.getUuid(), "6ab251a5-6c4e-4688-843f-60aea570c3a6");
     }
 
