@@ -36,9 +36,9 @@ public class AppConfig {
      * Creates a connection string from the host, port, user, and password
      * information supplied by the command line.
      *
-     * @param host the url where the database should be located
-     * @param port the port where the database application lives
-     * @param user the username we should use to connect to the database
+     * @param host the url where the access should be located
+     * @param port the port where the access application lives
+     * @param user the username we should use to connect to the access
      * @param password the password for the username from the previous arg
      */
     public void setConnectionString(

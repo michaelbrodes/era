@@ -1,27 +1,25 @@
 package era.server.controller;
 
-import era.server.data.database.AssignmentDAO;
-import era.server.data.database.CourseDAO;
-import era.server.data.database.StudentDAO;
+import era.server.data.AssignmentDAO;
+import era.server.data.CourseDAO;
+import era.server.data.StudentDAO;
 import era.server.data.model.Assignment;
+import era.server.data.model.Course;
+import era.server.data.model.Student;
 import spark.Request;
 import spark.Response;
-import spark.utils.IOUtils;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Objects;
+import java.time.LocalDateTime;
 
-import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.WRITE;
 
@@ -41,7 +39,7 @@ public class UploadController {
     }
 
 
-    public void handleRequest(Request request, Response response) {
+    public String handleRequest(Request request, Response response) {
         System.out.println("In request");
 
         long courseIdLong = 0;
@@ -52,7 +50,7 @@ public class UploadController {
 
         if (courseId == null) {
             response.status(400);
-            return;
+            return "";
         }// if :coursId is null malformed request, return 400
 
         String assignmentIdHeader = request.headers("X-Assignment-Id");
@@ -63,7 +61,7 @@ public class UploadController {
         try {
             if(!contentType.contains("multipart/form-data")){
                 response.status(415);
-                return;
+                return "";
             }
 
             courseIdLong = Long.valueOf(courseId);
@@ -72,27 +70,36 @@ public class UploadController {
         } catch (NumberFormatException e) {
             e.getMessage();
             response.status(400);
-            return;
+            return "";
         }
 
         request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("temp"));
         try (InputStream is = request.raw().getPart("pdf").getInputStream()) {
-            Assignment assignment = new Assignment(assignmentFileNameHeader, assignmentNameHeader,
-                    studentDAO.read(studentIdLong), assignmentId, courseDAO.read(courseIdLong));
-            if(storeInFileSystem(is, assignment)){
-                assignmentDAO.storeAssignment(assignment);
+            Course course = courseDAO.read(courseIdLong);
+            Student student = studentDAO.read(studentIdLong);
+            if (course != null && student != null) {
+                Assignment assignment = new Assignment(
+                        assignmentId,
+                        assignmentFileNameHeader,
+                        assignmentNameHeader,
+                        course,
+                        studentDAO.read(studentIdLong),
+                        LocalDateTime.now()
+                );
+                if(storeInFileSystem(is, assignment)){
+                    assignmentDAO.storeAssignment(assignment);
+                }
             }
         } catch (IOException | ServletException e) {
             e.printStackTrace();
             response.status(500);
-            return;
+            return "";
         }
         response.status(201);
-        return;
+        return "";
     }
 
-    public boolean storeInFileSystem(InputStream inputStream, Assignment assignment) {
-
+   private boolean storeInFileSystem(InputStream inputStream, Assignment assignment) {
             Path path = Paths.get(assignment.getImageFilePath());
 
             try (OutputStream out = new BufferedOutputStream(

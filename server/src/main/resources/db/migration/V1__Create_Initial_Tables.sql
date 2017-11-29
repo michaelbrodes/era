@@ -1,10 +1,10 @@
 -- This is the SQL Script for the initial schema of the Server database. The
--- Server database will be a MariaDB database that runs on a remote server.
+-- Server access will be a MariaDB access that runs on a remote server.
 
 -- If developing locally use flywayMigrate gradle task to update your
 -- particular local MariaDB instance. When deploying make sure to scp all
 -- SQL scripts in this directory and apply them in order against the remote
--- database.
+-- access.
 
 -- a student that belongs to many courses.
 CREATE TABLE student (

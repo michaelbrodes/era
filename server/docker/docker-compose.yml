@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     ports:
         # 3000 is the port of the main application during development so we
-        # chose 3001 so we can develop while running the database
+        # chose 3001 so we can develop while running the access
       - 3001:3306
     environment:
       # IMPORTANT: change .env when deployed

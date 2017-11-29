@@ -20,6 +20,7 @@ dependencies {
     compile 'org.jooq:jooq:3.10.0'
     compile 'com.sparkjava:spark-core:2.3'
     compile 'org.mariadb.jdbc:mariadb-java-client:2.1.2'
+    compile 'org.apache.commons:commons-dbcp2:2.1.1'
     testCompile group: 'junit', name: 'junit', version: '4.12'
     jooqRuntime 'org.mariadb.jdbc:mariadb-java-client:2.1.2'
 }
@@ -57,7 +58,7 @@ jooq {
                 fluentSetters = true
             }
             target {
-                packageName = 'era.server.database'
+                packageName = 'era.server.data.database'
                 directory = 'src/main/java'
             }
         }

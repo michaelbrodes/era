@@ -3,9 +3,9 @@ package era.server;
 import era.server.common.AppConfig;
 import era.server.common.ConfigOpts;
 import era.server.controller.UploadController;
-import era.server.data.database.AssignmentDAO;
-import era.server.data.database.CourseDAO;
-import era.server.data.database.StudentDAO;
+import era.server.data.access.AssignmentDAOImpl;
+import era.server.data.access.CourseDAOImpl;
+import era.server.data.access.StudentDAOImpl;
 import spark.Spark;
 
 import java.util.Map;
@@ -24,14 +24,14 @@ public class ServerApp {
         config.setConnectionString(host, port, user, password);
 
         // startup all the DAOs so we don't have any duplicated connections
-        final StudentDAO studentDAO = new StudentDAO();;
-        final AssignmentDAO assignmentDAO = new AssignmentDAO();
-        final CourseDAO courseDAO = new CourseDAO();
+        final StudentDAOImpl studentDAOImpl = new StudentDAOImpl();;
+        final AssignmentDAOImpl assignmentDAOImpl = new AssignmentDAOImpl();
+        final CourseDAOImpl courseDAOImpl = new CourseDAOImpl();
 
         UploadController upc = new UploadController(
-                courseDAO,
-                assignmentDAO,
-                studentDAO
+                courseDAOImpl,
+                assignmentDAOImpl,
+                studentDAOImpl
         );
 
         Spark.port(3000);
@@ -40,9 +40,6 @@ public class ServerApp {
             return "Is it me you are looking for?";
         });
 
-        Spark.post(API + "/course/:courseId/assignment", (req, res) -> {
-            upc.handleRequest(req, res);
-            return "";
-        });
+        Spark.post(API + "/course/:courseId/assignment", upc::handleRequest);
     }
 }

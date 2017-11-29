@@ -34,7 +34,7 @@ public class ConnectionPool implements ConnectionProvider {
 
     public static String getDBUrl() {
         UploaderProperties props = UploaderProperties.instance();
-        Optional<String> dbUrl = UploaderProperties.instance().getDbUrl();
+        Optional<String> dbUrl = props.getDbUrl();
         if (!dbUrl.isPresent()) {
             System.err.println(props.getFile().getAbsolutePath()
                     + " doesn't have a \"db.url\" property");
