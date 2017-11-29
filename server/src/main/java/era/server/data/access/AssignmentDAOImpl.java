@@ -7,8 +7,6 @@ import org.jooq.DSLContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import java.sql.Timestamp;
-
 import static era.server.data.database.Tables.ASSIGNMENT;
 
 /**
@@ -35,7 +33,7 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO{
                     ASSIGNMENT.STUDENT_ID,
                     ASSIGNMENT.CREATED_DATE_TIME
             ).values(
-                    (long) assignment.getUniqueId(),
+                    assignment.getUniqueId(),
                     assignment.getName(),
                     assignment.getImageFilePath(),
                     (long) courseId,
