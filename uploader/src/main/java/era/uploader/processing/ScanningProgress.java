@@ -5,7 +5,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @ThreadSafe
 public class ScanningProgress {
-    private AtomicInteger count = new AtomicInteger();
+    private AtomicInteger successfulProcesses = new AtomicInteger();
+
+    public int getSuccessfulProcesses() {
+        return successfulProcesses.get();
+    }
+
+    public int getPdfFileSize() {
+        return pdfFileSize;
+    }
+
     private int pdfFileSize;
 
 
@@ -14,6 +23,6 @@ public class ScanningProgress {
     }
 
     public void incrementCount(){
-        this.count.incrementAndGet();
+        this.successfulProcesses.incrementAndGet();
     }
 }

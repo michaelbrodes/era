@@ -12,6 +12,7 @@ import era.uploader.data.database.StudentDAOImpl;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.processing.PDFProcessor;
+import era.uploader.processing.ScanningProgress;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -37,7 +38,7 @@ public class PDFScanningService {
      * students with pages, groups student pages into assignments, and then,
      * if uploading is enabled, uploads each assignment to server.
      */
-    public Collection<Assignment> scanPDF(
+    public ScanningProgress scanPDF(
             Path pdf,
             Course course,
             String assignment,

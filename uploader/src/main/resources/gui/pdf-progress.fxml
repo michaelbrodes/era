@@ -1,15 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.PDFProgressController">
    <children>
-      <ProgressBar layoutX="200.0" layoutY="191.0" prefWidth="200.0" progress="0.0" />
-      <Label layoutX="227.0" layoutY="164.0" text="Percent of Pages Processed" />
-      <Label layoutX="400.0" layoutY="192.0" text="percent" />
+      <ProgressBar fx:id="errorProgress" layoutX="193.0" layoutY="166.0" prefWidth="200.0" progress="0.0" />
+      <Label layoutX="220.0" layoutY="139.0" text="Percent of Pages Processed" />
+      <Label layoutX="393.0" layoutY="167.0" text="percent" />
       <Button layoutX="526.0" layoutY="341.0" mnemonicParsing="false" text="OK" />
+      <TableView fx:id="errorList" layoutX="21.0" layoutY="219.0" prefHeight="200.0" prefWidth="206.0">
+         <columns>
+            <TableColumn prefWidth="102.0" text="Message">
+               <cellValueFactory>
+                  <PropertyValueFactory property="message" />
+               </cellValueFactory>
+            </TableColumn>
+
+            <TableColumn prefWidth="103.0" text="Page Number">
+               <cellValueFactory>
+                  <PropertyValueFactory property="pageNum" />
+               </cellValueFactory>
+            </TableColumn>
+         </columns>
+         <items>
+            <FXCollections fx:factory="observableArrayList">
+            </FXCollections>
+         </items>
+      </TableView>
+      <Label layoutX="80.0" layoutY="198.0" prefHeight="17.0" prefWidth="124.0" text="Error Messages" />
    </children>
 </AnchorPane>

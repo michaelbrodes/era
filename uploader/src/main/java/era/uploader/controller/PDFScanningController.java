@@ -2,15 +2,20 @@ package era.uploader.controller;
 
 import com.google.common.collect.Maps;
 import era.uploader.data.model.Course;
+import era.uploader.processing.ScanningProgress;
 import era.uploader.service.PDFScanningService;
+import era.uploader.view.UINavigator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -96,8 +101,17 @@ public class PDFScanningController {
             if (fullFileName != null)
                 try {
 
-                if(currentCourse != null && currentAssignment != null)
-                        pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, HOST_NAME);
+                if(currentCourse != null && currentAssignment != null) {
+                    final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, HOST_NAME);
+                    URL url = getClass().getResource("/gui/pdf-progress.fxml");
+
+                    FXMLLoader fxmlloader = new FXMLLoader();
+                    fxmlloader.setLocation(url);
+                    fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+
+                    // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
+                    ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
+                }
 
                 }
                 catch (IOException | IllegalArgumentException e) {
