@@ -65,15 +65,13 @@ public class PDFScanningController {
         );
 
 
-
         List<Course> courses = pdfServ.getAllCourses();
 
-        final Map<String,Course> nameToCourse = Maps.uniqueIndex(courses, Course::getName);
+        final Map<String, Course> nameToCourse = Maps.uniqueIndex(courses, Course::getName);
 
         ObservableList<String> courseKeys = FXCollections.observableArrayList(nameToCourse.keySet());
 
         courseNames.setItems(courseKeys);
-
 
 
         //Typical file browser logic to click on the file and display it
@@ -113,14 +111,22 @@ public class PDFScanningController {
                     ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
                 }
 
-                }
-                catch (IOException | IllegalArgumentException e) {
+                } catch (IOException | IllegalArgumentException e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                     errorAlert.setHeaderText("File Not Found");
                     errorAlert.setContentText("The File that you specified cannot be found");
                     errorAlert.showAndWait();
                 }
         });
+    }
 
+    public void home() throws IOException {
+        UINavigator nav = new UINavigator(assignmentName.getScene());
+        nav.changeToHome();
+    }
+
+    public void course() throws IOException {
+        UINavigator nav = new UINavigator(assignmentName.getScene());
+        nav.changeToCreateCourse();
     }
 }

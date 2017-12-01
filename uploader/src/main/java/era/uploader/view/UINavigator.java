@@ -43,6 +43,22 @@ public class UINavigator {
 
     }
 
+    public void changeToCreateAssignment() throws IOException {
+
+        Parent createAssignmentView = FXMLLoader.load(getClass().getResource("/gui/assignment-creation.fxml"));
+
+        mainScene.setRoot(createAssignmentView);
+
+    }
+
+    public void changeToCreateCourse() throws IOException {
+
+        Parent createCourseView = FXMLLoader.load(getClass().getResource("/gui/course-creation.fxml"));
+
+        mainScene.setRoot(createCourseView);
+
+    }
+
     public Window getPrimaryStage() {
         return primaryWindow;
     }
