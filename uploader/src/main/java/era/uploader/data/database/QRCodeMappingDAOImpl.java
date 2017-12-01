@@ -33,23 +33,20 @@ public class QRCodeMappingDAOImpl extends DatabaseDAO<QrCodeMappingRecord, QRCod
     public void insert(@Nonnull QRCodeMapping QRCodeMapping) {
         Preconditions.checkNotNull(QRCodeMapping, "cannot insert null qrCodeMapping");
         try (DSLContext ctx = connect()) {
-            QRCodeMapping.setUuid(ctx.insertInto(
+           ctx.insertInto(
                     //table
                     QR_CODE_MAPPING,
                     //columns
                     QR_CODE_MAPPING.SEQUENCE_NUMBER,
-                    QR_CODE_MAPPING.STUDENT_ID
+                    QR_CODE_MAPPING.STUDENT_ID,
+                    QR_CODE_MAPPING.UUID
             )
             .values(
                     QRCodeMapping.getSequenceNumber(),
-                    QRCodeMapping.getStudent().getUniqueId()
+                    QRCodeMapping.getStudent().getUniqueId(),
+                    QRCodeMapping.getUuid()
             )
-            .returning (
-                    QR_CODE_MAPPING.UUID
-            )
-            .fetchOne()
-            .getUuid()
-            );
+            .execute();
         }
     }
 

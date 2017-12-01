@@ -3,6 +3,7 @@ package era.uploader.controller;
 import com.google.common.collect.Maps;
 import era.uploader.data.model.Course;
 import era.uploader.service.PDFScanningService;
+import era.uploader.view.UINavigator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -60,15 +61,13 @@ public class PDFScanningController {
         );
 
 
-
         List<Course> courses = pdfServ.getAllCourses();
 
-        final Map<String,Course> nameToCourse = Maps.uniqueIndex(courses, Course::getName);
+        final Map<String, Course> nameToCourse = Maps.uniqueIndex(courses, Course::getName);
 
         ObservableList<String> courseKeys = FXCollections.observableArrayList(nameToCourse.keySet());
 
         courseNames.setItems(courseKeys);
-
 
 
         //Typical file browser logic to click on the file and display it
@@ -96,17 +95,26 @@ public class PDFScanningController {
             if (fullFileName != null)
                 try {
 
-                if(currentCourse != null && currentAssignment != null)
+                    if (currentCourse != null && currentAssignment != null)
                         pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, HOST_NAME);
 
-                }
-                catch (IOException | IllegalArgumentException e) {
+                } catch (IOException | IllegalArgumentException e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                     errorAlert.setHeaderText("File Not Found");
                     errorAlert.setContentText("The File that you specified cannot be found");
                     errorAlert.showAndWait();
                 }
         });
-
     }
+
+    public void home() throws IOException {
+        UINavigator nav = new UINavigator(assignmentName.getScene());
+        nav.changeToHome();
+    }
+
+    public void course() throws IOException {
+        UINavigator nav = new UINavigator(assignmentName.getScene());
+        nav.changeToCreateCourse();
+    }
+
 }

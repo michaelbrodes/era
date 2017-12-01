@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 import era.uploader.controller.QRErrorBus;
 import era.uploader.creation.QRCreator;
 import era.uploader.creation.QRErrorEvent;
@@ -14,6 +16,9 @@ import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -110,5 +115,13 @@ public class QRCreationService {
         QRCodeMappingDAO.insertAll(ret.values());
 
         return ret;
+    }
+
+    public String saveQRCodeMapping(QRCodeMapping qrCodeMapping) throws IOException {
+        String path = qrCodeMapping.getUuid() + ".PNG";
+
+        BitMatrix byteMatrix = qrCodeMapping.getQrCode();
+        MatrixToImageWriter.writeToPath(byteMatrix, "PNG", Paths.get(path));
+        return path;
     }
 }
