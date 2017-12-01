@@ -1,5 +1,6 @@
 package era.uploader.controller;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import era.uploader.data.CourseDAO;
@@ -30,16 +31,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static org.aspectj.weaver.ResolvedTypeMunger.Parent;
-
 public class AssignmentCreationController {
 
     int MAX_PAGES = 15;
     private static final CourseDAO COURSE_DAO = CourseDAOImpl.instance();
     private static final QRCodeMappingDAO QR_CODE_MAPPING_DAO = QRCodeMappingDAOImpl.instance();
-
-    private Scene scene;
-    private Window window;
 
     @FXML
     private TextField assignmentName;
@@ -54,12 +50,6 @@ public class AssignmentCreationController {
     private Button createAssignmentButton;
 
     @FXML
-    private MenuItem homeButton;
-
-    @FXML
-    private MenuItem createCourseButton;
-
-    @FXML
     void initialize() {
 
         CourseDAO courseDAO;
@@ -67,7 +57,15 @@ public class AssignmentCreationController {
 
         List<Course> courses = courseDAO.getAllCourses();
 
-        final Map<String,Course> nameToCourse = Maps.uniqueIndex(courses, Course::getName);
+        final Map<String,Course> nameToCourse = Maps.uniqueIndex(courses, (course )->{
+
+            Preconditions.checkNotNull(course, "Course can never be null when trying to get a name");
+
+            if (course.isNameAvailable()) {
+                return course.getName() + " " + course.getDepartment() + "-" + course.getCourseNumber() + "-" + course.getSectionNumber();
+            }
+            else return course.getName();
+        });
 
         ObservableList<String> courseKeys = FXCollections.observableArrayList(nameToCourse.keySet());
 

@@ -108,11 +108,16 @@ public class Course {
         this.department = department;
     }
 
+    @Nonnull
     public String getName() {
         if (name == null) {
             return department + '-' + courseNumber + '-' + sectionNumber;
         }
         return name;
+    }
+
+    public boolean isNameAvailable() {
+        return (name != null);
     }
 
     public void setName(String name) {
