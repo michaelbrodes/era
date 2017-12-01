@@ -84,8 +84,7 @@ public class PDFScanningController {
             if (file != null) {
                 fullPath = file.toPath();
                 fullFileName = fullPath.toString();
-                String[] splitFile = fullFileName.split(File.separator);
-                String fName = splitFile[splitFile.length - 1];
+                String fName = file.getName();
                 fileNameLabel.setText(fName);
             }
         });
@@ -108,6 +107,7 @@ public class PDFScanningController {
                     FXMLLoader fxmlloader = new FXMLLoader();
                     fxmlloader.setLocation(url);
                     fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+                    fxmlloader.load();
 
                     // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
                     ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
