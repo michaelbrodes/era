@@ -4,15 +4,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.IOException;
 
 public class UINavigator {
 
-    public static final int GUI_WIDTH = 1000;
-    public static final int GUI_HEIGHT = 600;
+    private static final int GUI_WIDTH = 1000;
+    private static final int GUI_HEIGHT = 600;
 
     private Scene mainScene;
     private Window primaryWindow;
@@ -43,8 +42,11 @@ public class UINavigator {
 
     }
 
-    public Window getPrimaryStage() {
-        return primaryWindow;
-    }
+    public void changeToCourseCreation() throws IOException {
+        Parent creationView = FXMLLoader.load(
+                getClass().getResource("/gui/course-creation.fxml")
+        );
 
+        mainScene.setRoot(creationView);
+    }
 }
