@@ -2,9 +2,9 @@ package era.server.data.model;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+import era.server.data.Model;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Set;
 
 /**
@@ -12,13 +12,12 @@ import java.util.Set;
  * builder QR codes, and match the information inside of each code to its
  * respective student.
  */
-public class Student {
+public class Student implements Model {
+    public static final String ENDPOINT = "/student";
     /* Class Fields */
-    private String firstName; /* Student's first name */
-    private String lastName;  /* Student's last name */
-    private String schoolId;  /* Identifier for each student provided by the school */
     private String userName;
-    private int uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
+    private String email;
+    private long uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
     // every course that the student belongs to
     private Set<Course> courses = Sets.newHashSet();
 
@@ -35,34 +34,26 @@ public class Student {
     }
 
     public Student(
-            String firstName,
-            String lastName,
-            String schoolId,
             @Nonnull String userName,
+            String email,
             int uniqueId,
             Set<Course> courses
     ) {
         Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.schoolId = schoolId;
         this.userName = userName;
         this.uniqueId = uniqueId;
+        this.email = email;
         this.courses = courses == null ? Sets.newHashSet() : courses;
     }
 
     public Student(
-            String firstName,
-            String lastName,
-            String schoolId,
             @Nonnull String userName,
+            String email,
             int uniqueId
     ) {
         Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.schoolId = schoolId;
         this.userName = userName;
+        this.email = email;
         this.uniqueId = uniqueId;
     }
 
@@ -70,9 +61,6 @@ public class Student {
         Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
         this.userName = userName;
         this.courses = builder.courses == null ? Sets.newHashSet() : builder.courses;
-        this.firstName = builder.firstName;
-        this.schoolId = builder.schoolId;
-        this.lastName = builder.lastName;
         this.uniqueId = builder.uniqueId;
     }
 
@@ -80,69 +68,12 @@ public class Student {
         return new Builder();
     }
 
-    /* Getters and Setters */
-    @Nullable
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    @Nullable
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    @Nullable
-    public String getSchoolId() {
-        return schoolId;
-    }
-
-    public void setSchoolId(String schoolId) {
-        this.schoolId = schoolId;
-    }
-
-    public int getUniqueId() {
+    public long getUniqueId() {
         return uniqueId;
     }
 
-    public void setUniqueId(int uniqueId) {
+    public void setUniqueId(long uniqueId) {
         this.uniqueId = uniqueId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Student student = (Student) o;
-
-        return uniqueId == student.uniqueId && student.schoolId.equals(schoolId);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getFirstName() != null ? getFirstName().hashCode() : 0;
-        result = 31 * result + (getLastName() != null ? getLastName().hashCode() : 0);
-        result = 31 * result + (getSchoolId() != null ? getSchoolId().hashCode() : 0);
-        result = 31 * result + getUserName().hashCode();
-        result = 31 * result + getUniqueId();
-        return result;
-    }
-
-    @Nonnull
-    public Set<Course> getCourses() {
-        return courses;
-    }
-
-    public void setCourses(Set<Course> courses) {
-        this.courses = courses == null ? Sets.newHashSet() : courses;
     }
 
     @Nonnull
@@ -162,8 +93,34 @@ public class Student {
      */
     @Nonnull
     public String getEmail() {
-        return userName
-                + "@siue.edu";
+        return email == null ? userName + "@siue.edu" : email;
+    }
+
+    @Nonnull
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses == null ? Sets.newHashSet() : courses;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Student student = (Student) o;
+
+        return getUniqueId() == student.getUniqueId() && getUserName().equals(student.getUserName()) && getEmail().equals(student.getEmail());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getUserName().hashCode();
+        result = 31 * result + getEmail().hashCode();
+        result = 31 * result + (int) (getUniqueId() ^ (getUniqueId() >>> 32));
+        return result;
     }
 
     /**
@@ -180,10 +137,8 @@ public class Student {
      * {@link #create}.
      */
     public static class Builder {
-        private String firstName; /* Student's first name */
-        private String lastName;  /* Student's last name */
-        private String schoolId;  /* Identifier for each student provided by the school */
-        private int uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
+        private long uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
+        private String email;
         // every course that the student belongs to
         private Set<Course> courses = Sets.newHashSet();
 
@@ -191,22 +146,12 @@ public class Student {
 
         }
 
-        public Builder withFirstName(String firstName) {
-            this.firstName = firstName;
+        public Builder withEmail(String email) {
+            this.email = email;
             return this;
         }
 
-        public Builder withLastName(String lastName) {
-            this.lastName = lastName;
-            return this;
-        }
-
-        public Builder withSchoolId(String schoolId) {
-            this.schoolId = schoolId;
-            return this;
-        }
-
-        public Builder withUniqueId(int uniqueId) {
+        public Builder withUniqueId(long uniqueId) {
             this.uniqueId = uniqueId;
             return this;
         }

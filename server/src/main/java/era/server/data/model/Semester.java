@@ -30,7 +30,7 @@ public class Semester implements Comparable<Semester> {
         }
     }
 
-    private int uniqueId;
+    private long uniqueId;
     private Term term;
     private Year year;
 
@@ -41,7 +41,7 @@ public class Semester implements Comparable<Semester> {
         this.year = year;
     }
 
-    public Semester(int uniqueId, String term, @Nullable Integer year) {
+    public Semester(long uniqueId, String term, @Nullable Integer year) {
         Preconditions.checkArgument(uniqueId > 0, "A database id cannot be less than 1!");
         Preconditions.checkNotNull(term, "Term cannot be null!");
         this.uniqueId = uniqueId;
@@ -54,7 +54,7 @@ public class Semester implements Comparable<Semester> {
         return new Semester(term, year);
     }
 
-    public int getUniqueId() {
+    public long getUniqueId() {
         return uniqueId;
     }
 

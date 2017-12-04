@@ -19,7 +19,8 @@ abstract class DatabaseDAO implements DAO {
      * Creates a new {@link DSLContext} with a configuration that uses
      * {@link ConnectionPool} as its {@link ConnectionProvider}.
      */
-    public DSLContext connect() {
+    @SuppressWarnings("WeakerAccess")
+    protected DSLContext connect() {
         return DSL.using(
                 new DefaultConfiguration()
                         .set(POOL)
