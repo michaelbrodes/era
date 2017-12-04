@@ -14,6 +14,7 @@ import org.jooq.DSLContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,6 +44,28 @@ public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment>
     @Override
     public Assignment insert(Assignment assignment) {
         try (DSLContext ctx = connect()) {
+            if(assignment.getCreatedDateTime() == null){
+                assignment.setCreatedDateTime(LocalDateTime.now());
+            }
+
+            int studentId;
+
+            if(assignment.getStudent() == null){
+                studentId = assignment.getStudent_id();
+            }
+            else {
+                studentId = assignment.getStudent().getUniqueId();
+            }
+
+            int courseId;
+
+            if(assignment.getCourse() == null){
+                courseId = assignment.getCourse_id();
+            }
+            else{
+                courseId = assignment.getCourse().getUniqueId();
+            }
+
             assignment.setUniqueId(ctx.insertInto(
                     //table
                     ASSIGNMENT,
@@ -56,8 +79,8 @@ public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment>
                     .values(
                             assignment.getName(),
                             assignment.getImageFilePath(),
-                            assignment.getCourse().getUniqueId(),
-                            assignment.getStudent().getUniqueId(),
+                            courseId,
+                            studentId,
                             assignment.getCreatedDateTimeString()
                     )
                     .returning(

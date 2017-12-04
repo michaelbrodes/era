@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @ThreadSafe
 public class ScanningProgress {
-    private AtomicInteger successfulProcesses = new AtomicInteger();
+    private final AtomicInteger successfulProcesses = new AtomicInteger();
 
     public int getSuccessfulProcesses() {
         return successfulProcesses.get();

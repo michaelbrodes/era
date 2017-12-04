@@ -10,6 +10,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 
@@ -104,11 +106,13 @@ public class PDFScanningController {
 
                     FXMLLoader fxmlloader = new FXMLLoader();
                     fxmlloader.setLocation(url);
-                    fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
-                    fxmlloader.load();
-
+                    //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+                    Parent root = fxmlloader.load();
+                    Scene mainScene = scanButton.getScene();
                     // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
                     ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
+                    mainScene.setRoot(root);
+
                 }
 
                 } catch (IOException | IllegalArgumentException e) {

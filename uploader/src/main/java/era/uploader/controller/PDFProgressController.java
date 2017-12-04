@@ -4,10 +4,12 @@ import era.uploader.processing.ScanningProgress;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableView;
 import javafx.util.Duration;
+import org.jooq.True;
 
 
 public class PDFProgressController {
@@ -20,14 +22,24 @@ public class PDFProgressController {
 
     @FXML
     void intialize(){
-        Timeline timeline = new Timeline(new KeyFrame(
-                Duration.millis(2500),
-                ae -> checkForSuccessfulProcesses()));
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+
     }
     void setScanningProgress(ScanningProgress scanningProgress) {
         this.scanningProgress = scanningProgress;
+        Task<Void> pipelineTask = new Task() {
+            @Override
+            protected Void call() throws Exception {
+                while(true){
+                    updateProgress(scanningProgress.getSuccessfulProcesses(),scanningProgress.getPdfFileSize());
+                    Thread.sleep(2500);
+                }
+            }
+        };
+        errorProgress.progressProperty().bind(pipelineTask.progressProperty());
+
+        Thread checkingThread = new Thread(pipelineTask);
+        checkingThread.setDaemon(false);
+        checkingThread.start();
     }
 
     void checkForSuccessfulProcesses(){

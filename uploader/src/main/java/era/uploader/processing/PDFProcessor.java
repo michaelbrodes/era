@@ -117,7 +117,6 @@ public class PDFProcessor {
         progress.setPdfFileSize(pages.size());
 
         Runnable pipelineTask = () -> {
-            System.out.println("Thread Running");
             QRScanner scanner = new QRScanner(progress);
             Multimap<Student, QRCodeMapping> collect = pages.entrySet().parallelStream()
                     .map(scanner::extractQRCodeInformation)

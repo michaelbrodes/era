@@ -138,10 +138,10 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
     public Student fromQRMapping(@Nonnull QRCodeMapping mapping) {
         Preconditions.checkNotNull(mapping, "Cannot grab a student from a null qrCodeMapping");
         try (DSLContext ctx = connect()) {
-            return ctx.selectFrom(STUDENT)
+            StudentRecord student = ctx.selectFrom(STUDENT)
                     .where(STUDENT.UNIQUE_ID.eq(mapping.getStudentId()))
-                    .fetchOne()
-                    .into(Student.class);
+                    .fetchOne();
+                    return CONVERTER.convert(student);
         }
     }
 
@@ -149,10 +149,10 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
     public Student fromAssignment(@Nonnull Assignment assignment) {
         Preconditions.checkNotNull(assignment, "Cannot grab a student from a null assignment");
         try (DSLContext ctx = connect()) {
-            return ctx.selectFrom(STUDENT)
+            StudentRecord student = ctx.selectFrom(STUDENT)
                     .where(STUDENT.UNIQUE_ID.eq(assignment.getStudent_id()))
-                    .fetchOne()
-                    .into(Student.class);
+                    .fetchOne();
+            return CONVERTER.convert(student);
         }
     }
 

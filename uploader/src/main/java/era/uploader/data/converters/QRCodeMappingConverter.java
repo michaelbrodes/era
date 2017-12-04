@@ -18,7 +18,7 @@ public class QRCodeMappingConverter
 
     @Override
     protected final QRCodeMapping doForward(@Nonnull QrCodeMappingRecord qrCodeMappingRecord) {
-        return QRCodeMapping.builder()
+        return QRCodeMapping.builder().withStudentId(qrCodeMappingRecord.getStudentId())
                 .withSequenceNumber(qrCodeMappingRecord.getSequenceNumber())
                 .create(qrCodeMappingRecord.getUuid());
     }
