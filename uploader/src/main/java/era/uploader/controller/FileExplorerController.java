@@ -97,7 +97,7 @@ public class FileExplorerController {
     public void createCourse(MouseEvent mouseEvent) {
         UINavigator nav = new UINavigator(allAssignments.getScene());
         try {
-            nav.changeToCourseCreation();
+            nav.changeToCreateCourse();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

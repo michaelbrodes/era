@@ -6,6 +6,7 @@ import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
 import era.uploader.service.CourseCreationService;
+import era.uploader.view.UINavigator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -181,5 +182,17 @@ public class CourseCreationController {
         }
 
         return chosenSemester;
+    }
+    public void home() throws IOException {
+        UINavigator nav = new UINavigator(browseFiles.getScene());
+        nav.changeToHome();
+    }
+    public void assignment() throws IOException {
+        UINavigator nav = new UINavigator(browseFiles.getScene());
+        nav.changeToCreateAssignment();
+    }
+    public void scanPDF() throws IOException {
+        UINavigator nav = new UINavigator(browseFiles.getScene());
+        nav.changeToScan();
     }
 }

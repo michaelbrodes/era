@@ -41,6 +41,7 @@
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#home" text="Home" />
                         <MenuItem mnemonicParsing="false" onAction="#course" text="Create Course" />
+                        <MenuItem mnemonicParsing="false" onAction="#assignment" text="Create Assignment" />
                     </items>
                 </Menu>
             </menus>

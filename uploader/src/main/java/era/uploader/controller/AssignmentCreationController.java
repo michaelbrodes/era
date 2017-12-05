@@ -130,5 +130,9 @@ public class AssignmentCreationController {
         UINavigator nav = new UINavigator(assignmentName.getScene());
         nav.changeToCreateCourse();
     }
+    public void scanPDF() throws IOException {
+        UINavigator nav = new UINavigator(assignmentName.getScene());
+        nav.changeToScan();
+    }
 
 }

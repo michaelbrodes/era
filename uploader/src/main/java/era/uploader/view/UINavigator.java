@@ -62,6 +62,4 @@ public class UINavigator {
     public Window getPrimaryStage() {
         return primaryWindow;
     }
-
-    }
 }

@@ -4,6 +4,9 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
@@ -11,26 +14,26 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.CourseCreationController">
-    <Button fx:id="browseFiles" layoutX="79.0" layoutY="131.0" onMouseClicked="#findrosterFile" text="Browse Files" />
-    <Label fx:id="chosenFile" layoutX="188.0" layoutY="137.0" text="Chosen File" />
-    <Label fx:id="createCourseLabel" layoutX="359.0" layoutY="14.0" prefHeight="29.0" prefWidth="194.0" text="Create Course">
+    <Button fx:id="browseFiles" layoutX="17.0" layoutY="254.0" onMouseClicked="#findrosterFile" text="Browse Files" />
+    <Label fx:id="chosenFile" layoutX="188.0" layoutY="260.0" text="Chosen File" />
+    <Label fx:id="createCourseLabel" layoutX="21.0" layoutY="52.0" prefHeight="29.0" prefWidth="194.0" text="Create Course">
       <font>
          <Font size="24.0" />
       </font></Label>
 
-    <TableView fx:id="output" layoutX="20.0" layoutY="178.0" prefHeight="400.0" prefWidth="960.0">
+    <TableView fx:id="output" layoutX="318.0" layoutY="95.0" prefHeight="483.0" prefWidth="662.0">
     <columns>
-        <TableColumn prefWidth="153.0" text="Student Name">
+        <TableColumn prefWidth="240.0" text="Student Name">
             <cellValueFactory>
                 <PropertyValueFactory property="studentName" />
             </cellValueFactory>
         </TableColumn>
-        <TableColumn prefWidth="89.0" text="Student ID">
+        <TableColumn prefWidth="102.0" text="Student ID">
             <cellValueFactory>
                 <PropertyValueFactory property="studentId" />
             </cellValueFactory>
         </TableColumn>
-        <TableColumn prefWidth="229.0" text="Course Name">
+        <TableColumn prefWidth="319.0" text="Course Name">
             <cellValueFactory>
                 <PropertyValueFactory property="courseName" />
             </cellValueFactory>
@@ -41,8 +44,18 @@
             </FXCollections>
         </items>
     </TableView>
-    <ComboBox fx:id="termDropdown" layoutX="28.0" layoutY="53.0" prefWidth="150.0" />
-    <ComboBox fx:id="yearDropdown" layoutX="28.0" layoutY="91.0" prefWidth="150.0" />
-   <Button fx:id="createCourse" layoutX="676.0" layoutY="141.0" mnemonicParsing="false" onAction="#createCourses" text="Create Course" />
-
+    <ComboBox fx:id="termDropdown" layoutX="111.0" layoutY="176.0" prefWidth="150.0" />
+    <ComboBox fx:id="yearDropdown" layoutX="111.0" layoutY="214.0" prefWidth="150.0" />
+   <Button fx:id="createCourse" layoutX="154.0" layoutY="298.0" mnemonicParsing="false" onAction="#createCourses" text="Create Course" />
+    <MenuBar fx:id="menuBar" prefHeight="29.0" prefWidth="1000.0">
+        <menus>
+            <Menu mnemonicParsing="false" text="Navigation Menu">
+                <items>
+                    <MenuItem fx:id="home" mnemonicParsing="false" onAction="#home" text="Home" />
+                    <MenuItem fx:id="createAssignment" mnemonicParsing="false" onAction="#assignment" text="Create Assignment" />
+                    <MenuItem fx:id="scanPDF" mnemonicParsing="false" onAction="#scanPDF" text="Scan PDF" />
+                </items>
+            </Menu>
+        </menus>
+    </MenuBar>
 </AnchorPane>
