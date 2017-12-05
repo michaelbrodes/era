@@ -160,9 +160,25 @@ public class Assignment {
 
     @Override
     public int hashCode() {
+        int studentHashCode;
+        int courseHashCode;
+
+        if( student == null){
+            studentHashCode = 0;
+        }
+        else{
+            studentHashCode = student.hashCode();
+        }
+
+        if( course == null){
+            courseHashCode = 0;
+        }
+        else{
+            courseHashCode = course.hashCode();
+        }
         int result = name.hashCode();
-        result = 31 * result + student.hashCode();
-        result = 31 * result + course.hashCode();
+        result = 31 * result + studentHashCode;
+        result = 31 * result + courseHashCode;
         result = 31 * result + uniqueId;
         return result;
     }

@@ -114,7 +114,7 @@ public class AssignmentCreationController {
 
             Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
             infoAlert.setHeaderText("QRCodes Saved Successfully");
-            infoAlert.setContentText(mmap.values().size() + "QR Codes have been saved to " + System.getProperty("user.dir"));
+            infoAlert.setContentText(mmap.values().size() + "QR Codes have been saved to " + System.getProperty("user.dir")+ File.separator + QRCreationService.QRCODEDIRECTORY);
             infoAlert.showAndWait();
 
         });

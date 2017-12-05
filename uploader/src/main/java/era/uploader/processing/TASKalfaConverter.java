@@ -63,15 +63,15 @@ public class TASKalfaConverter implements Converter<Path, Map<Integer, String>> 
                     filenameBuilder.append(rand.nextInt());
                 }
                 String filename = filenameBuilder.toString();
-                File pdf = File.createTempFile(filename, "pdf");
+                File pdf = File.createTempFile(filename, ".pdf");
                 document.save(pdf);
                 tmpFiles.add(pdf.getAbsolutePath());
                 document.close();
             }
 
             List<String> fileNames = tmpFiles.build();
-            for (int i = 0; i < fileNames.size(); i++){
-                    mappedFiles.put(i, fileNames.get(i));
+            for (int i = 1; i <= fileNames.size(); i++){
+                    mappedFiles.put(i, fileNames.get(i-1));
             }
 
             inputPDF.close();

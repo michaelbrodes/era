@@ -38,8 +38,6 @@ class QRScanner {
 
     }
 
-    private static final QRErrorBus BUS = QRErrorBus.instance();
-
     QRCodeMapping extractQRCodeInformation(Map.Entry<Integer,String> idToDocument){
         String tmpFinalResult;
         try{
@@ -55,14 +53,14 @@ class QRScanner {
             tmpResult = multiForm.decodeWithState(tmpBitmap);
             tmpFinalResult = String.valueOf(tmpResult.getText());
             if(tmpFinalResult == null){
-                BUS.fire(new QRErrorEvent(QRErrorStatus.UUID_ERROR));
+                progress.addError(QRErrorStatus.UUID_ERROR.getReason(), idToDocument.getKey().toString());
                 return null;
             }
             document.close();
         }
         catch (IOException | NotFoundException e) {
             System.out.println("Error: " + e );
-            BUS.fire(new QRErrorEvent(QRErrorStatus.UUID_ERROR));
+            progress.addError(QRErrorStatus.UUID_ERROR.getReason(), idToDocument.getKey().toString());
             return null;
         }
         progress.incrementCount();

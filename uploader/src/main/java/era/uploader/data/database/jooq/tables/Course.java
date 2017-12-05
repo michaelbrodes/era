@@ -15,6 +15,7 @@ import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Schema;
 import org.jooq.Table;
@@ -37,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Course extends TableImpl<CourseRecord> {
 
-    private static final long serialVersionUID = -1343485721;
+    private static final long serialVersionUID = -1936678712;
 
     /**
      * The reference instance of <code>course</code>
@@ -55,7 +56,7 @@ public class Course extends TableImpl<CourseRecord> {
     /**
      * The column <code>course.unique_id</code>.
      */
-    public final TableField<CourseRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+    public final TableField<CourseRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>course.name</code>.
@@ -117,6 +118,14 @@ public class Course extends TableImpl<CourseRecord> {
     @Override
     public Schema getSchema() {
         return DefaultSchema.DEFAULT_SCHEMA;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Identity<CourseRecord, Integer> getIdentity() {
+        return Keys.IDENTITY_COURSE;
     }
 
     /**

@@ -53,8 +53,7 @@ public class QRCreator implements Callable<QRCodeMapping> {
                     QR_HEIGHT
             );
         } catch (WriterException e) {
-            QRErrorStatus status = QRErrorStatus.GENERATION_ERROR;
-            BUS.fire(new QRErrorEvent(status, student));
+            System.out.println("Issue writing QR Code");
         }
 
         return QRCodeMapping.builder()
