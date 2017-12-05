@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.IOException;
@@ -42,11 +43,25 @@ public class UINavigator {
 
     }
 
-    public void changeToCourseCreation() throws IOException {
-        Parent creationView = FXMLLoader.load(
-                getClass().getResource("/gui/course-creation.fxml")
-        );
+    public void changeToCreateAssignment() throws IOException {
 
-        mainScene.setRoot(creationView);
+        Parent createAssignmentView = FXMLLoader.load(getClass().getResource("/gui/assignment-creation.fxml"));
+
+        mainScene.setRoot(createAssignmentView);
+
+    }
+
+    public void changeToCreateCourse() throws IOException {
+
+        Parent createCourseView = FXMLLoader.load(getClass().getResource("/gui/course-creation.fxml"));
+
+        mainScene.setRoot(createCourseView);
+
+    }
+
+    public Window getPrimaryStage() {
+        return primaryWindow;
+    }
+
     }
 }

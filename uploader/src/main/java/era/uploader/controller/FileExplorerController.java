@@ -102,4 +102,28 @@ public class FileExplorerController {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Switch to the assignment creation view.
+     */
+    public void createAssignment(MouseEvent mouseEvent) {
+        UINavigator nav = new UINavigator(allAssignments.getScene());
+        try {
+            nav.changeToCreateAssignment();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Switch to the assignment creation view.
+     */
+    public void home(MouseEvent mouseEvent) {
+        UINavigator nav = new UINavigator(allAssignments.getScene());
+        try {
+            nav.changeToHome();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

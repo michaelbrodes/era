@@ -22,6 +22,8 @@
         <buttons>
             <Button onMouseClicked="#createCourse" text="Create Class" ButtonBar.buttonData="LEFT" />
             <Button text="Create assignment" ButtonBar.buttonData="LEFT" />
+            <Button text="Create Class" ButtonBar.buttonData="LEFT" />
+            <Button onMouseClicked="#createAssignment" text="Create Assignment" ButtonBar.buttonData="LEFT" />
             <Button onMouseClicked="#scanPDF" text="Scan PDF" ButtonBar.buttonData="LEFT" />
         </buttons>
     </ButtonBar>
