@@ -38,6 +38,7 @@ public class QRCreationService {
     private static final QRErrorBus BUS = QRErrorBus.instance();
     private final QRCodeMappingDAO QRCodeMappingDAO;
     private final CourseDAO courseDAO;
+    public  final static String QRCODEDIRECTORY = "QRCode Directory";
 
     public QRCreationService(QRCodeMappingDAO QRCodeMappingDAO, CourseDAO courseDAO) {
         Preconditions.checkNotNull(QRCodeMappingDAO);
@@ -87,12 +88,10 @@ public class QRCreationService {
 
         try {
             if (!threads.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)) {
-                QRErrorStatus status = QRErrorStatus.TIMEOUT_ERROR;
-                BUS.fire(new QRErrorEvent(status));
+                System.err.println("Thread Timed Out");
             }
         } catch (InterruptedException e) {
-            QRErrorStatus status = QRErrorStatus.INTERRUPT_ERROR;
-            BUS.fire(new QRErrorEvent(status));
+            System.err.println("Tread Interrrupted Before Shutdown");
         }
 
         ImmutableMultimap.Builder<Student, QRCodeMapping> studentsToPages =
@@ -103,11 +102,9 @@ public class QRCreationService {
                 QRCodeMapping QRCodeMapping = futurePage.get();
                 studentsToPages.put(QRCodeMapping.getStudent(), QRCodeMapping);
             } catch (InterruptedException e) {
-                QRErrorStatus status = QRErrorStatus.INTERRUPT_ERROR;
-                BUS.fire(new QRErrorEvent(status));
+                System.err.println("Tread Interrrupted Before Shutdown");
             } catch (ExecutionException e) {
-                QRErrorStatus status = QRErrorStatus.GENERATION_ERROR;
-                BUS.fire(new QRErrorEvent(status));
+                System.err.println("Exception Generating QR Code");
             }
         }
 
@@ -118,7 +115,12 @@ public class QRCreationService {
     }
 
     public String saveQRCodeMapping(QRCodeMapping qrCodeMapping) throws IOException {
-        String path = qrCodeMapping.getUuid() + ".PNG";
+        File directory = new File(QRCODEDIRECTORY);
+        if(!directory.exists()){
+            directory.mkdir();
+        }
+
+        String path = directory.getAbsolutePath() + File.separator + qrCodeMapping.getStudent().getUserName() +"_" + qrCodeMapping.getUuid() + ".PNG";
 
         BitMatrix byteMatrix = qrCodeMapping.getQrCode();
         MatrixToImageWriter.writeToPath(byteMatrix, "PNG", Paths.get(path));

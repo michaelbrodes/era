@@ -9,21 +9,21 @@
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.PDFProgressController">
+<AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.PDFProgressController">
    <children>
-      <ProgressBar fx:id="errorProgress" layoutX="193.0" layoutY="166.0" prefWidth="200.0" progress="0.0" />
-      <Label layoutX="220.0" layoutY="139.0" text="Percent of Pages Processed" />
-      <Label layoutX="393.0" layoutY="167.0" text="percent" />
-      <Button layoutX="526.0" layoutY="341.0" mnemonicParsing="false" text="OK" />
-      <TableView fx:id="errorList" layoutX="21.0" layoutY="219.0" prefHeight="200.0" prefWidth="206.0">
+      <ProgressBar fx:id="errorProgress" layoutX="380.0" layoutY="157.0" prefWidth="200.0" progress="0.0" />
+      <Label layoutX="407.0" layoutY="130.0" text="Percent of Pages Processed" />
+      <Label fx:id="numPercent" layoutX="580.0" layoutY="158.0" text="percent" />
+      <Button layoutX="732.0" layoutY="401.0" mnemonicParsing="false" onMouseClicked="#endAndReturn" text="OK" />
+      <TableView fx:id="errorList" layoutX="312.0" layoutY="226.0" prefHeight="200.0" prefWidth="377.0">
          <columns>
-            <TableColumn prefWidth="102.0" text="Message">
+            <TableColumn prefWidth="293.0" text="Message">
                <cellValueFactory>
                   <PropertyValueFactory property="message" />
                </cellValueFactory>
             </TableColumn>
 
-            <TableColumn prefWidth="103.0" text="Page Number">
+            <TableColumn minWidth="0.0" prefWidth="83.0" text="Page Number">
                <cellValueFactory>
                   <PropertyValueFactory property="pageNum" />
                </cellValueFactory>
@@ -34,6 +34,6 @@
             </FXCollections>
          </items>
       </TableView>
-      <Label layoutX="80.0" layoutY="198.0" prefHeight="17.0" prefWidth="124.0" text="Error Messages" />
+      <Label layoutX="312.0" layoutY="209.0" prefHeight="17.0" prefWidth="124.0" text="Error Messages" />
    </children>
 </AnchorPane>

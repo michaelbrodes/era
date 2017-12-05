@@ -144,3 +144,5 @@ server/docker/db
 server/docker/.env
 
 *.pdf
+
+uploader/QRCode Directory/

@@ -71,10 +71,10 @@ public class CSVParser {
                                 .create(fields[USER_NAME])
                 );
             } else {
-                fireError(QRErrorStatus.COURSE_PARSE_ERROR, fields);
+                System.err.println("Error Parsing Course CSV");
             }
         } else {
-            fireError(QRErrorStatus.PARSE_ERROR, fields);
+            System.err.println("Error Parsing Course CSV");
         }
 
         return ret;

@@ -40,6 +40,7 @@ public class PDFProcessor {
     private final QRCodeMappingDAO QRCodeMappingDAO;
     private final AssignmentDAO assignmentDAO;
     private final String host;
+    private final ScanningProgress scanningProgress;
 
     PDFProcessor(
             QRCodeMappingDAO QRCodeMappingDao,
@@ -47,7 +48,8 @@ public class PDFProcessor {
             Map<Integer, String> pages,
             Course course,
             String assignmentName,
-            String host
+            String host,
+            ScanningProgress scanningProgress
     ) {
         this.pages = pages;
         this.assignmentDAO = assignmentDAO;
@@ -55,6 +57,7 @@ public class PDFProcessor {
         this.assignmentName = assignmentName;
         this.QRCodeMappingDAO = QRCodeMappingDao;
         this.host = host;
+        this.scanningProgress = scanningProgress;
     }
 
     /**
@@ -90,9 +93,9 @@ public class PDFProcessor {
         Preconditions.checkNotNull(course);
         Preconditions.checkNotNull(assignmentName);
         Preconditions.checkNotNull(QRCodeMappingDAO);
-
+        final ScanningProgress progress = new ScanningProgress();
         Map<Integer, String> pages = TASKalfaConverter.convertFile(pdf);
-        PDFProcessor processor = new PDFProcessor(QRCodeMappingDAO, assignmentDAO, pages, course, assignmentName, host);
+        PDFProcessor processor = new PDFProcessor(QRCodeMappingDAO, assignmentDAO, pages, course, assignmentName, host, progress);
 
         //TODO at the end of processing add a message to the screen that says that processing was successful
 
@@ -113,11 +116,11 @@ public class PDFProcessor {
      * @return the assignment submissions we generated during this run.
      */
     private ScanningProgress startPipeline() {
-        final ScanningProgress progress = new ScanningProgress();
-        progress.setPdfFileSize(pages.size());
+
+        scanningProgress.setPdfFileSize(pages.size());
 
         Runnable pipelineTask = () -> {
-            QRScanner scanner = new QRScanner(progress);
+            QRScanner scanner = new QRScanner(scanningProgress);
             Multimap<Student, QRCodeMapping> collect = pages.entrySet().parallelStream()
                     .map(scanner::extractQRCodeInformation)
                     .filter(Objects::nonNull)
@@ -140,7 +143,7 @@ public class PDFProcessor {
 
         new Thread(pipelineTask).start();
 
-        return progress;
+        return scanningProgress;
     }
 
     /**
@@ -189,8 +192,8 @@ public class PDFProcessor {
             Student student = pages.getKey();
             Collection<QRCodeMapping> pagesToAdd = pages.getValue();
             assignments.add(new Assignment(assignmentName, pagesToAdd, student, course, LocalDateTime.now()));
-            mergeAssignmentPages(assignments);
         }
+        mergeAssignmentPages(assignments);
 
         return assignments;
     }
@@ -219,7 +222,7 @@ public class PDFProcessor {
                         Files.delete(Paths.get(p.getTempDocumentName()));
                     }
                 } catch (java.io.IOException e) {
-                    BUS.fire(new QRErrorEvent(QRErrorStatus.MERGE_ERROR));
+                    scanningProgress.addError(QRErrorStatus.MERGE_ERROR.getReason());
                 }
             }
             try {
@@ -227,7 +230,7 @@ public class PDFProcessor {
                 assignmentDAO.storeAssignment(a);//store assignment in database
                 allPages.close();
             } catch (java.io.IOException e) {
-                BUS.fire(new QRErrorEvent(QRErrorStatus.SAVE_ERROR));
+                scanningProgress.addError(QRErrorStatus.SAVE_ERROR.getReason());
             }
         }
     }
