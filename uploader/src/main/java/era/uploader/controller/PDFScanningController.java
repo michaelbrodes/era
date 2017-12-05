@@ -96,8 +96,16 @@ public class PDFScanningController {
             String currCourseName = courseNames.getValue();
             Course currentCourse = nameToCourse.get(currCourseName);
 
+            if (fullFileName == null || currCourseName == null || currentAssignment == null) {
 
-            if (fullFileName != null)
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setHeaderText("Must Choose Options");
+                errorAlert.setContentText("You must enter an Assignment Name, Choose a course, and Choose a PDF file to Scan.");
+                errorAlert.showAndWait();
+
+            }
+
+            else if (fullFileName != null)
                 try {
 
                 if(currentCourse != null && currentAssignment != null) {
