@@ -133,4 +133,9 @@ public class PDFScanningController {
         UINavigator nav = new UINavigator(assignmentName.getScene());
         nav.changeToCreateCourse();
     }
+
+    public void assignment() throws IOException {
+        UINavigator nav = new UINavigator(assignmentName.getScene());
+        nav.changeToCreateAssignment();
+    }
 }

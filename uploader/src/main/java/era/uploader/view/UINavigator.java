@@ -11,8 +11,8 @@ import java.io.IOException;
 
 public class UINavigator {
 
-    public static final int GUI_WIDTH = 1000;
-    public static final int GUI_HEIGHT = 600;
+    private static final int GUI_WIDTH = 1000;
+    private static final int GUI_HEIGHT = 600;
 
     private Scene mainScene;
     private Window primaryWindow;
@@ -62,5 +62,4 @@ public class UINavigator {
     public Window getPrimaryStage() {
         return primaryWindow;
     }
-
 }

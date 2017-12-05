@@ -92,6 +92,18 @@ public class FileExplorerController {
     }
 
     /**
+     * Switch to the class creation view.
+     */
+    public void createCourse(MouseEvent mouseEvent) {
+        UINavigator nav = new UINavigator(allAssignments.getScene());
+        try {
+            nav.changeToCreateCourse();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Switch to the assignment creation view.
      */
     public void createAssignment(MouseEvent mouseEvent) {
