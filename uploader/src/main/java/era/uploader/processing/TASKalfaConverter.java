@@ -71,7 +71,7 @@ public class TASKalfaConverter implements Converter<Path, Map<Integer, String>> 
 
             List<String> fileNames = tmpFiles.build();
             for (int i = 1; i <= fileNames.size(); i++){
-                    mappedFiles.put(i, fileNames.get(i));
+                    mappedFiles.put(i, fileNames.get(i-1));
             }
 
             inputPDF.close();
