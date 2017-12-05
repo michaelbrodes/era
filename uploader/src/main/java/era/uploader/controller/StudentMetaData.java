@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
 
@@ -67,7 +68,7 @@ public class StudentMetaData {
     }
 
     public static ObservableList<StudentMetaData> fromMultimap(Multimap<Course, Student> coursesToStudents) {
-        coursesToStudents
+        return coursesToStudents
                 .entries()
                 .stream()
                 .map((courseToStudent) -> {
@@ -78,10 +79,9 @@ public class StudentMetaData {
 
                     return new StudentMetaData(name, id, course);
                 })
-                .collect(FXCollections::observableArrayList, (currentList, student) -> {
-                    
-                }, (leftMerge, rightMerge) -> {
-
-                });
+                .collect(Collector.of(FXCollections::observableArrayList, List::add,(l, r) -> {
+                    l.addAll(r);
+                    return l;
+                }));
     }
 }

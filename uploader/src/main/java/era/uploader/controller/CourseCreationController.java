@@ -8,6 +8,7 @@ import era.uploader.data.model.Student;
 import era.uploader.service.CourseCreationService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -39,13 +40,18 @@ public class CourseCreationController {
     @FXML
     private Button browseFiles;
     @FXML
+    private Button createCourse;
+    @FXML
     private TableView<StudentMetaData> output;
     @FXML
     private Label chosenFile;
     @FXML
+    private Label createCourseLabel;
+    @FXML
     private ComboBox<String> termDropdown;
     @FXML
     private ComboBox<Integer> yearDropdown;
+
 
     private final FileChooser chooser = new FileChooser();
     private final CourseCreationService service = new CourseCreationService(CourseDAOImpl.instance());
@@ -115,7 +121,7 @@ public class CourseCreationController {
      *
      * @param event the mouse event that triggered this handler
      */
-    public void createCourses(MouseEvent event) {
+    public void createCourses(ActionEvent event) {
         Optional<Semester> semester = grabCurrentSemester();
         Optional<String> chosenFile = grabChosenFile();
 
