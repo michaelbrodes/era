@@ -146,3 +146,5 @@ server/docker/.env
 *.pdf
 
 uploader/QRCode Directory/
+uploader/out/*
+server/out/*
