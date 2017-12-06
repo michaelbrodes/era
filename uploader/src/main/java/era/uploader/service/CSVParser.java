@@ -3,9 +3,6 @@ package era.uploader.service;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import era.uploader.controller.QRErrorBus;
-import era.uploader.creation.QRErrorEvent;
-import era.uploader.creation.QRErrorStatus;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
@@ -33,11 +30,9 @@ public class CSVParser {
     private static final int SECTION_NBR = 2;
     private static final int REFERENCE_NBR = 3;
 
-    private static final QRErrorBus BUS = QRErrorBus.instance();
-
     private final Semester semester;
 
-    public CSVParser(Semester semester) {
+    CSVParser(Semester semester) {
         this.semester = semester;
     }
 
@@ -78,15 +73,5 @@ public class CSVParser {
         }
 
         return ret;
-    }
-
-    private static void fireError(QRErrorStatus status, String[] erroredFields) {
-        String erroredLine = String.join(",", erroredFields);
-        QRErrorEvent event = new QRErrorEvent(
-                status,
-                null,
-                erroredLine
-        );
-        BUS.fire(event);
     }
 }

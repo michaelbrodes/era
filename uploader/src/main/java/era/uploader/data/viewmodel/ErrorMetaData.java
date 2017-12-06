@@ -1,4 +1,4 @@
-package era.uploader.controller;
+package era.uploader.data.viewmodel;
 
 import javafx.beans.property.SimpleStringProperty;
 

@@ -1,4 +1,4 @@
-package era.uploader.data.model;
+package era.uploader.data.viewmodel;
 
 import com.google.common.base.Preconditions;
 import era.uploader.data.database.jooq.tables.records.AllAssignmentsRecord;

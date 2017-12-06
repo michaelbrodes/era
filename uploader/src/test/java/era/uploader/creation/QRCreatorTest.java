@@ -1,13 +1,11 @@
 package era.uploader.creation;
 
-import era.uploader.controller.QRErrorBus;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class QRCreatorTest {
     /**
@@ -23,12 +21,10 @@ public class QRCreatorTest {
                 .create("rmcguy");
         int sequenceNumber = 1;
         QRCreator creator = new QRCreator(robMcGuy, sequenceNumber);
-        QRErrorBus bus = QRErrorBus.instance();
 
         QRCodeMapping robsQRCodeMapping = creator.call();
 
         assertNotNull(robsQRCodeMapping);
-        assertTrue(bus.isEmpty());
         assertNotNull(robsQRCodeMapping.getQrCode());
         assertEquals(robMcGuy, robsQRCodeMapping.getStudent());
         assertEquals(sequenceNumber, robsQRCodeMapping.getSequenceNumber());

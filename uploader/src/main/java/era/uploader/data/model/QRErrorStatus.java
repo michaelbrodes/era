@@ -1,4 +1,4 @@
-package era.uploader.creation;
+package era.uploader.data.model;
 
 import javax.annotation.Nonnull;
 

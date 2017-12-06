@@ -1,25 +1,18 @@
 package era.uploader.processing;
 
 import era.uploader.data.model.Assignment;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-//import org.apache.http.client.fluent.Form;
-//import org.apache.http.client.fluent.Request;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
 
 public class AssignmentUploader {
 

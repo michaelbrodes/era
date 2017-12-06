@@ -12,7 +12,6 @@ import era.uploader.data.database.jooq.tables.records.SemesterRecord;
 import era.uploader.data.database.jooq.tables.records.StudentRecord;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
-import era.uploader.data.model.Grader;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
 import org.jooq.Condition;
@@ -39,7 +38,7 @@ import static era.uploader.data.database.jooq.Tables.STUDENT;
 
 /**
  * Provides CRUD functionality for {@link Course} objects stored in the
- * database. A course has many {@link Student}s and many {@link Grader}s.
+ * database. A course has many {@link Student}s and many {@link Assignment}s
  */
 @ParametersAreNonnullByDefault
 public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements CourseDAO {

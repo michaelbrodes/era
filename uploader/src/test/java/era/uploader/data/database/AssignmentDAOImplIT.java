@@ -14,6 +14,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -45,6 +46,7 @@ import static era.uploader.data.database.jooq.Tables.STUDENT;
  * instead it should be ran <strong>only</strong> when we are testing the
  * behavior of the database directly
  */
+@Ignore
 public class AssignmentDAOImplIT {
     private static Connection dbConnection;
     private static final List<String> TABLE_LIST = Arrays.asList(

@@ -14,7 +14,7 @@ public class QRScannerTest {
     public static final String path = "src" + File.separator + "test"+ File.separator + "resources"+ File.separator +"single-page_300dpi.pdf";
 
     @Test
-    public void extractQRCodeInformation() throws Exception {
+    public void extractQRCodeInformation() {
         QRScanner qrScanner = new QRScanner(new ScanningProgress());
         ImmutableMap<Integer, String> idsToDocuments = ImmutableMap.of(0, path);
         Map.Entry<Integer, String> idToDocument = Iterables.getOnlyElement(idsToDocuments.entrySet());

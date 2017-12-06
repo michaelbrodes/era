@@ -6,11 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import era.uploader.controller.QRErrorBus;
 import era.uploader.creation.QRCreator;
-import era.uploader.creation.QRErrorEvent;
-import era.uploader.creation.QRErrorStatus;
-import era.uploader.data.CourseDAO;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
@@ -29,22 +25,16 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * This class contains the business logic for QR Creation. If any errors occur
- * during QR creation they will be inserted into the
- * {@link QRCreationService#BUS}
+ * This class contains the business logic for QR Creation.
  */
 @ParametersAreNonnullByDefault
 public class QRCreationService {
-    private static final QRErrorBus BUS = QRErrorBus.instance();
     private final QRCodeMappingDAO QRCodeMappingDAO;
-    private final CourseDAO courseDAO;
     public  final static String QRCODEDIRECTORY = "QRCode Directory";
 
-    public QRCreationService(QRCodeMappingDAO QRCodeMappingDAO, CourseDAO courseDAO) {
+    public QRCreationService(QRCodeMappingDAO QRCodeMappingDAO) {
         Preconditions.checkNotNull(QRCodeMappingDAO);
-        Preconditions.checkNotNull(courseDAO);
         this.QRCodeMappingDAO = QRCodeMappingDAO;
-        this.courseDAO = courseDAO;
     }
 
     /**
@@ -114,7 +104,8 @@ public class QRCreationService {
         return ret;
     }
 
-    public String saveQRCodeMapping(QRCodeMapping qrCodeMapping) throws IOException {
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void saveQRCodeMapping(QRCodeMapping qrCodeMapping) throws IOException {
         File directory = new File(QRCODEDIRECTORY);
         if(!directory.exists()){
             directory.mkdir();
@@ -124,6 +115,5 @@ public class QRCreationService {
 
         BitMatrix byteMatrix = qrCodeMapping.getQrCode();
         MatrixToImageWriter.writeToPath(byteMatrix, "PNG", Paths.get(path));
-        return path;
     }
 }

@@ -1,10 +1,7 @@
 package era.uploader.controller;
 
+import era.uploader.data.viewmodel.ErrorMetaData;
 import era.uploader.processing.ScanningProgress;
-import era.uploader.view.UINavigator;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -16,8 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
-import javafx.util.Duration;
-import org.jooq.True;
 
 import java.io.IOException;
 

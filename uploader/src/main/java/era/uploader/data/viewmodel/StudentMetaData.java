@@ -1,8 +1,6 @@
-package era.uploader.controller;
+package era.uploader.data.viewmodel;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import com.sun.javafx.collections.ObservableListWrapper;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 import javafx.beans.property.SimpleStringProperty;
@@ -10,7 +8,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collector;
 
 /**

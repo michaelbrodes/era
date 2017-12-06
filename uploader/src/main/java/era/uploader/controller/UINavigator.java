@@ -1,10 +1,8 @@
-package era.uploader.view;
+package era.uploader.controller;
 
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.IOException;

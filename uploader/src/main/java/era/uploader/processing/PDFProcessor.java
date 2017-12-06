@@ -2,11 +2,10 @@ package era.uploader.processing;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import era.uploader.common.MultimapCollector;
-import era.uploader.creation.QRErrorBus;
-import era.uploader.creation.QRErrorEvent;
-import era.uploader.creation.QRErrorStatus;
+import era.uploader.data.model.QRErrorStatus;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.Assignment;
@@ -29,12 +28,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @ParametersAreNonnullByDefault
 public class PDFProcessor {
-    private static final QRErrorBus BUS = QRErrorBus.instance();
-    private final Map<Integer, String> pages;
+    private final Path pdfInput;
     private final Course course;
     private final String assignmentName;
     private final QRCodeMappingDAO QRCodeMappingDAO;
@@ -45,31 +44,30 @@ public class PDFProcessor {
     PDFProcessor(
             QRCodeMappingDAO QRCodeMappingDao,
             AssignmentDAO assignmentDAO,
-            Map<Integer, String> pages,
+            Path pdfInput,
             Course course,
             String assignmentName,
-            String host,
-            ScanningProgress scanningProgress
+            @Nullable String host
     ) {
-        this.pages = pages;
+        this.pdfInput = pdfInput;
         this.assignmentDAO = assignmentDAO;
         this.course = course;
         this.assignmentName = assignmentName;
         this.QRCodeMappingDAO = QRCodeMappingDao;
         this.host = host;
-        this.scanningProgress = scanningProgress;
+        this.scanningProgress = new ScanningProgress();
     }
 
     /**
      * Entry point into the {@link era.uploader.processing} package. It is our
      * PDF processing algorithm (i.e. the algorithm that matches students to
-     * pages in an inputted PDF). The algorithm is heavily based upon
+     * pdfInput in an inputted PDF). The algorithm is heavily based upon
      * MapReduce. Map reduce allows for high concurrency by creating a pipeline
      * of sorts, while also keeping logic modularized. The stages of the
-     * pipeline are Spit a large pdf into pages -> scatter those pages with
+     * pipeline are Spit a large pdf into pdfInput -> scatter those pdfInput with
      * {@link List#parallelStream()} -> feed them into
      * {@link QRScanner#extractQRCodeInformation(Map.Entry)} to grab uuid ->
-     * match {@link #associateStudentsWithPage(QRCodeMapping)} -> merge student
+     * match {@link #associateStudentsWithPage(QRCodeMapping)} -> mergeMappings student
      * associated Pages into one pdf -> store in either the local database or
      * the remote database.
      *
@@ -77,9 +75,8 @@ public class PDFProcessor {
      *                       assignments, in arbitrary order.
      * @param course         the course this pdf was submitted to.
      * @param assignmentName the name of the assignment that this pdf was for
-     * @return a list of PDFs that have pages that were associated with
+     * @return a list of PDFs that have pdfInput that were associated with
      * students.
-     * @throws IOException couldn't find the pdf from the path specified.
      */
     public static ScanningProgress process(
             QRCodeMappingDAO QRCodeMappingDAO,
@@ -88,52 +85,71 @@ public class PDFProcessor {
             Course course,
             String assignmentName,
             @Nullable String host
-    ) throws IOException {
+    ) {
         Preconditions.checkNotNull(pdf);
         Preconditions.checkNotNull(course);
         Preconditions.checkNotNull(assignmentName);
         Preconditions.checkNotNull(QRCodeMappingDAO);
-        final ScanningProgress progress = new ScanningProgress();
-        Map<Integer, String> pages = TASKalfaConverter.convertFile(pdf);
-        PDFProcessor processor = new PDFProcessor(QRCodeMappingDAO, assignmentDAO, pages, course, assignmentName, host, progress);
 
-        //TODO at the end of processing add a message to the screen that says that processing was successful
+        PDFProcessor processor = new PDFProcessor(
+                QRCodeMappingDAO,
+                assignmentDAO,
+                pdf,
+                course,
+                assignmentName,
+                host
+        );
 
         return processor.startPipeline();
     }
 
     /**
-     * The pipeline for scanning qr codes off of assignment pages to find which
+     * The pipeline for scanning qr codes off of assignment pdfInput to find which
      * students they belong to. Essentially we are provided a list of
-     * {@link PDDocument} which represents all the pages that belong to all
+     * {@link PDDocument} which represents all the pdfInput that belong to all
      * the submissions for the assignment with the name {@link #assignmentName}.
-     * For each of those pages we pull out the QR code attached to the page,
+     * For each of those pdfInput we pull out the QR code attached to the page,
      * then we match the UUID on that QR code to a student, then put those
      * matches into a {@link Multimap} that groups the Pages by student, and
-     * then finally we merge all pages together into an {@link Assignment}
+     * then finally we mergeMappings all pdfInput together into an {@link Assignment}
      * object and store it in the database.
      *
      * @return the assignment submissions we generated during this run.
      */
     private ScanningProgress startPipeline() {
-
-        scanningProgress.setPdfFileSize(pages.size());
-
         Runnable pipelineTask = () -> {
+            // load and exlode document
+            Optional<PDDocument> pages = loadPDF(pdfInput);
+            Map<Integer, String> idToPage = ImmutableMap.of();
+
+            try {
+                idToPage = PDFExploder.explodeFile(pages);
+            } catch (IOException e) {
+                // this shouldn't happen, but we want to user to know when it does.
+                scanningProgress.addError("Cannot split inputted pdf into pages.");
+                e.printStackTrace();
+            }
+
+            scanningProgress.setPdfFileSize(idToPage.size());
+
+            // scan and match pages in parallel
             QRScanner scanner = new QRScanner(scanningProgress);
-            Multimap<Student, QRCodeMapping> collect = pages.entrySet().parallelStream()
+            Multimap<Student, QRCodeMapping> studentsToPages = idToPage.entrySet().parallelStream()
                     .map(scanner::extractQRCodeInformation)
                     .filter(Objects::nonNull)
                     .map(this::associateStudentsWithPage)
                     .collect(MultimapCollector.toMultimap());
 
-            Collection<Assignment> assignments = addAssignments(collect);
+            // group pages into assignments based on their students
+            Collection<Assignment> assignments = groupIntoAssignments(studentsToPages);
 
+            // if we have remote uploading enabled, upload assignments to the server
             if (host != null) {
 
                 try {
                     AssignmentUploader.uploadAssignments(assignments, host);
                 } catch (IOException e) {
+                    scanningProgress.addError("Unable to upload assignments to server.");
                     e.printStackTrace();
                 }
 
@@ -151,19 +167,15 @@ public class PDFProcessor {
      * Valid QRCodeMapping. Create multimap object and populate with student
      * associated with the QRCodeMapping in the argument
      */
-    public Multimap<Student, QRCodeMapping> associateStudentsWithPage(QRCodeMapping QRCodeMapping) {
+    private Multimap<Student, QRCodeMapping> associateStudentsWithPage(QRCodeMapping QRCodeMapping) {
         Preconditions.checkNotNull(QRCodeMapping);
         QRCodeMapping QRCodeMappingFromDB;
         QRCodeMappingFromDB = QRCodeMappingDAO.read(QRCodeMapping.getUuid());
         if(QRCodeMappingFromDB == null){
             return ArrayListMultimap.create();
-        }
-        else{
-
-            QRCodeMappingFromDB = merge(QRCodeMappingFromDB, QRCodeMapping);
-
+        } else{
+            QRCodeMappingFromDB = mergeMappings(QRCodeMappingFromDB, QRCodeMapping);
             Multimap<Student, QRCodeMapping> mmap = ArrayListMultimap.create();
-
             mmap.put(
                     QRCodeMappingFromDB.getStudent(),
                     QRCodeMappingFromDB
@@ -173,7 +185,14 @@ public class PDFProcessor {
         }
     }
 
-    private QRCodeMapping merge(QRCodeMapping dbQRCodeMapping, QRCodeMapping scannedQRCodeMapping) {
+    /**
+     * Merges a QRCodeMapping from the database to the QRCodeMapping we saw on
+     * the page.
+     */
+    private QRCodeMapping mergeMappings(QRCodeMapping dbQRCodeMapping, QRCodeMapping scannedQRCodeMapping) {
+        Preconditions.checkNotNull(dbQRCodeMapping);
+        Preconditions.checkNotNull(scannedQRCodeMapping);
+
         dbQRCodeMapping.setTempDocumentName(scannedQRCodeMapping.getTempDocumentName());
         dbQRCodeMapping.setDocument(scannedQRCodeMapping.getDocument());
 
@@ -184,7 +203,7 @@ public class PDFProcessor {
      * After this is called, we now have a multimap object with each page
      * mapped to a student
      */
-    public Collection<Assignment> addAssignments(Multimap<Student, QRCodeMapping> mmap) {
+    private Collection<Assignment> groupIntoAssignments(Multimap<Student, QRCodeMapping> mmap) {
         Set<Assignment> assignments = new HashSet<>();
         for (Map.Entry<Student, Collection<QRCodeMapping>> pages :
                 mmap.asMap().entrySet()
@@ -199,7 +218,7 @@ public class PDFProcessor {
     }
 
     /**
-     * After this is called, all pages for each student are now merged, and saved at the
+     * After this is called, all pdfInput for each student are now merged, and saved at the
      * appropriate location. also stores the assignment file location in the database
      */
     public void mergeAssignmentPages(Set<Assignment> assignments) {
@@ -216,7 +235,7 @@ public class PDFProcessor {
                     } else {
                         document = p.getDocument();
                     }
-                    merger.appendDocument(allPages, document); //merge individual PDDocuments into 1 document
+                    merger.appendDocument(allPages, document); //mergeMappings individual PDDocuments into 1 document
                     document.close();
                     if (p.getTempDocumentName() != null) {
                         Files.delete(Paths.get(p.getTempDocumentName()));
@@ -226,12 +245,33 @@ public class PDFProcessor {
                 }
             }
             try {
-                allPages.save(a.getImageFilePath()); //save PDDocument with all pages to server
+                allPages.save(a.getImageFilePath()); //save PDDocument with all pdfInput to server
                 assignmentDAO.storeAssignment(a);//store assignment in database
                 allPages.close();
             } catch (java.io.IOException e) {
                 scanningProgress.addError(QRErrorStatus.SAVE_ERROR.getReason());
             }
         }
+    }
+
+    /**
+     * Loads a PDF from the filesystem. If said pdf document doesn't exist, or
+     * we don't have the permissions to access it, an error will show up in
+     * {@link ScanningProgress}
+     *
+     * @param pdf the path to the pdf we want to load
+     * @return {@link Optional#EMPTY} if there was a problem loading a pdf, or
+     * a present optional if we did load it
+     */
+    private Optional<PDDocument> loadPDF(Path pdf) {
+        Optional<PDDocument> loaded = Optional.empty();
+
+        try {
+            loaded = Optional.of(PDDocument.load(pdf.toFile()));
+        } catch (IOException e) {
+            scanningProgress.addError("Could not open PDF document");
+        }
+
+        return loaded;
     }
 }

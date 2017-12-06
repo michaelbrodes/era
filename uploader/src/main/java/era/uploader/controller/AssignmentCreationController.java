@@ -7,25 +7,18 @@ import era.uploader.data.CourseDAO;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.QRCodeMappingDAOImpl;
-import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 import era.uploader.service.QRCreationService;
-import era.uploader.view.UINavigator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -33,8 +26,7 @@ import java.util.Map;
 
 public class AssignmentCreationController {
 
-    int MAX_PAGES = 15;
-    private static final CourseDAO COURSE_DAO = CourseDAOImpl.instance();
+    private static final int MAX_PAGES = 15;
     private static final QRCodeMappingDAO QR_CODE_MAPPING_DAO = QRCodeMappingDAOImpl.instance();
 
     @FXML
@@ -78,12 +70,10 @@ public class AssignmentCreationController {
 
         numPagesComboBox.setItems(pageNums);
 
-        /**
-         * When the user clicks 'create assignment'
-         */
+        // When the user clicks 'create assignment'
         createAssignmentButton.setOnAction(event -> {
 
-            /** If the user does not enter values for each field */
+            // If the user does not enter values for each field
             if (courseNamesComboBox.getValue() == null ||
                     numPagesComboBox.getValue() == null ||
                     assignmentName.getCharacters().length() == 0) {
@@ -97,13 +87,13 @@ public class AssignmentCreationController {
             String currentCourseName = courseNamesComboBox.getValue();
             Course currentCourse = nameToCourse.get(currentCourseName);
 
-            QRCreationService qrs = new QRCreationService(QR_CODE_MAPPING_DAO, COURSE_DAO);
+            QRCreationService qrs = new QRCreationService(QR_CODE_MAPPING_DAO);
             Multimap<Student, QRCodeMapping> mmap = qrs.createQRs(currentCourse.getStudentsEnrolled(), numPagesComboBox.getValue());
 
             for (QRCodeMapping qrCodeMapping : mmap.values()
                  ) {
                 try {
-                    String path = qrs.saveQRCodeMapping(qrCodeMapping);
+                    qrs.saveQRCodeMapping(qrCodeMapping);
                 } catch (IOException e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                     errorAlert.setHeaderText("QRCode Save Error");
