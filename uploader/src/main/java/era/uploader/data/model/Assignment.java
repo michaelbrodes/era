@@ -142,7 +142,7 @@ public class Assignment {
     private String generateFileLocation() {
         return IOUtil.removeSpaces(course.getName())
                 + '_'
-                + student.getSchoolId()
+                + student.getUserName()
                 + "_"
                 + IOUtil.removeSpaces(name)
                 + ".pdf";

@@ -18,7 +18,9 @@ public class Semester implements Comparable<Semester> {
 
     public enum Term {
         FALL,
-        SPRING;
+        SPRING,
+        SUMMER,
+        WINTER;
 
         public final String humanReadable() {
             return this.name().substring(0, 1)

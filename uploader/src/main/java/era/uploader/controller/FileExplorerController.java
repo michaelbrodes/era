@@ -6,6 +6,7 @@ import era.uploader.data.database.AssignmentDAOImpl;
 import era.uploader.data.viewmodel.AssignmentMetaData;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -44,10 +45,15 @@ public class FileExplorerController {
                 }
             });
 
+            row.hoverProperty().addListener((observable -> {
+                row.setCursor(Cursor.HAND);
+            }));
+
             return row;
         });
         ObservableList<AssignmentMetaData> assignments = allAssignments.getItems();
         assignments.addAll(loadFromDB());
+
     }
 
     /**

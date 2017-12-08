@@ -99,7 +99,9 @@ public class PDFScanningController {
             String currCourseName = courseNames.getValue();
             Course currentCourse = nameToCourse.get(currCourseName);
 
-            if (fullFileName == null || currCourseName == null || currentAssignment == null) {
+
+
+            if (fullFileName == null || currCourseName == null || currentAssignment == null || currentAssignment.trim().equals("")) {
 
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                 errorAlert.setHeaderText("Must Choose Options");
