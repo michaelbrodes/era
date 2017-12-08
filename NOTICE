@@ -48,11 +48,54 @@ The license can be found at:
 https://www.apache.org/licenses/LICENSE-2.0
 
 -------------------------------------------------------------------------------
-NOTICES FOR JOOQ
+NOTICES FOR PDFBOX
 -------------------------------------------------------------------------------
 
 This software contains code from the PDFBox library that was developed by The
 Apache Software Foundation and licensed under Apache License Version 2.0
+
+The license can be found at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------
+NOTICES FOR APACHE HTTP COMPONENTS
+-------------------------------------------------------------------------------
+
+This software contains code from the Apache HTTP Components library that was 
+developed by The Apache Software Foundation and licensed under Apache License 
+Version 2.0
+
+The license can be found at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------
+NOTICES FOR APACHE COMMONS
+-------------------------------------------------------------------------------
+
+This software contains code from the Apache Commons library that was developed 
+by The Apache Software Foundation and licensed under Apache License Version 2.0
+
+The license can be found at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------
+NOTICES FOR MARIADB
+-------------------------------------------------------------------------------
+
+This software contains code from the MariaDB Database Management System (DBMS) 
+that was developed by the MariaDB Foundation and licensed under the GNU General
+Public License Version 2.0 
+
+The license can be found at:
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+
+-------------------------------------------------------------------------------
+NOTICES FOR SPARK
+-------------------------------------------------------------------------------
+
+This software contains code from the Spark library that was developed by 
+Per Wendel, David Ase, and Love Löfdahl and licensed under Apache License 
+Version 2.0
 
 The license can be found at:
 https://www.apache.org/licenses/LICENSE-2.0
