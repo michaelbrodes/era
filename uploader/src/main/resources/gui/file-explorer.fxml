@@ -22,7 +22,7 @@
         <buttons>
             <Button onMouseClicked="#createCourse" text="Create Class" ButtonBar.buttonData="LEFT" />
             <Button onMouseClicked="#createAssignment" text="Create Assignment" ButtonBar.buttonData="LEFT" />
-            <Button onMouseClicked="#scanPDF" text="Scan PDF" ButtonBar.buttonData="LEFT" />
+            <Button onMouseClicked="#scanPDF" text="Process PDF" ButtonBar.buttonData="LEFT" />
         </buttons>
     </ButtonBar>
     <TableView fx:id="allAssignments" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS">

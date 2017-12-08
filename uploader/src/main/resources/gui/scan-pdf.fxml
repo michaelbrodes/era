@@ -23,14 +23,14 @@
             </font>
         </Button>
         <Label fx:id="fileNameLabel" layoutX="170.0" layoutY="247.0" prefHeight="17.0" prefWidth="125.0" />
-        <Label layoutX="50.0" layoutY="37.0" text="Scan PDFs">
+        <Label layoutX="50.0" layoutY="37.0" text="Process PDFs">
             <font>
                 <Font name="Courier New" size="36.0" />
             </font>
         </Label>
         <TextField fx:id="assignmentName" alignment="CENTER" layoutX="54.0" layoutY="125.0" prefHeight="27.0" prefWidth="283.0" promptText="Assignment Name" />
         <ComboBox fx:id="courseNames" layoutX="54.0" layoutY="187.0" prefHeight="27.0" prefWidth="283.0" promptText="Course" />
-        <Button fx:id="scanButton" layoutX="511.0" layoutY="344.0" mnemonicParsing="false" text="Scan">
+        <Button fx:id="scanButton" layoutX="511.0" layoutY="344.0" mnemonicParsing="false" text="Process">
             <font>
                 <Font size="14.0" />
             </font>

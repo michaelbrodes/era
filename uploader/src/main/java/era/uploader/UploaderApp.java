@@ -26,5 +26,7 @@ public class UploaderApp extends Application {
 
         primaryStage.setScene(mainScene);
         primaryStage.show();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> System.out.println("Shutting down...")));
     }
 }

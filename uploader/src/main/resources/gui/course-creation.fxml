@@ -53,7 +53,7 @@
                 <items>
                     <MenuItem fx:id="home" mnemonicParsing="false" onAction="#home" text="Home" />
                     <MenuItem fx:id="createAssignment" mnemonicParsing="false" onAction="#assignment" text="Create Assignment" />
-                    <MenuItem fx:id="scanPDF" mnemonicParsing="false" onAction="#scanPDF" text="Scan PDF" />
+                    <MenuItem fx:id="scanPDF" mnemonicParsing="false" onAction="#scanPDF" text="Process PDF" />
                 </items>
             </Menu>
         </menus>
