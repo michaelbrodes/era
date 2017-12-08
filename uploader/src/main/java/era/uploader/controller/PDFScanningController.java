@@ -1,5 +1,6 @@
 package era.uploader.controller;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import era.uploader.data.model.Course;
 import era.uploader.processing.ScanningProgress;
@@ -72,7 +73,15 @@ public class PDFScanningController {
 
         List<Course> courses = pdfServ.getAllCourses();
 
-        final Map<String, Course> nameToCourse = Maps.uniqueIndex(courses, Course::getName);
+        final Map<String, Course> nameToCourse = Maps.uniqueIndex(courses, course -> {
+
+            Preconditions.checkNotNull(course);
+
+            return course.getName() + " " + course.getSemester();
+
+        });
+
+
 
         ObservableList<String> courseKeys = FXCollections.observableArrayList(nameToCourse.keySet());
 

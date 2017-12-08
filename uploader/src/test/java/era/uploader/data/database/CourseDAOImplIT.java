@@ -184,7 +184,7 @@ public class CourseDAOImplIT {
                 testCourse, s2,
                 testCourse2, s1
         );
-        courseDAO.insertCourseAndStudents(mmap);
+        courseDAO.insertCourseAndStudents(mmap, Semester.of(Semester.Term.FALL, Year.now()));
 
         List<Course> courses = courseDAO.getAllCourses();
         Assert.assertEquals(2, courses.size());

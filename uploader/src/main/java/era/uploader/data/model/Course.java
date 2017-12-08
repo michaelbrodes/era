@@ -19,6 +19,7 @@ public class Course {
     /* Class Fields */
     // will be an unsigned int in the database.
     private int uniqueId;
+    private int semesterId;
     private String department;                              /* Department where the course is held */
     private String name;                                    /* Name of Course */
     private Semester semester;
@@ -82,6 +83,7 @@ public class Course {
             String courseNumber,
             String sectionNumber,
             @Nonnull Builder builder) {
+        this.semesterId = builder.semesterId;
         this.department = department;
         this.courseNumber = courseNumber;
         this.sectionNumber = sectionNumber;
@@ -198,6 +200,14 @@ public class Course {
         return result;
     }
 
+    public int getSemesterId() {
+        return semesterId;
+    }
+
+    public void setSemesterId(int semesterId) {
+        this.semesterId = semesterId;
+    }
+
     /**
      * A Builder is a <em>design pattern</em> that allows you to specify constructor
      * arguments with just plain setters. We use a builder here because the
@@ -217,6 +227,7 @@ public class Course {
         private Semester semester;
         private Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
         private Set<Assignment> assignments;
+        private int semesterId;
 
         public Builder withDatabaseId(int uniqueId) {
             this.uniqueId = uniqueId;
@@ -230,6 +241,11 @@ public class Course {
 
         public Builder withSemester(Semester semester) {
             this.semester =  semester;
+            return this;
+        }
+
+        public Builder withSemesterId(int semesterId) {
+            this.semesterId = semesterId;
             return this;
         }
 
