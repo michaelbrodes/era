@@ -47,7 +47,7 @@ public class CourseCreationService {
                     .filter(Objects::nonNull)
                     .collect(toMultimap());
         }
-        courseDAO.insertCourseAndStudents(courseToStudents);
+        courseDAO.insertCourseAndStudents(courseToStudents, semester);
         return courseToStudents;
     }
 }

@@ -209,8 +209,10 @@ public class PDFProcessor {
                 mmap.asMap().entrySet()
                 ) {
             Student student = pages.getKey();
-            Collection<QRCodeMapping> pagesToAdd = pages.getValue();
-            assignments.add(new Assignment(assignmentName, pagesToAdd, student, course, LocalDateTime.now()));
+            if (student != null) {
+                Collection<QRCodeMapping> pagesToAdd = pages.getValue();
+                assignments.add(new Assignment(assignmentName, pagesToAdd, student, course, LocalDateTime.now()));
+            }
         }
         mergeAssignmentPages(assignments);
 

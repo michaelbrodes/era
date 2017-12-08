@@ -70,7 +70,7 @@ public class StudentMetaData {
                 .stream()
                 .map((courseToStudent) -> {
                     Student student = courseToStudent.getValue();
-                    String name = student.getFirstName() + student.getLastName();
+                    String name = student.getFirstName() + " " + student.getLastName();
                     String course = courseToStudent.getKey().getName();
                     String id = student.getSchoolId();
 

@@ -26,6 +26,7 @@ public class CourseConverter
         return Course.builder()
                 .withDatabaseId(courseRecord.getUniqueId())
                 .withName(courseRecord.getName())
+                .withSemesterId(courseRecord.getSemesterId())
                 .create(
                         courseRecord.getDepartment(),
                         courseRecord.getCourseNumber(),
@@ -40,11 +41,16 @@ public class CourseConverter
         courseRecord.setUniqueId(course.getUniqueId() < 1 ? null : course.getUniqueId());
         courseRecord.setCourseNumber(course.getCourseNumber());
         courseRecord.setDepartment(course.getDepartment());
-        courseRecord.setSemesterId(
-                course.getSemester().getUniqueId() < 1 ?
-                        null :
-                        course.getSemester().getUniqueId()
-        );
+
+        if (course.getSemester() == null) {
+            courseRecord.setSemesterId(course.getSemesterId());
+        } else {
+            courseRecord.setSemesterId(
+                    course.getSemester().getUniqueId() < 1 ?
+                            null :
+                            course.getSemester().getUniqueId()
+            );
+        }
         courseRecord.setSectionNumber(course.getSectionNumber());
 
         return courseRecord;

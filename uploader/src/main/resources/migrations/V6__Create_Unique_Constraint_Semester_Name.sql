@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX name_semester_id_unique on course(name, semester_id);

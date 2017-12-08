@@ -14,6 +14,7 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.CourseCreationController">
+   <Button fx:id="homeButton" layoutX="873.0" layoutY="53.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="107.0" text="Home" onAction="#home" />
     <Button fx:id="browseFiles" layoutX="17.0" layoutY="254.0" onMouseClicked="#findrosterFile" text="Browse Files" />
     <Label fx:id="chosenFile" layoutX="188.0" layoutY="260.0" text="Chosen File" />
     <Label fx:id="createCourseLabel" layoutX="21.0" layoutY="52.0" prefHeight="29.0" prefWidth="194.0" text="Create Course">

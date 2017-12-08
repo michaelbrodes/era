@@ -18,7 +18,9 @@ public class Semester implements Comparable<Semester> {
 
     public enum Term {
         FALL,
-        SPRING;
+        SPRING,
+        SUMMER,
+        WINTER;
 
         public final String humanReadable() {
             return this.name().substring(0, 1)
@@ -52,6 +54,14 @@ public class Semester implements Comparable<Semester> {
 
     public static Semester of(Term term, Year year) {
         return new Semester(term, year);
+    }
+
+    public static Semester of(String term, int year) {
+
+        Term t = Term.valueOf(term);
+        Year y = Year.of(year);
+
+        return new Semester(t, y);
     }
 
     public int getUniqueId() {
@@ -119,6 +129,6 @@ public class Semester implements Comparable<Semester> {
 
     @Override
     public String toString() {
-        return term.humanReadable() + year.toString();
+        return term.humanReadable() + " " + year.toString();
     }
 }

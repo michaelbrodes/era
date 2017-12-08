@@ -53,10 +53,8 @@ public class AssignmentCreationController {
 
             Preconditions.checkNotNull(course, "Course can never be null when trying to get a name");
 
-            if (course.isNameAvailable()) {
-                return course.getName() + " " + course.getDepartment() + "-" + course.getCourseNumber() + "-" + course.getSectionNumber();
-            }
-            else return course.getName();
+            return course.getName() + " " + course.getSemester();
+
         });
 
         ObservableList<String> courseKeys = FXCollections.observableArrayList(nameToCourse.keySet());

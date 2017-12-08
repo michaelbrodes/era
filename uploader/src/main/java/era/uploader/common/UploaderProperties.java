@@ -49,7 +49,7 @@ public class UploaderProperties {
         return ret;
     }
 
-    public Optional<String> getEmailSuffix() {
+    public String getEmailSuffix() {
         Optional<String> ret = Optional.ofNullable(emailSuffix);
         if (!ret.isPresent()) {
             String defaultSuffix = "siue.edu";
@@ -60,7 +60,7 @@ public class UploaderProperties {
             dbUrl = ret.orElse(null);
         }
 
-        return ret;
+        return ret.orElse("");
     }
 
     public Optional<String> getDbUrl() {

@@ -13,6 +13,7 @@
 
 <?import javafx.scene.control.ToggleGroup?>
 <AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.AssignmentCreationController">
+    <Button fx:id="homeButton" layoutX="873.0" layoutY="53.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="107.0" text="Home" onAction="#home" />
     <fx:define>
         <ToggleGroup fx:id="databaseLocation" />
     </fx:define>

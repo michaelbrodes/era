@@ -59,40 +59,6 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
         Preconditions.checkNotNull(course.getStudentsEnrolled(), "Cannot insert null students");
         Preconditions.checkNotNull(course.getAssignments(), "Cannot insert null students");
         try (DSLContext ctx = connect()) {
-            final Semester semesterToResolve = course.getSemester();
-            Condition filterer = DSL.and(
-                    SEMESTER.TERM.eq(semesterToResolve.getTermString()),
-                    SEMESTER.YEAR.eq(semesterToResolve.getYearInt())
-            );
-
-            // try to find the semester if it exists, otherwise insert it
-            Semester semester = ctx.selectFrom(SEMESTER)
-                    .where(filterer)
-                    .fetchOptional()
-                    .orElseGet(() -> {
-                        SemesterRecord semesterRecord = ctx.insertInto(
-                                SEMESTER,
-                                SEMESTER.TERM,
-                                SEMESTER.YEAR
-                        ).values(
-                                semesterToResolve.getTermString(),
-                                semesterToResolve.getYearInt()
-                        ).returning(
-                                SEMESTER.UNIQUE_ID
-                        ).fetchOne();
-
-                        semesterRecord.setTerm(semesterToResolve.getTermString());
-                        semesterRecord.setYear(semesterToResolve.getYearInt());
-                        return semesterRecord;
-                    })
-                    .map((record) -> {
-                        SemesterRecord semesterRecord = record.into(SEMESTER);
-                        return new Semester(
-                                semesterRecord.getUniqueId(),
-                                semesterRecord.getTerm(),
-                                semesterRecord.getYear()
-                        );
-                    });
 
             course.setUniqueId(
                     ctx.insertInto(
@@ -109,13 +75,54 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                             course.getCourseNumber(),
                             course.getSectionNumber(),
                             course.getName(),
-                            semester.getUniqueId()
+                            course.getSemester().getUniqueId()
                     ).returning(
                             COURSE.UNIQUE_ID
                     ).fetchOne()
                             .getUniqueId()
             );
 
+            insertAllStudentsIntoCourse(course);
+
+        }
+
+        return course;
+    }
+
+    /**
+     * This method takes in a multimap of courses to students. A multimap means
+     * that a {@link Course} can be a key of many {@link Student}s. Just think
+     * of this as grouping students by their course.
+     *
+     * This method first goes over that multimap and attaches the grouped
+     * students to the course they are grouped by. Then it iterates over the
+     * keys of the multimap, and inserts them all.
+     *
+     * @param coursesToStudents Students grouped by the course they belong to.
+     */
+    @Override
+    public void insertCourseAndStudents(@Nonnull Multimap<Course, Student> coursesToStudents, @Nonnull Semester semester) {
+        Preconditions.checkNotNull(semester);
+        Preconditions.checkNotNull(coursesToStudents, "Cannot insert null multimap");
+
+        Semester sem = resolveSemester(semester);
+
+        for (Course course: squashMap(coursesToStudents)) {
+            CourseRecord cRec = getCourseByNameAndSemester(course.getName(), course.getSemester());
+            if (cRec == null) {
+                course.setSemester(sem);
+                insert(course);
+            }
+            else
+                insertAllStudentsIntoCourse(course);
+
+        }
+    }
+
+
+    private void insertAllStudentsIntoCourse(Course course) {
+
+        try (DSLContext ctx = connect()) {
             for (Student student : course.getStudentsEnrolled()) {
                 StudentRecord studentRecord = ctx.selectFrom(STUDENT).
                         where(STUDENT.SCHOOL_ID.eq(student.getSchoolId())).fetchOne();
@@ -141,8 +148,7 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                                     STUDENT.UNIQUE_ID
                             )
                             .fetchOne().getUniqueId());
-                }
-                else {
+                } else {
                     student.setUniqueId(studentRecord.getUniqueId());
                 }
 
@@ -159,45 +165,76 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                         )
                         .execute();
             }
+        }
+    }
 
-            for (Assignment assignment : course.getAssignments()) {
-                ctx.insertInto(
-                           // table
-                           ASSIGNMENT,
-                           ASSIGNMENT.COURSE_ID,
-                           ASSIGNMENT.NAME,
-                           ASSIGNMENT.IMAGE_FILE_PATH
-                        )
-                        .values(
-                                course.getUniqueId(),
-                                assignment.getName(),
-                                assignment.getImageFilePath()
-                        )
-                        .execute();
-            }
+
+    private CourseRecord getCourseByNameAndSemester(String name, Semester semester){
+
+        Semester sem = resolveSemester(semester);
+        CourseRecord course;
+
+        try (DSLContext ctx = connect()) {
+
+            Condition filterer = DSL.and(
+                    COURSE.NAME.eq(name),
+                    COURSE.SEMESTER_ID.eq(semester.getUniqueId())
+            );
+
+            course = ctx.selectFrom(COURSE)
+                    .where(filterer)
+                    .fetchOne();
         }
 
         return course;
     }
 
-    /**
-     * This method takes in a multimap of courses to students. A multimap means
-     * that a {@link Course} can be a key of many {@link Student}s. Just think
-     * of this as grouping students by their course.
-     *
-     * This method first goes over that multimap and attaches the grouped
-     * students to the course they are grouped by. Then it iterates over the
-     * keys of the multimap, and inserts them all.
-     *
-     * @param coursesToStudents Students grouped by the course they belong to.
-     */
-    @Override
-    public void insertCourseAndStudents(@Nonnull Multimap<Course, Student> coursesToStudents) {
-        Preconditions.checkNotNull(coursesToStudents, "Cannot insert null multimap");
-        for (Course course: squashMap(coursesToStudents)) {
-            insert(course);
+
+    private Semester resolveSemester(Semester sem) {
+
+        try (DSLContext ctx = connect()) {
+            Condition filterer = DSL.and(
+                    SEMESTER.TERM.eq(sem.getTermString()),
+                    SEMESTER.YEAR.eq(sem.getYearInt())
+            );
+
+            // try to find the semester if it exists, otherwise insert it
+            Semester semester = ctx.selectFrom(SEMESTER)
+                    .where(filterer)
+                    .fetchOptional()
+                    .orElseGet(() -> {
+                        SemesterRecord semesterRecord = ctx.insertInto(
+                                SEMESTER,
+                                SEMESTER.TERM,
+                                SEMESTER.YEAR
+                        ).values(
+                                sem.getTermString(),
+                                sem.getYearInt()
+                        ).returning(
+                                SEMESTER.UNIQUE_ID
+                        ).fetchOne();
+
+                        semesterRecord.setTerm(sem.getTermString());
+                        semesterRecord.setYear(sem.getYearInt());
+                        return semesterRecord;
+                    })
+                    .map((record) -> {
+                        SemesterRecord semesterRecord = record.into(SEMESTER);
+                        return new Semester(
+                                semesterRecord.getUniqueId(),
+                                semesterRecord.getTerm(),
+                                semesterRecord.getYear()
+                        );
+                    });
+
+            sem.setUniqueId(semester.getUniqueId());
         }
+
+
+        return sem;
+
     }
+
 
     @VisibleForTesting
     Collection<Course> squashMap(Multimap<Course, Student> coursesToStudents) {
@@ -289,7 +326,12 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
         StudentDAOImpl studentDAO = StudentDAOImpl.instance();
         try(DSLContext ctx = DSL.using(CONNECTION_STR)) {
              courses = ctx.selectFrom(COURSE).fetch().map(this::convertToModel);
+
             for (Course course : courses) {
+                SemesterRecord semRec = ctx.selectFrom(SEMESTER).where(SEMESTER.UNIQUE_ID.eq(course.getSemesterId())).fetchOne();
+                Semester semester = Semester.of(semRec.getTerm(), semRec.getYear());
+                course.setSemester(semester);
+
                 List<Integer> student_ids = new ArrayList<>();
                 student_ids.addAll(
                         ctx.selectFrom(COURSE_STUDENT)
