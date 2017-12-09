@@ -8,6 +8,7 @@ import era.uploader.data.CourseDAO;
 import era.uploader.data.StudentDAO;
 import era.uploader.data.converters.CourseConverter;
 import era.uploader.data.database.jooq.tables.records.CourseRecord;
+import era.uploader.data.database.jooq.tables.records.CourseStudentRecord;
 import era.uploader.data.database.jooq.tables.records.SemesterRecord;
 import era.uploader.data.database.jooq.tables.records.StudentRecord;
 import era.uploader.data.model.Assignment;
@@ -30,7 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static era.uploader.data.database.jooq.Tables.ASSIGNMENT;
 import static era.uploader.data.database.jooq.Tables.COURSE;
 import static era.uploader.data.database.jooq.Tables.COURSE_STUDENT;
 import static era.uploader.data.database.jooq.Tables.SEMESTER;
@@ -113,9 +113,10 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                 course.setSemester(sem);
                 insert(course);
             }
-            else
+            else {
+                course.setUniqueId(cRec.getUniqueId());
                 insertAllStudentsIntoCourse(course);
-
+            }
         }
     }
 
@@ -152,18 +153,30 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                     student.setUniqueId(studentRecord.getUniqueId());
                 }
 
-                ctx.insertInto(
-                        // table
-                        COURSE_STUDENT,
-                        // columns
-                        COURSE_STUDENT.COURSE_ID,
-                        COURSE_STUDENT.STUDENT_ID
-                )
-                        .values(
-                                course.getUniqueId(),
-                                student.getUniqueId()
-                        )
-                        .execute();
+                // they may have been inserted before, the preference is to
+                // not introduce bad data in our application.
+                Condition filterer = DSL.and(
+                        COURSE_STUDENT.STUDENT_ID.eq(student.getUniqueId()),
+                        COURSE_STUDENT.COURSE_ID.eq(course.getUniqueId())
+                );
+                CourseStudentRecord courseStudentRecord = ctx.selectFrom(COURSE_STUDENT)
+                        .where(filterer)
+                        .fetchOne();
+
+                if (courseStudentRecord == null) {
+                    ctx.insertInto(
+                            // table
+                            COURSE_STUDENT,
+                            // columns
+                            COURSE_STUDENT.COURSE_ID,
+                            COURSE_STUDENT.STUDENT_ID
+                    )
+                            .values(
+                                    course.getUniqueId(),
+                                    student.getUniqueId()
+                            )
+                            .execute();
+                }
             }
         }
     }
@@ -178,7 +191,7 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
 
             Condition filterer = DSL.and(
                     COURSE.NAME.eq(name),
-                    COURSE.SEMESTER_ID.eq(semester.getUniqueId())
+                    COURSE.SEMESTER_ID.eq(sem.getUniqueId())
             );
 
             course = ctx.selectFrom(COURSE)
@@ -332,13 +345,10 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                 Semester semester = Semester.of(semRec.getTerm(), semRec.getYear());
                 course.setSemester(semester);
 
-                List<Integer> student_ids = new ArrayList<>();
-                student_ids.addAll(
-                        ctx.selectFrom(COURSE_STUDENT)
-                            .where(COURSE_STUDENT.COURSE_ID.eq(course.getUniqueId()))
-                            .fetch()
-                            .getValues(COURSE_STUDENT.STUDENT_ID)
-                );
+                List<Integer> student_ids = new ArrayList<>(ctx.selectFrom(COURSE_STUDENT)
+                        .where(COURSE_STUDENT.COURSE_ID.eq(course.getUniqueId()))
+                        .fetch()
+                        .getValues(COURSE_STUDENT.STUDENT_ID));
                 course.getStudentsEnrolled()
                         .addAll(ctx.selectFrom(STUDENT)
                                 .where(STUDENT.UNIQUE_ID.in(student_ids))
