@@ -1,6 +1,8 @@
 package era.server.data;
 
 import era.server.data.model.Assignment;
+import era.server.data.model.Course;
+import era.server.data.model.Student;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -10,5 +12,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 @ParametersAreNonnullByDefault
 public interface AssignmentDAO {
+    /**
+     * Insert a new assignment into the database.
+     *
+     * @param assignment the assignment to insert.
+     */
     void storeAssignment(Assignment assignment);
 }

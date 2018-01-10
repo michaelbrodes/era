@@ -1,27 +1,30 @@
 package era.server.data.model;
 
 import com.google.common.base.Preconditions;
-import era.server.common.IOUtil;
+import com.google.common.collect.ImmutableMap;
+import era.server.data.Model;
 
 import javax.annotation.Nonnull;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 /**
  * An assignment is a pdf scan of the student's actual assignment. One Course
  * can have many assignments. Additionally one Student can also have many
  * assignments.
  */
-public class Assignment {
+public class Assignment implements Model {
+    public static final String ENDPOINT = "/assignment";
     /* Class Fields */
     private String imageFilePath;               /* Path to the PDF file with the images associated with the assignment */
     private String name;                        /* Name of the Assignment */
     private LocalDateTime createdDateTime;
     private Student student;
     private Course course;
-    private int course_id;
-    private int student_id;
+    private long course_id;
+    private long student_id;
     private long uniqueId;
 
     /* Constructors */
@@ -75,7 +78,7 @@ public class Assignment {
             @Nonnull Student student,
             @Nonnull LocalDateTime createdDateTime
     ) {
-        Preconditions.checkArgument(uniqueId == 0, "unique id must be a valid database id");
+        Preconditions.checkArgument(uniqueId != 0, "unique id must be a valid database id");
         Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(imageFilePath, "Cannot create an Assignment with a null imageFilePath");
         Preconditions.checkNotNull(student, "Cannot create an Assignment with a null student");
@@ -104,17 +107,19 @@ public class Assignment {
             @Nonnull String name,
             @Nonnull Student student,
             @Nonnull Course course,
-            @Nonnull LocalDateTime createdDateTime
+            @Nonnull LocalDateTime createdDateTime,
+            @Nonnull String imageFilePath
     ) {
         Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(student, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(course, "Cannot create an Assignment with a null course");
         Preconditions.checkNotNull(createdDateTime, "Cannot create an Assignment with a null create date");
+        Preconditions.checkNotNull(imageFilePath, "Cannot create an Assignment with a null create date");
 
         this.name = name;
         this.student = student;
         this.course = course;
-        this.imageFilePath = generateFileLocation();
+        this.imageFilePath = imageFilePath;
     }
 
     public Assignment(
@@ -142,29 +147,10 @@ public class Assignment {
         this.course = builder.course;
         this.student = builder.student;
         this.createdDateTime = createdDateTime;
-
-        this.imageFilePath = course == null || student == null ?
-                null :
-                generateFileLocation();
-
+        this.imageFilePath = builder.imageFilePath;
         this.course_id = builder.course_id;
         this.student_id = builder.student_id;
         this.uniqueId = builder.uniqueId;
-    }
-
-    /**
-     * This generates the filename that we are going to save this assignment at.
-     * We name assignments like:
-     * "course name"-"student id (800 number at SIUE)"-"assignment name".pdf.
-     * Note that no spaces are allowed in the filename.
-     */
-    private String generateFileLocation() {
-        return IOUtil.removeSpaces(course.getName())
-                + '_'
-                + student.getSchoolId()
-                + "_"
-                + IOUtil.removeSpaces(name)
-                + ".pdf";
     }
 
     @Override
@@ -207,19 +193,19 @@ public class Assignment {
         this.name = name;
     }
 
-    public int getCourse_id() {
+    public long getCourse_id() {
         return course_id;
     }
 
-    public void setCourse_id(int course_id) {
+    public void setCourse_id(long course_id) {
         this.course_id = course_id;
     }
 
-    public int getStudent_id() {
+    public long getStudent_id() {
         return student_id;
     }
 
-    public void setStudent_id(int student_id) {
+    public void setStudent_id(long student_id) {
         this.student_id = student_id;
     }
 
@@ -240,12 +226,25 @@ public class Assignment {
         this.student = student;
     }
 
-    public void setUniqueId(int uniqueId) {
+    public void setUniqueId(long uniqueId) {
         this.uniqueId = uniqueId;
     }
 
     public long getUniqueId() {
         return this.uniqueId;
+    }
+
+    @Override
+    public Map<String, Object> toViewModel() {
+        // Format: Month/Day/Year Era e.g. July/13/2014 AD
+        String assignmentDate = createdDateTime.format(DateTimeFormatter.ofPattern("L/d/y G"));
+        return ImmutableMap.of(
+                "name", name,
+                "createdDateTime", assignmentDate,
+                "student", student.getUserName(),
+                "course", course.getName(),
+                "uniqueId", uniqueId
+        );
     }
 
     public static Builder builder() {
@@ -287,8 +286,8 @@ public class Assignment {
      */
     public static class Builder {
         private String imageFilePath;               /* Path to the PDF file with the images associated with the assignment */
-        private int course_id;
-        private int student_id;
+        private long course_id;
+        private long student_id;
         private long uniqueId;
         private Student student;
         private Course course;
@@ -309,12 +308,12 @@ public class Assignment {
             return this;
         }
 
-        public Builder withCourse_id(int course_id) {
+        public Builder withCourse_id(long course_id) {
             this.course_id = course_id;
             return this;
         }
 
-        public Builder withStudent_id(int student_id) {
+        public Builder withStudent_id(long student_id) {
             this.student_id = student_id;
             return this;
         }

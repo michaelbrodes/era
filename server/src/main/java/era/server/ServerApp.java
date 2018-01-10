@@ -1,45 +1,52 @@
 package era.server;
 
+import era.server.api.UploaderAPIModule;
 import era.server.common.AppConfig;
 import era.server.common.ConfigOpts;
-import era.server.controller.UploadController;
+import era.server.data.AssignmentDAO;
+import era.server.data.CourseDAO;
+import era.server.data.StudentDAO;
 import era.server.data.access.AssignmentDAOImpl;
 import era.server.data.access.CourseDAOImpl;
 import era.server.data.access.StudentDAOImpl;
-import spark.Spark;
+import era.server.web.ServerWebModule;
 
 import java.util.Map;
 
 public class ServerApp {
-    public static final String API = "/api";
+    private static final String API = "/api";
 
     public static void main(String[] args) {
         Map<ConfigOpts, String> optionMap = ConfigOpts.parseArgs(args);
+        String dbName = optionMap.getOrDefault(ConfigOpts.DB_NAME, "dev");
         String host = optionMap.getOrDefault(ConfigOpts.HOST, "localhost");
-        String port = optionMap.getOrDefault(ConfigOpts.PORT, "3001");
-        String user = optionMap.getOrDefault(ConfigOpts.USER, "root");
-        String password = optionMap.getOrDefault(ConfigOpts.PASSWORD, "");
+        String dbPort = optionMap.getOrDefault(ConfigOpts.DB_PORT, "3306");
+        String user = optionMap.getOrDefault(ConfigOpts.USER, "s002716");
+        String password = optionMap.getOrDefault(ConfigOpts.PASSWORD, "qot42yim");
+        String port = optionMap.getOrDefault(ConfigOpts.SERVER_PORT, "80");
 
         AppConfig config = AppConfig.instance();
-        config.setConnectionString(host, port, user, password);
+        config.setPort(port);
+        config.setConnectionString(dbName, host, dbPort, user, password);
 
         // startup all the DAOs so we don't have any duplicated connections
-        final StudentDAOImpl studentDAOImpl = new StudentDAOImpl();;
-        final AssignmentDAOImpl assignmentDAOImpl = new AssignmentDAOImpl();
-        final CourseDAOImpl courseDAOImpl = new CourseDAOImpl();
+        final StudentDAO studentDAOImpl = StudentDAOImpl.instance();
+        final CourseDAO courseDAOImpl = CourseDAOImpl.instance();
+        final AssignmentDAO assignmentDAOImpl = AssignmentDAOImpl.instance();
 
-        UploadController upc = new UploadController(
-                courseDAOImpl,
-                assignmentDAOImpl,
-                studentDAOImpl
-        );
+        ServerModule[] modules = new ServerModule[] {
+                UploaderAPIModule.instance(
+                        studentDAOImpl,
+                        courseDAOImpl,
+                        assignmentDAOImpl),
+                ServerWebModule.instance(
+                        studentDAOImpl,
+                        courseDAOImpl,
+                        assignmentDAOImpl)
+        };
 
-        Spark.port(3000);
-        Spark.get("/hello", (req, res) -> {
-            res.status(200);
-            return "Is it me you are looking for?";
-        });
-
-        Spark.post(API + "/course/:courseId/assignment", upc::handleRequest);
+        for (ServerModule module : modules) {
+            module.setupRoutes();
+        }
     }
 }
