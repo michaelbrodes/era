@@ -4,6 +4,7 @@ import era.server.data.ConnectionPool;
 import era.server.data.DAO;
 import org.jooq.ConnectionProvider;
 import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 
@@ -23,6 +24,7 @@ abstract class DatabaseDAO implements DAO {
     protected DSLContext connect() {
         return DSL.using(
                 new DefaultConfiguration()
+                        .set(SQLDialect.MYSQL)
                         .set(POOL)
         );
     }

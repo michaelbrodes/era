@@ -198,9 +198,12 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                     .orElseGet(() -> {
                         SemesterRecord semesterRecord = ctx.insertInto(
                                 SEMESTER,
+                                SEMESTER.UNIQUE_ID,
                                 SEMESTER.TERM,
                                 SEMESTER.YEAR
                         ).values(
+                                // uniqueId is sent over the API
+                                semesterToResolve.getUniqueId(),
                                 semesterToResolve.getTermString(),
                                 semesterToResolve.getYearInt()
                         ).returning(

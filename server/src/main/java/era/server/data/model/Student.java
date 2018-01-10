@@ -1,11 +1,16 @@
 package era.server.data.model;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import era.server.data.Model;
 
 import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Class that will represent each individual student and provide a means to
@@ -60,6 +65,7 @@ public class Student implements Model {
     private Student(@Nonnull String userName, Builder builder) {
         Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
         this.userName = userName;
+        this.email = builder.email;
         this.courses = builder.courses == null ? Sets.newHashSet() : builder.courses;
         this.uniqueId = builder.uniqueId;
     }
@@ -70,6 +76,21 @@ public class Student implements Model {
 
     public long getUniqueId() {
         return uniqueId;
+    }
+
+    @Override
+    public Map<String, Object> toViewModel() {
+        List<String> courseNames = ImmutableList.copyOf(
+                courses.stream()
+                .map(Course::getName)
+                .collect(Collectors.toList()));
+
+        return ImmutableMap.of(
+                "uniqueId", uniqueId,
+                "userName", userName,
+                "email", email,
+                "courses", courseNames
+        );
     }
 
     public void setUniqueId(long uniqueId) {
@@ -98,6 +119,9 @@ public class Student implements Model {
 
     @Nonnull
     public Set<Course> getCourses() {
+        if (courses == null) {
+            courses = Sets.newHashSet();
+        }
         return courses;
     }
 

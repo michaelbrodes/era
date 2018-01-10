@@ -44,6 +44,7 @@ public class ConnectionPool implements ConnectionProvider{
         try {
             return dataSource.getConnection();
         } catch (SQLException e) {
+            e.printStackTrace();
             LOGGER.error("Cannot connect to data source");
             System.exit(1);
             return null;

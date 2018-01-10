@@ -1,8 +1,7 @@
-package era.server.controller;
+package era.server.api;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import era.server.common.APIMessage;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.StudentDAO;
@@ -91,7 +90,7 @@ public class UploadController {
                         assignmentFileNameHeader,
                         assignmentNameHeader,
                         course,
-                        studentDAO.read(studentIdLong),
+                        student,
                         LocalDateTime.now()
                 );
                 if (storeInFileSystem(is, assignment)) {

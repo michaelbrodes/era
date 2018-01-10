@@ -1,6 +1,8 @@
 package era.server.data.model;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import era.server.data.Model;
 
@@ -8,7 +10,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNullableByDefault;
 import java.time.Year;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Class that will represent Courses which assignments will belong to. This
@@ -98,10 +103,20 @@ public class Course implements Model {
     }
 
     public Set<Student> getStudentsEnrolled() {
+        // GSON might send over a null students set, so we need an empty one
+        if (studentsEnrolled == null) {
+            studentsEnrolled = Sets.newHashSet();
+        }
+
         return studentsEnrolled;
     }
 
     public Set<Assignment> getAssignments() {
+        // GSON might send over a null assignments set, so we need an empty one
+        if (assignments == null){
+            assignments = Sets.newHashSet();
+        }
+
         return assignments;
     }
 
@@ -111,6 +126,27 @@ public class Course implements Model {
 
     public long getUniqueId() {
         return uniqueId;
+    }
+
+    @Override
+    public Map<String, Object> toViewModel() {
+        List<String> assignmentNames = ImmutableList.copyOf(
+                assignments.stream()
+                    .map(Assignment::getName)
+                    .collect(Collectors.toList())
+        );
+        List<String> studentNames = ImmutableList.copyOf(
+                studentsEnrolled.stream()
+                        .map(Student::getUserName)
+                        .collect(Collectors.toList())
+        );
+        return ImmutableMap.of(
+                "uniqueId", uniqueId,
+                "name", name,
+                "semester", semester.toString(),
+                "studentsEnrolled", studentNames,
+                "assignments", assignmentNames
+        );
     }
 
     public void setUniqueId(long uniqueId) {

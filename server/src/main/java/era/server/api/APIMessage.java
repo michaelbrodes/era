@@ -1,4 +1,4 @@
-package era.server.common;
+package era.server.api;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;

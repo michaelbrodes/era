@@ -1,12 +1,14 @@
 package era.server.data.model;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import era.server.data.Model;
 
 import javax.annotation.Nonnull;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 /**
  * An assignment is a pdf scan of the student's actual assignment. One Course
@@ -76,7 +78,7 @@ public class Assignment implements Model {
             @Nonnull Student student,
             @Nonnull LocalDateTime createdDateTime
     ) {
-        Preconditions.checkArgument(uniqueId == 0, "unique id must be a valid database id");
+        Preconditions.checkArgument(uniqueId != 0, "unique id must be a valid database id");
         Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
         Preconditions.checkNotNull(imageFilePath, "Cannot create an Assignment with a null imageFilePath");
         Preconditions.checkNotNull(student, "Cannot create an Assignment with a null student");
@@ -230,6 +232,19 @@ public class Assignment implements Model {
 
     public long getUniqueId() {
         return this.uniqueId;
+    }
+
+    @Override
+    public Map<String, Object> toViewModel() {
+        // Format: Month/Day/Year Era e.g. July/13/2014 AD
+        String assignmentDate = createdDateTime.format(DateTimeFormatter.ofPattern("L/d/y G"));
+        return ImmutableMap.of(
+                "name", name,
+                "createdDateTime", assignmentDate,
+                "student", student.getUserName(),
+                "course", course.getName(),
+                "uniqueId", uniqueId
+        );
     }
 
     public static Builder builder() {

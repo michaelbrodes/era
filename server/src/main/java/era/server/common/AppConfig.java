@@ -89,7 +89,7 @@ public class AppConfig {
         if (host == null || dbPort == null || dbName == null) {
             return null;
         } else {
-            return JDBC_PREFIX + host + dbPort + "/" + dbName;
+            return JDBC_PREFIX + host + ":" + dbPort + "/" + dbName;
         }
     }
 

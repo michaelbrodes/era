@@ -1,17 +1,15 @@
 package era.server;
 
+import era.server.api.UploaderAPIModule;
 import era.server.common.AppConfig;
 import era.server.common.ConfigOpts;
-import era.server.controller.HealthController;
-import era.server.controller.UploadController;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.StudentDAO;
 import era.server.data.access.AssignmentDAOImpl;
 import era.server.data.access.CourseDAOImpl;
 import era.server.data.access.StudentDAOImpl;
-import era.server.data.model.Course;
-import spark.Spark;
+import era.server.web.ServerWebModule;
 
 import java.util.Map;
 
@@ -33,19 +31,22 @@ public class ServerApp {
 
         // startup all the DAOs so we don't have any duplicated connections
         final StudentDAO studentDAOImpl = StudentDAOImpl.instance();
-        final AssignmentDAO assignmentDAOImpl = AssignmentDAOImpl.instance();
         final CourseDAO courseDAOImpl = CourseDAOImpl.instance();
+        final AssignmentDAO assignmentDAOImpl = AssignmentDAOImpl.instance();
 
-        UploadController upc = new UploadController(
-                courseDAOImpl,
-                assignmentDAOImpl,
-                studentDAOImpl
-        );
-        HealthController healthCtrler = new HealthController();
+        ServerModule[] modules = new ServerModule[] {
+                UploaderAPIModule.instance(
+                        studentDAOImpl,
+                        courseDAOImpl,
+                        assignmentDAOImpl),
+                ServerWebModule.instance(
+                        studentDAOImpl,
+                        courseDAOImpl,
+                        assignmentDAOImpl)
+        };
 
-        Spark.get("/hello", healthCtrler::checkHealth);
-
-        Spark.post(API + Course.ENDPOINT, upc::uploadCourses);
-        Spark.post(API + Course.ENDPOINT + "/:courseId/assignment", upc::uploadAssignment);
+        for (ServerModule module : modules) {
+            module.setupRoutes();
+        }
     }
 }

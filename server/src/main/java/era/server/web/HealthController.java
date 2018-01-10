@@ -1,4 +1,4 @@
-package era.server.controller;
+package era.server.web;
 
 
 import era.server.common.AppConfig;
