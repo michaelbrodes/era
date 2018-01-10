@@ -4,9 +4,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
+import era.uploader.creation.QRCodeMappingFactory;
 import era.uploader.creation.QRCreator;
+import era.uploader.creation.QRSaver;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
@@ -18,7 +24,6 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -63,14 +68,19 @@ public class QRCreationService {
         Preconditions.checkNotNull(students);
 
         int processors = Runtime.getRuntime().availableProcessors();
-        ExecutorService threads = Executors.newFixedThreadPool(processors);
-        List<Future<QRCodeMapping>> futures =
+        ListeningExecutorService threads = MoreExecutors.listeningDecorator(
+                Executors.newFixedThreadPool(processors)
+        );
+        List<Future<QRCodeMappingFactory>> futures =
                 Lists.newArrayList();
 
         for (int i = 0; i < numberOfQRs; i++) {
             for (Student student : students) {
                 QRCreator creator = new QRCreator(student, i);
-                futures.add(threads.submit(creator));
+                QRSaver saver = new QRSaver();
+                ListenableFuture<QRCodeMappingFactory> creationFuture = threads.submit(creator);
+                Futures.addCallback(creationFuture, saver, MoreExecutors.directExecutor());
+                futures.add(creationFuture);
             }
         }
 
@@ -87,9 +97,9 @@ public class QRCreationService {
         ImmutableMultimap.Builder<Student, QRCodeMapping> studentsToPages =
                 ImmutableMultimap.builder();
 
-        for (Future<QRCodeMapping> futurePage : futures) {
+        for (Future<QRCodeMappingFactory> futurePage : futures) {
             try {
-                QRCodeMapping QRCodeMapping = futurePage.get();
+                QRCodeMapping QRCodeMapping = futurePage.get().createQRCodeMapping();
                 studentsToPages.put(QRCodeMapping.getStudent(), QRCodeMapping);
             } catch (InterruptedException e) {
                 System.err.println("Tread Interrrupted Before Shutdown");
@@ -104,6 +114,11 @@ public class QRCreationService {
         return ret;
     }
 
+    /**
+     * Creates a large PDF of containging
+     * @param qrCodeMapping
+     * @throws IOException
+     */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void saveQRCodeMapping(QRCodeMapping qrCodeMapping) throws IOException {
         File directory = new File(QRCODEDIRECTORY);

@@ -17,16 +17,12 @@ import java.util.concurrent.Callable;
  * QR code and then will eventually put those QR codes into a PDF
  */
 @ParametersAreNonnullByDefault
-public class QRCreator implements Callable<QRCodeMapping> {
-    private static final int QR_HEIGHT = 100;
-    private static final int QR_WIDTH = 100;
-    private final Student student;
-    private final int sequenceNumber;
+public class QRCreator implements Callable<QRCodeMappingFactory> {
+    private final QRCodeMappingFactory factory;
 
     public QRCreator(Student student, int sequenceNumber) {
         Preconditions.checkNotNull(student);
-        this.student = student;
-        this.sequenceNumber = sequenceNumber;
+        factory = new QRCodeMappingFactory(student, sequenceNumber);
     }
 
     /**
@@ -39,25 +35,21 @@ public class QRCreator implements Callable<QRCodeMapping> {
      *                   the class throw a general exception
      */
     @Override
-    public QRCodeMapping call() throws Exception {
+    public QRCodeMappingFactory call() throws Exception {
         String uuid = UUID.randomUUID().toString();
         MultiFormatWriter writer = new MultiFormatWriter();
-        BitMatrix qrCode = null;
         try {
-            qrCode = writer.encode(
+            factory.setQRCode(writer.encode(
                     uuid,
                     BarcodeFormat.QR_CODE,
-                    QR_WIDTH,
-                    QR_HEIGHT
-            );
+                    QRCodeMappingFactory.QR_WIDTH,
+                    QRCodeMappingFactory.QR_HEIGHT
+            ));
         } catch (WriterException e) {
             System.out.println("Issue writing QR Code");
         }
 
-        return QRCodeMapping.builder()
-                .withQRCode(qrCode)
-                .withSequenceNumber(sequenceNumber)
-                .withStudent(student)
-                .create(uuid);
+        factory.setUUID(uuid);
+        return factory;
     }
 }
