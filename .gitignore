@@ -147,3 +147,4 @@ server/docker/.env
 uploader/QRCode Directory/
 uploader/out/*
 server/out/*
+server/gradle.properties

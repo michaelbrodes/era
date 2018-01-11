@@ -1,0 +1,58 @@
+html,
+body {
+	height: 100%;
+	width: 100%;
+}
+
+img {
+	max-width: 100%;
+}
+
+/*cover*/
+#login-cover {
+	background: #222 url('/img/assignment.jpg') center center no-repeat;
+	background-size: cover;
+	color: #e9f3ff;
+	height: 100%;
+	text-align: center;
+	display: flex;
+	align-items: center;
+}
+
+#cover {
+	background: #222 url('/img/assignment.jpg') center center no-repeat;
+	background-size: cover;
+	color: #e9f3ff;
+	height: 100%;
+	text-align: center;
+	display: flex;
+	align-items: center;
+}
+
+#cover-caption {
+	width: 100%;
+}
+
+#section1 {
+	background: rgba(0,0,0,0.45);
+	box-shadow: 3px 3px 5px #65635b;
+	color: white;
+	padding: 20px;
+	max-width: 40%;
+	align-items: center;
+}
+
+
+
+.container {
+	text-align: center;
+	display: flex;
+	align-items: center;
+}
+
+@media (max-width: 576px) {
+	#section1 {
+		max-width: 80%;
+		padding: 10px;
+	}
+}
