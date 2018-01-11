@@ -12,10 +12,12 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * The Server Web <em>module</em> is a module of the "Server" application
  * that handles requests coming from students to view their assignments. It is
- * responsible for generating the UI that allows students to see their
- * assignments
+ * responsible for both generating the UI that allows students to see their
+ * assignments and authenticating those students.
  *
  * This particular package will have Controllers to handle these requests.
+ *
+ * @see ServerModule
  */
 @ThreadSafe
 public class ServerWebModule implements ServerModule {

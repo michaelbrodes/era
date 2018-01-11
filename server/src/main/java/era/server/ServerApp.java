@@ -14,8 +14,13 @@ import era.server.web.ServerWebModule;
 import java.util.Map;
 
 public class ServerApp {
-    private static final String API = "/api";
 
+    /**
+     * Main entry point into the Server web application. It is responsible
+     * configuration and setup of {@link ServerModule}s. It parses commandline
+     * arguments for setting up the database connection and networking. See
+     * the RUNME doc for details.
+     */
     public static void main(String[] args) {
         Map<ConfigOpts, String> optionMap = ConfigOpts.parseArgs(args);
         String dbName = optionMap.getOrDefault(ConfigOpts.DB_NAME, "dev");
