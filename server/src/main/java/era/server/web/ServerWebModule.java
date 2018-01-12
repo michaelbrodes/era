@@ -5,6 +5,10 @@ import era.server.ServerModule;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.StudentDAO;
+import org.pac4j.core.config.Config;
+import org.pac4j.sparkjava.CallbackRoute;
+import org.pac4j.sparkjava.LogoutRoute;
+import org.pac4j.sparkjava.SecurityFilter;
 import spark.Spark;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -61,5 +65,19 @@ public class ServerWebModule implements ServerModule {
         }
 
         return INSTANCE;
+    }
+
+    public void setUpCallback(Config config) {
+
+        Spark.before("/", new SecurityFilter(config, "CasClient"));
+
+        final CallbackRoute cr = new CallbackRoute(config);
+        Spark.get("/callback", cr);
+        Spark.post("/callback", cr);
+
+
+
+        Spark.get("/logout", new LogoutRoute(config, "/"));
+
     }
 }

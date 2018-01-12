@@ -53,5 +53,8 @@ class ConfigParser {
         if (allArgsIteration + 1 < allArgs.length) {
             configMap.put(option, allArgs[allArgsIteration + 1]);
         }
+        else if (option == ConfigOpts.PASSWORD) {
+            configMap.put(option, "");
+        }
     }
 }
