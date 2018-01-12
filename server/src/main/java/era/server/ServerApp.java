@@ -10,6 +10,7 @@ import era.server.data.access.AssignmentDAOImpl;
 import era.server.data.access.CourseDAOImpl;
 import era.server.data.access.StudentDAOImpl;
 import era.server.web.ServerWebModule;
+import spark.Spark;
 
 import java.util.Map;
 
@@ -44,6 +45,8 @@ public class ServerApp {
                         courseDAOImpl,
                         assignmentDAOImpl)
         };
+
+        Spark.staticFiles.location("/static");
 
         for (ServerModule module : modules) {
             module.setupRoutes();
