@@ -9,8 +9,6 @@ public class AssignmentViewController {
 
         request.session(true);
 
-        request.session().attribute("user", "user");
-
         return "It worked. Username = " + request.params(":userName");
 
     }

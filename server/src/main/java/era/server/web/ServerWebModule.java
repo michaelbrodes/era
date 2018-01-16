@@ -45,6 +45,8 @@ public class ServerWebModule implements ServerModule {
     @Override
     public void setupRoutes() {
 
+        Config pac4jConfig = CASAuth.initializeConfig();
+        setUpCASRoutes(pac4jConfig);
         Spark.get("/hello", healthController::checkHealth);
         Spark.get("/", indexController::checkIndex);
         Spark.get("/student/:userName", assignmentViewController::showAssignments);
@@ -74,17 +76,13 @@ public class ServerWebModule implements ServerModule {
         return INSTANCE;
     }
 
-    public void setUpCallback(Config config) {
-
-        Spark.before("/", new SecurityFilter(config, "CasClient"));
+    public void setUpCASRoutes(Config config) {
+        Spark.before("/student", new SecurityFilter(config, "CasClient"));
 
         final CallbackRoute cr = new CallbackRoute(config);
-        Spark.get("/callback", cr);
-        Spark.post("/callback", cr);
-
-
+        Spark.get("/casCallback", cr);
+        Spark.post("/casCallback", cr);
 
         Spark.get("/logout", new LogoutRoute(config, "/"));
-
     }
 }
