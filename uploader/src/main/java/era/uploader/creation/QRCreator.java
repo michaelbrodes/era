@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
  * QR code and then will eventually put those QR codes into a PDF
  */
 @ParametersAreNonnullByDefault
-public class QRCreator implements Callable<QRCodeMappingFactory> {
+public class QRCreator implements Callable<QRCodeMapping> {
     private final QRCodeMappingFactory factory;
 
     public QRCreator(Student student, int sequenceNumber) {

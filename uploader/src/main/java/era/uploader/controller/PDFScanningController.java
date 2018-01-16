@@ -49,7 +49,7 @@ public class PDFScanningController {
 
 
     //TODO update this to something not hardcoded you schlum
-    private static final String HOST_NAME = "http://localhost:3000";
+    private static final String HOST_NAME = "http://localhost:3001";
 
     private final PDFScanningService pdfServ = new PDFScanningService();
 

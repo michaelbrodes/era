@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -12,7 +11,6 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import era.uploader.creation.QRCodeMappingFactory;
 import era.uploader.creation.QRCreator;
-import era.uploader.creation.QRSaver;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
@@ -77,9 +75,7 @@ public class QRCreationService {
         for (int i = 0; i < numberOfQRs; i++) {
             for (Student student : students) {
                 QRCreator creator = new QRCreator(student, i);
-                QRSaver saver = new QRSaver();
                 ListenableFuture<QRCodeMappingFactory> creationFuture = threads.submit(creator);
-                Futures.addCallback(creationFuture, saver, MoreExecutors.directExecutor());
                 futures.add(creationFuture);
             }
         }

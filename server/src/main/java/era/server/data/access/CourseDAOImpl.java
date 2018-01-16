@@ -196,7 +196,7 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                     .where(filterer)
                     .fetchOptional()
                     .orElseGet(() -> {
-                        SemesterRecord semesterRecord = ctx.insertInto(
+                        ctx.insertInto(
                                 SEMESTER,
                                 SEMESTER.UNIQUE_ID,
                                 SEMESTER.TERM,
@@ -206,10 +206,9 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                                 semesterToResolve.getUniqueId(),
                                 semesterToResolve.getTermString(),
                                 semesterToResolve.getYearInt()
-                        ).returning(
-                                SEMESTER.UNIQUE_ID
-                        ).fetchOne();
-
+                        ).execute();
+                        SemesterRecord semesterRecord = new SemesterRecord();
+                        semesterRecord.setUniqueId(semesterToResolve.getUniqueId());
                         semesterRecord.setTerm(semesterToResolve.getTermString());
                         semesterRecord.setYear(semesterToResolve.getYearInt());
                         return semesterRecord;
