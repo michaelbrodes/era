@@ -86,10 +86,13 @@ public class AssignmentCreationController {
             Course currentCourse = nameToCourse.get(currentCourseName);
 
             QRCreationService qrs = new QRCreationService(QR_CODE_MAPPING_DAO);
-            Multimap<Student, QRCodeMapping> mmap = qrs.createQRs(currentCourse.getStudentsEnrolled(), numPagesComboBox.getValue());
+            Multimap<Student, QRCodeMapping> mmap = qrs.createQRs(
+                    currentCourse,
+                    assignmentName.getText(),
+                    numPagesComboBox.getValue()
+            );
 
-            for (QRCodeMapping qrCodeMapping : mmap.values()
-                 ) {
+            for (QRCodeMapping qrCodeMapping : mmap.values()) {
                 try {
                     qrs.saveQRCodeMapping(qrCodeMapping);
                 } catch (IOException e) {
@@ -102,7 +105,11 @@ public class AssignmentCreationController {
 
             Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
             infoAlert.setHeaderText("QRCodes Saved Successfully");
-            infoAlert.setContentText(mmap.values().size() + "QR Codes have been saved to " + System.getProperty("user.dir")+ File.separator + QRCreationService.QRCODEDIRECTORY);
+            infoAlert.setContentText(
+                    mmap.values().size()
+                    + " QR Codes have been saved to "
+                    + qrs.assignmentFileName(assignmentName.getText())
+            );
             infoAlert.showAndWait();
 
         });

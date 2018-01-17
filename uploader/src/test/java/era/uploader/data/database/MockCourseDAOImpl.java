@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
+import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
 
 import javax.annotation.Nonnull;
@@ -36,7 +37,9 @@ public class MockCourseDAOImpl implements CourseDAO, MockDAO<Course> {
     }
 
     @Override
-    public void insertCourseAndStudents(@Nonnull Multimap<Course, Student> coursesToStudents) {
+    public void insertCourseAndStudents(@Nonnull Multimap<Course, Student> coursesToStudents, @Nonnull Semester semester) {
+        coursesToStudents.keys()
+                .forEach((course) -> course.setSemester(semester));
         courses.addAll(coursesToStudents.keys());
         for(Map.Entry<Course, Collection<Student>> studentsInCourse:
                 coursesToStudents.asMap().entrySet()) {

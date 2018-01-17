@@ -15,7 +15,6 @@ import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Schema;
 import org.jooq.Table;
@@ -38,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Assignment extends TableImpl<AssignmentRecord> {
 
-    private static final long serialVersionUID = 1947219123;
+    private static final long serialVersionUID = 815494568;
 
     /**
      * The reference instance of <code>assignment</code>
@@ -56,7 +55,7 @@ public class Assignment extends TableImpl<AssignmentRecord> {
     /**
      * The column <code>assignment.unique_id</code>.
      */
-    public final TableField<AssignmentRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+    public final TableField<AssignmentRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>assignment.name</code>.
@@ -118,14 +117,6 @@ public class Assignment extends TableImpl<AssignmentRecord> {
     @Override
     public Schema getSchema() {
         return DefaultSchema.DEFAULT_SCHEMA;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Identity<AssignmentRecord, Integer> getIdentity() {
-        return Keys.IDENTITY_ASSIGNMENT;
     }
 
     /**
