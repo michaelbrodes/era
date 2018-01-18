@@ -8,12 +8,6 @@ import era.uploader.data.database.jooq.DefaultSchema;
 import era.uploader.data.database.jooq.Indexes;
 import era.uploader.data.database.jooq.Keys;
 import era.uploader.data.database.jooq.tables.records.SchemaVersionRecord;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.Generated;
-
 import org.jooq.Field;
 import org.jooq.Index;
 import org.jooq.Name;
@@ -23,6 +17,10 @@ import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
+
+import javax.annotation.Generated;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**

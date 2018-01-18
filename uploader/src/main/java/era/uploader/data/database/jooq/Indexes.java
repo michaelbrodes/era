@@ -9,12 +9,11 @@ import era.uploader.data.database.jooq.tables.CourseStudent;
 import era.uploader.data.database.jooq.tables.QrCodeMapping;
 import era.uploader.data.database.jooq.tables.SchemaVersion;
 import era.uploader.data.database.jooq.tables.Student;
-
-import javax.annotation.Generated;
-
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.AbstractKeys;
+
+import javax.annotation.Generated;
 
 
 /**

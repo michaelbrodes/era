@@ -5,13 +5,12 @@ package era.uploader.data.database.jooq.tables.records;
 
 
 import era.uploader.data.database.jooq.tables.AllAssignments;
-
-import javax.annotation.Generated;
-
 import org.jooq.Field;
 import org.jooq.Record8;
 import org.jooq.Row8;
 import org.jooq.impl.TableRecordImpl;
+
+import javax.annotation.Generated;
 
 
 /**

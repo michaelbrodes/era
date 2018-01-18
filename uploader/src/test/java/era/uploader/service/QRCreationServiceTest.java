@@ -9,7 +9,6 @@ import era.uploader.data.database.MockQRCodeMappingDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

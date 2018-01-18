@@ -1,7 +1,6 @@
 package era.uploader.data.model;
 
 import com.google.common.base.Preconditions;
-import com.google.zxing.common.BitMatrix;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import javax.annotation.Nonnull;

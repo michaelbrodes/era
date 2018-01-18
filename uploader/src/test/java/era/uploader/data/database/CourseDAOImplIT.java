@@ -18,11 +18,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.time.Year;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import static era.uploader.data.database.jooq.Tables.COURSE;
 import static era.uploader.data.database.jooq.Tables.COURSE_STUDENT;
