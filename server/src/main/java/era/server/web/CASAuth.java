@@ -9,21 +9,29 @@ import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.sparkjava.DefaultHttpActionAdapter;
 
+import static spark.Spark.secure;
+
 public class CASAuth {
 
     public static Config initializeConfig() {
         final CasConfiguration casConfig = new CasConfiguration("https://cas.isg.siue.edu/itscas/login");
         //final CasConfiguration casConfig = new CasConfiguration("http://localhost:8080/");
         casConfig.setProtocol(CasProtocol.CAS20);
-
+        //matcher to secure
         final Client client = new CasClient(casConfig);
         AppConfig appConfig = AppConfig.instance();
         int port = appConfig.getPort();
-        final Clients clients = new Clients("http://localhost:" + port + "/callback", client);
+        final Clients clients = new Clients("http://my-assignments.isg.siue.edu" + port + "/callback", client);
         final Config config = new Config(clients);
         config.setHttpActionAdapter(new DefaultHttpActionAdapter());
         return config;
+
     }
 
+    public static void setCertificateLocation() {
+        String keyStoreLocation = "resources/security/clientkeystore.jks";
+        String keyStorePassword = "javacaps";
+        secure(keyStoreLocation, keyStorePassword, null, null);
+    }
 
 }

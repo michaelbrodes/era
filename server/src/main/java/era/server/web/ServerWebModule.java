@@ -29,6 +29,7 @@ public class ServerWebModule implements ServerModule {
     private final HealthController healthController;
     private final IndexController indexController;
     private final AssignmentViewController assignmentViewController;
+    private final Boolean casEnabled;
 
     /**
      * Creates the controllers contained in this module
@@ -36,20 +37,24 @@ public class ServerWebModule implements ServerModule {
     private ServerWebModule(
             StudentDAO studentDAO,
             CourseDAO courseDAO,
-            AssignmentDAO assignmentDAO) {
+            AssignmentDAO assignmentDAO,
+            Boolean casEnabled) {
         this.healthController = new HealthController();
         this.indexController = new IndexController();
         this.assignmentViewController = new AssignmentViewController();
+        this.casEnabled = casEnabled;
     }
 
     @Override
     public void setupRoutes() {
+        if (casEnabled) {
+            Config pac4jConfig = CASAuth.initializeConfig();
+            setUpCASRoutes(pac4jConfig);
+        }
+    Spark.get("/hello", healthController::checkHealth);
+    Spark.get("/", indexController::checkIndex);
+    Spark.get("/student/:userName", assignmentViewController::showAssignments);
 
-        Config pac4jConfig = CASAuth.initializeConfig();
-        setUpCASRoutes(pac4jConfig);
-        Spark.get("/hello", healthController::checkHealth);
-        Spark.get("/", indexController::checkIndex);
-        Spark.get("/student/:userName", assignmentViewController::showAssignments);
     }
 
     /**
@@ -60,14 +65,16 @@ public class ServerWebModule implements ServerModule {
     public static ServerWebModule instance(
             StudentDAO studentDAO,
             CourseDAO courseDAO,
-            AssignmentDAO assignmentDAO) {
+            AssignmentDAO assignmentDAO,
+            Boolean casEnabled) {
         if (INSTANCE == null) {
             synchronized (ServerWebModule.class) {
                 if (INSTANCE == null) {
                     INSTANCE = new ServerWebModule(
                             studentDAO,
                             courseDAO,
-                            assignmentDAO
+                            assignmentDAO,
+                            casEnabled
                     );
                 }
             }
@@ -77,7 +84,7 @@ public class ServerWebModule implements ServerModule {
     }
 
     public void setUpCASRoutes(Config config) {
-        Spark.before("/student", new SecurityFilter(config, "CasClient"));
+        Spark.before("/student*", new SecurityFilter(config, "CasClient"));
 
         final CallbackRoute cr = new CallbackRoute(config);
         Spark.get("/casCallback", cr);

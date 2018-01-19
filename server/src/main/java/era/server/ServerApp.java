@@ -25,6 +25,7 @@ public class ServerApp {
         String user = optionMap.getOrDefault(ConfigOpts.USER, "s002716");
         String password = optionMap.getOrDefault(ConfigOpts.PASSWORD, "qot42yim");
         String port = optionMap.getOrDefault(ConfigOpts.SERVER_PORT, "80");
+        Boolean casEnabled = Boolean.valueOf(optionMap.getOrDefault(ConfigOpts.CAS_ENABLE, "false"));
 
         AppConfig config = AppConfig.instance();
         config.setPort(port);
@@ -43,7 +44,8 @@ public class ServerApp {
                 ServerWebModule.instance(
                         studentDAOImpl,
                         courseDAOImpl,
-                        assignmentDAOImpl)
+                        assignmentDAOImpl,
+                        casEnabled)
         };
 
         Spark.staticFiles.location("/static");
