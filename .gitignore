@@ -149,3 +149,5 @@ uploader/out/*
 server/out/*
 
 server/gradle\.properties
+
+*.xml
