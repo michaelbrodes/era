@@ -7,9 +7,15 @@ package era.uploader.data.database.jooq.tables;
 import era.uploader.data.database.jooq.DefaultSchema;
 import era.uploader.data.database.jooq.Keys;
 import era.uploader.data.database.jooq.tables.records.CourseRecord;
+
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Generated;
+
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Index;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Schema;
 import org.jooq.Table;
@@ -17,10 +23,6 @@ import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
-
-import javax.annotation.Generated;
-import java.util.Arrays;
-import java.util.List;
 
 
 /**
@@ -36,7 +38,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Course extends TableImpl<CourseRecord> {
 
-    private static final long serialVersionUID = -1784348871;
+    private static final long serialVersionUID = -1936678712;
 
     /**
      * The reference instance of <code>course</code>
@@ -54,7 +56,7 @@ public class Course extends TableImpl<CourseRecord> {
     /**
      * The column <code>course.unique_id</code>.
      */
-    public final TableField<CourseRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+    public final TableField<CourseRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>course.name</code>.
@@ -122,8 +124,8 @@ public class Course extends TableImpl<CourseRecord> {
      * {@inheritDoc}
      */
     @Override
-    public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.NAME_SEMESTER_ID_UNIQUE);
+    public Identity<CourseRecord, Integer> getIdentity() {
+        return Keys.IDENTITY_COURSE;
     }
 
     /**

@@ -48,15 +48,16 @@ public class PDFScanningController {
     private TextField assignmentName;
 
 
-    //TODO update this to something not hardcoded you schlum
+    //TODO update this to something not hardcoded you schlum... fu -Josh
     private static final String HOST_NAME = "http://localhost:3001";
+    private static final String NULL_HOST = null;
 
     private final PDFScanningService pdfServ = new PDFScanningService();
 
     private Path fullPath;
     private String fullFileName;
+    //private Course currentCourse;
     //private String currentAssignment;
-   //private Course currentCourse;
 
 
     @FXML
@@ -123,17 +124,33 @@ public class PDFScanningController {
                 try {
 
                 if(currentCourse != null && currentAssignment != null) {
-                    final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, HOST_NAME);
-                    URL url = getClass().getResource("/gui/pdf-progress.fxml");
+                    if(online.isSelected()){
 
-                    FXMLLoader fxmlloader = new FXMLLoader();
-                    fxmlloader.setLocation(url);
-                    //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
-                    Parent root = fxmlloader.load();
-                    Scene mainScene = scanButton.getScene();
-                    // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
-                    ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
-                    mainScene.setRoot(root);
+                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, HOST_NAME);
+                        URL url = getClass().getResource("/gui/pdf-progress.fxml");
+
+                        FXMLLoader fxmlloader = new FXMLLoader();
+                        fxmlloader.setLocation(url);
+                        //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+                        Parent root = fxmlloader.load();
+                        Scene mainScene = scanButton.getScene();
+                        // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
+                        ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
+                        mainScene.setRoot(root);
+                    }
+                    else {
+                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, NULL_HOST);
+                        URL url = getClass().getResource("/gui/pdf-progress.fxml");
+
+                        FXMLLoader fxmlloader = new FXMLLoader();
+                        fxmlloader.setLocation(url);
+                        //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+                        Parent root = fxmlloader.load();
+                        Scene mainScene = scanButton.getScene();
+                        // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
+                        ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
+                        mainScene.setRoot(root);
+                    }
 
                 }
 

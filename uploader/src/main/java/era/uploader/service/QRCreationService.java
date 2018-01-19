@@ -5,11 +5,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import era.uploader.creation.QRCode;
 import era.uploader.creation.QRCreator;
+import era.uploader.creation.QRSaver;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
@@ -17,6 +19,7 @@ import era.uploader.data.model.Student;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -122,6 +125,7 @@ public class QRCreationService {
         String assignmentFileName = assignmentFileName(assignmentName);
         try {
             saver.save(assignmentFileName);
+            Desktop.getDesktop().open(new File(assignmentFileName));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

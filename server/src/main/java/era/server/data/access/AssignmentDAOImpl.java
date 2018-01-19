@@ -49,7 +49,7 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO{
                     courseId,
                     studentId,
                     assignment.getCreatedDateTimeStamp()
-            );
+            ).execute();
         }
     }
 
