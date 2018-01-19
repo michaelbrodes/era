@@ -4,16 +4,16 @@
 package era.uploader.data.database.jooq;
 
 
-import era.uploader.data.database.jooq.tables.Course;
 import era.uploader.data.database.jooq.tables.CourseStudent;
 import era.uploader.data.database.jooq.tables.QrCodeMapping;
 import era.uploader.data.database.jooq.tables.SchemaVersion;
 import era.uploader.data.database.jooq.tables.Student;
+
+import javax.annotation.Generated;
+
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.AbstractKeys;
-
-import javax.annotation.Generated;
 
 
 /**
@@ -33,7 +33,6 @@ public class Indexes {
     // INDEX definitions
     // -------------------------------------------------------------------------
 
-    public static final Index NAME_SEMESTER_ID_UNIQUE = Indexes0.NAME_SEMESTER_ID_UNIQUE;
     public static final Index SQLITE_AUTOINDEX_COURSE_STUDENT_1 = Indexes0.SQLITE_AUTOINDEX_COURSE_STUDENT_1;
     public static final Index SQLITE_AUTOINDEX_QR_CODE_MAPPING_1 = Indexes0.SQLITE_AUTOINDEX_QR_CODE_MAPPING_1;
     public static final Index SCHEMA_VERSION_S_IDX = Indexes0.SCHEMA_VERSION_S_IDX;
@@ -45,7 +44,6 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     private static class Indexes0 extends AbstractKeys {
-        public static Index NAME_SEMESTER_ID_UNIQUE = createIndex("name_semester_id_unique", Course.COURSE, new OrderField[] { Course.COURSE.NAME, Course.COURSE.SEMESTER_ID }, true);
         public static Index SQLITE_AUTOINDEX_COURSE_STUDENT_1 = createIndex("sqlite_autoindex_course_student_1", CourseStudent.COURSE_STUDENT, new OrderField[] { CourseStudent.COURSE_STUDENT.COURSE_ID, CourseStudent.COURSE_STUDENT.STUDENT_ID }, true);
         public static Index SQLITE_AUTOINDEX_QR_CODE_MAPPING_1 = createIndex("sqlite_autoindex_qr_code_mapping_1", QrCodeMapping.QR_CODE_MAPPING, new OrderField[] { QrCodeMapping.QR_CODE_MAPPING.UUID }, true);
         public static Index SCHEMA_VERSION_S_IDX = createIndex("schema_version_s_idx", SchemaVersion.SCHEMA_VERSION, new OrderField[] { SchemaVersion.SCHEMA_VERSION.SUCCESS }, false);

@@ -18,6 +18,7 @@ import static era.uploader.common.MultimapCollector.toMultimap;
 
 public class CourseCreationService {
     private final CourseDAO courseDAO;
+    private static final String HOSTNAME = "http://localhost:3001";
 
     public CourseCreationService(CourseDAO courseDAO) {
         this.courseDAO = courseDAO;
@@ -48,6 +49,7 @@ public class CourseCreationService {
                     .collect(toMultimap());
         }
         courseDAO.insertCourseAndStudents(courseToStudents, semester);
+        CourseUploader.uploadCourses(courseToStudents.keySet(), HOSTNAME);
         return courseToStudents;
     }
 }

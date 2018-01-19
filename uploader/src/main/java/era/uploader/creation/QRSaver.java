@@ -13,6 +13,9 @@ import javax.annotation.ParametersAreNullableByDefault;
 import javax.annotation.WillClose;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -193,6 +196,10 @@ public class QRSaver implements FutureCallback<List<QRCode>> {
      * Saves and closes the aggregating PDF using the supplied assignmentName.
      */
     public void save(@Nonnull String assignmentName) throws IOException {
+        final Path path = Paths.get(assignmentName);
+        if(!Files.exists(path.getParent())){
+            Files.createDirectory(path.getParent());
+        }
         pdf.save(assignmentName);
     }
 }

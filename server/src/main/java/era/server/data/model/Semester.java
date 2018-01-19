@@ -122,7 +122,9 @@ public class Semester implements Comparable<Semester>, Model {
 
     public enum Term {
         FALL,
-        SPRING;
+        SPRING,
+        SUMMER,
+        WINTER;
 
         public static Term humanValueOf(String humanReadable) {
             return Term.valueOf(humanReadable.toUpperCase());

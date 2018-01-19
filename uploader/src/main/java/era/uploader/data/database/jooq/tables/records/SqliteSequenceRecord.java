@@ -5,12 +5,13 @@ package era.uploader.data.database.jooq.tables.records;
 
 
 import era.uploader.data.database.jooq.tables.SqliteSequence;
+
+import javax.annotation.Generated;
+
 import org.jooq.Field;
 import org.jooq.Record2;
 import org.jooq.Row2;
 import org.jooq.impl.TableRecordImpl;
-
-import javax.annotation.Generated;
 
 
 /**

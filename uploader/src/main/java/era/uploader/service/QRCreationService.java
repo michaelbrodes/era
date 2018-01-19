@@ -19,6 +19,7 @@ import era.uploader.data.model.Student;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -124,6 +125,7 @@ public class QRCreationService {
         String assignmentFileName = assignmentFileName(assignmentName);
         try {
             saver.save(assignmentFileName);
+            Desktop.getDesktop().open(new File(assignmentFileName));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
