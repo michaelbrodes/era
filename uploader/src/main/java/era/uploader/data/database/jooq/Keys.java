@@ -18,13 +18,11 @@ import era.uploader.data.database.jooq.tables.records.QrCodeMappingRecord;
 import era.uploader.data.database.jooq.tables.records.SchemaVersionRecord;
 import era.uploader.data.database.jooq.tables.records.SemesterRecord;
 import era.uploader.data.database.jooq.tables.records.StudentRecord;
-
-import javax.annotation.Generated;
-
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.AbstractKeys;
+
+import javax.annotation.Generated;
 
 
 /**
@@ -45,10 +43,6 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
-    public static final Identity<AssignmentRecord, Integer> IDENTITY_ASSIGNMENT = Identities0.IDENTITY_ASSIGNMENT;
-    public static final Identity<CourseRecord, Integer> IDENTITY_COURSE = Identities0.IDENTITY_COURSE;
-    public static final Identity<SemesterRecord, Integer> IDENTITY_SEMESTER = Identities0.IDENTITY_SEMESTER;
-    public static final Identity<StudentRecord, Integer> IDENTITY_STUDENT = Identities0.IDENTITY_STUDENT;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
@@ -76,13 +70,6 @@ public class Keys {
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
-
-    private static class Identities0 extends AbstractKeys {
-        public static Identity<AssignmentRecord, Integer> IDENTITY_ASSIGNMENT = createIdentity(Assignment.ASSIGNMENT, Assignment.ASSIGNMENT.UNIQUE_ID);
-        public static Identity<CourseRecord, Integer> IDENTITY_COURSE = createIdentity(Course.COURSE, Course.COURSE.UNIQUE_ID);
-        public static Identity<SemesterRecord, Integer> IDENTITY_SEMESTER = createIdentity(Semester.SEMESTER, Semester.SEMESTER.UNIQUE_ID);
-        public static Identity<StudentRecord, Integer> IDENTITY_STUDENT = createIdentity(Student.STUDENT, Student.STUDENT.UNIQUE_ID);
-    }
 
     private static class UniqueKeys0 extends AbstractKeys {
         public static final UniqueKey<AssignmentRecord> PK_ASSIGNMENT = createUniqueKey(Assignment.ASSIGNMENT, "pk_assignment", Assignment.ASSIGNMENT.UNIQUE_ID);
