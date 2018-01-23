@@ -7,7 +7,6 @@ import org.jooq.RecordMapper;
 
 import javax.annotation.Nonnull;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class AssignmentConverter
         extends Converter<AssignmentRecord, Assignment>
