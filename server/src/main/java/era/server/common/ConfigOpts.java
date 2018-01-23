@@ -1,5 +1,7 @@
 package era.server.common;
 
+import com.google.common.collect.Maps;
+
 import java.util.Map;
 
 /**
@@ -7,20 +9,15 @@ import java.util.Map;
  * runs.
  */
 public enum ConfigOpts {
-    SERVER_PORT,
-    DB_NAME,
-    DB_PORT,
     HOST,
+    PORT,
     USER,
     PASSWORD;
 
-    // here to make it easier to add new options per new enum constants
-    static final String SERVER_PORT_OPT = "--app-port";
-    static final String DB_PORT_OPT = "--db-port";
-    static final String DB_NAME_OPT = "--db-name";
-    static final String HOST_OPT = "--db-host";
-    static final String USER_OPT = "--db-user";
-    static final String PASSWORD_OPT = "--db-password";
+    private static final String PORT_OPT = "--port";
+    private static final String HOST_OPT = "--host";
+    private static final String USER_OPT = "--user";
+    private static final String PASSWORD_OPT = "--password";
 
     /**
      * Parse arguments that have come in through the command line into a map
@@ -32,8 +29,35 @@ public enum ConfigOpts {
      * arguments
      */
     public static Map<ConfigOpts, String> parseArgs (String[] args) {
-        ConfigParser parser = new ConfigParser(args);
-        return parser.parseArgs();
-    }
+        Map<ConfigOpts, String> options = Maps.newHashMap();
+        for (int i = 0; i < args.length; i+=2) {
+            switch(args[i]) {
+                case PORT_OPT:
+                    if (i + 1 < args.length) {
+                        options.put(ConfigOpts.PORT, args[i +1]);
+                    }
+                    break;
+                case HOST_OPT:
+                    if (i + 1 < args.length) {
+                        options.put(ConfigOpts.HOST, args[i +1]);
+                    }
+                    break;
+                case USER_OPT:
+                    if (i + 1 < args.length) {
+                        options.put(ConfigOpts.USER, args[i + 1]);
+                    }
+                    break;
+                case PASSWORD_OPT:
+                    if (i + 1 < args.length) {
+                        options.put(ConfigOpts.PASSWORD, args[i + 1]);
+                    }
+                    break;
+                default:
+                    // NO-OP as there is no option to parse.
+                    break;
+            }
+        }
 
+        return options;
+    }
 }

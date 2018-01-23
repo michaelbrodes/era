@@ -13,30 +13,27 @@ public class AppConfigTest {
     @Ignore
     public void setConnectionString_integratesWithDb() throws Exception {
         String[] args = new String[] {
-                "--db-name",
-                "era",
-                "--db-host",
+                "--host",
                 "localhost",
-                "--db-port",
+                "--port",
                 "3001",
-                "--db-user",
+                "--user",
                 "root",
-                "--db-password",
+                "--password",
                 "fakepassword"
         };
 
         Map<ConfigOpts, String> configOpts= ConfigOpts.parseArgs(args);
         AppConfig.instance()
                 .setConnectionString(
-                        configOpts.get(ConfigOpts.DB_NAME),
                         configOpts.get(ConfigOpts.HOST),
-                        configOpts.get(ConfigOpts.DB_PORT),
+                        configOpts.get(ConfigOpts.PORT),
                         configOpts.get(ConfigOpts.USER),
                         configOpts.get(ConfigOpts.PASSWORD)
                 );
 
         Assert.assertEquals(
-                "jdbc:mariadb://localhost:3001/era?user=root&password=fakepassword",
+                "jdbc:mariadb://localhost:3001/era?user=root&password=fee3kie0paed0ahghe1iH8reol8aepaN",
                 AppConfig.instance().getConnectionString()
         );
 

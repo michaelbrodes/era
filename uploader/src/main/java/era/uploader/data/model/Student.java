@@ -19,8 +19,7 @@ public class Student {
     private String lastName;  /* Student's last name */
     private String schoolId;  /* Identifier for each student provided by the school */
     private String userName;
-    private String email;     /* Student's SIUE email */
-    private int uniqueId;/* Identifier that we generate to uniquely identify each student inside the QR code */
+    private int uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
     // every course that the student belongs to
     private Set<Course> courses = Sets.newHashSet();
 
@@ -34,9 +33,6 @@ public class Student {
     public Student(@Nonnull String userName) {
         Preconditions.checkNotNull(userName);
         this.userName = userName;
-        this.email = userName
-                + "@"
-                + UploaderProperties.instance().getEmailSuffix();
     }
 
     public Student(
@@ -54,9 +50,6 @@ public class Student {
         this.userName = userName;
         this.uniqueId = uniqueId;
         this.courses = courses == null ? Sets.newHashSet() : courses;
-        this.email = userName
-                + "@"
-                + UploaderProperties.instance().getEmailSuffix();
     }
 
     public Student(
@@ -72,9 +65,6 @@ public class Student {
         this.schoolId = schoolId;
         this.userName = userName;
         this.uniqueId = uniqueId;
-        this.email = userName
-                + "@"
-                + UploaderProperties.instance().getEmailSuffix();
     }
 
     private Student(@Nonnull String userName, Builder builder) {
@@ -85,7 +75,6 @@ public class Student {
         this.schoolId = builder.schoolId;
         this.lastName = builder.lastName;
         this.uniqueId = builder.uniqueId;
-        this.email = builder.email;
     }
 
     public static Builder builder() {
@@ -174,11 +163,9 @@ public class Student {
      */
     @Nonnull
     public String getEmail() {
-        return this.email;
-    }
-
-    public void setEmail(String email){
-        this.email = email;
+        return userName
+                + "@"
+                + UploaderProperties.instance().getEmailSuffix();
     }
 
     /**
@@ -198,7 +185,6 @@ public class Student {
         private String firstName; /* Student's first name */
         private String lastName;  /* Student's last name */
         private String schoolId;  /* Identifier for each student provided by the school */
-        private String email;     /* Student's SIUE email */
         private int uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
         // every course that the student belongs to
         private Set<Course> courses = Sets.newHashSet();
@@ -222,11 +208,6 @@ public class Student {
             return this;
         }
 
-        public Builder withEmail(String email) {
-            this.email = email;
-            return this;
-        }
-
         public Builder withUniqueId(int uniqueId) {
             this.uniqueId = uniqueId;
             return this;
@@ -244,9 +225,6 @@ public class Student {
 
         public Student create(@Nonnull String userName) {
             Preconditions.checkNotNull(userName);
-            this.email = userName
-                    + "@"
-                    + UploaderProperties.instance().getEmailSuffix();
             return new Student(userName, this);
         }
     }

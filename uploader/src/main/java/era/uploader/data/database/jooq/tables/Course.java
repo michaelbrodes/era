@@ -5,6 +5,7 @@ package era.uploader.data.database.jooq.tables;
 
 
 import era.uploader.data.database.jooq.DefaultSchema;
+import era.uploader.data.database.jooq.Indexes;
 import era.uploader.data.database.jooq.Keys;
 import era.uploader.data.database.jooq.tables.records.CourseRecord;
 
@@ -16,6 +17,7 @@ import javax.annotation.Generated;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Schema;
 import org.jooq.Table;
@@ -38,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Course extends TableImpl<CourseRecord> {
 
-    private static final long serialVersionUID = -1936678712;
+    private static final long serialVersionUID = 1528733722;
 
     /**
      * The reference instance of <code>course</code>
@@ -118,6 +120,14 @@ public class Course extends TableImpl<CourseRecord> {
     @Override
     public Schema getSchema() {
         return DefaultSchema.DEFAULT_SCHEMA;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.NAME_SEMESTER_ID_UNIQUE);
     }
 
     /**

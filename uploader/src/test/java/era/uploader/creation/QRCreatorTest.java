@@ -1,15 +1,8 @@
 package era.uploader.creation;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import era.uploader.data.model.Assignment;
-import era.uploader.data.model.Course;
-import era.uploader.data.model.Semester;
+import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
 import org.junit.Test;
-
-import java.time.Year;
-import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -26,19 +19,15 @@ public class QRCreatorTest {
                 .withFirstName("McGuy")
                 .withFirstName("Rob")
                 .create("rmcguy");
-        Course course = Course.builder()
-                .withStudents(ImmutableSet.of(robMcGuy))
-                .withName("ebrbrbrbrbrbrbrb")
-                .create("CS", "111", "001");
         int sequenceNumber = 1;
-        QRCreator creator = new QRCreator(course, Collections.singletonList(robMcGuy), "Ambitions of a Rider", sequenceNumber);
+        QRCreator creator = new QRCreator(robMcGuy, sequenceNumber);
 
-        QRCode robsQRCodeMapping = Iterables.getOnlyElement(creator.call());
+        QRCodeMapping robsQRCodeMapping = creator.call();
 
         assertNotNull(robsQRCodeMapping);
         assertNotNull(robsQRCodeMapping.getQrCode());
-        assertEquals(robMcGuy.getFirstName() + " " + robMcGuy.getLastName(), robsQRCodeMapping.getStudentName());
-        assertEquals(sequenceNumber, robsQRCodeMapping.getPageNumber());
+        assertEquals(robMcGuy, robsQRCodeMapping.getStudent());
+        assertEquals(sequenceNumber, robsQRCodeMapping.getSequenceNumber());
     }
 
     /**
@@ -48,30 +37,7 @@ public class QRCreatorTest {
      */
     @Test(expected = NullPointerException.class)
     public void call_NullStudent() throws Exception {
-        new QRCreator(null, null, null, 0);
-    }
-
-    @Test
-    public void createAssignmentForStudent() {
-        String assignmentName = "It is 1 am and I am writing code. I hate myself";
-        Student chance = Student.builder()
-                .withFirstName("chance")
-                .withLastName("rapper")
-                .create("crapper");
-        Course course = Course.builder()
-                .withName("I am a name")
-                .withSemester(Semester.of(Semester.Term.SPRING, Year.of(2017)))
-                .withDatabaseId(1)
-                .create("CS", "111", "001");
-        int pageSize = 9;
-        QRCreator creator = new QRCreator(course, Collections.singletonList(chance), assignmentName, pageSize);
-
-        Assignment assignment = creator.createAssignmentForStudent(chance);
-
-        assertEquals(assignmentName, assignment.getName());
-        assertEquals(chance, assignment.getStudent());
-        assertEquals(0, assignment.getStudent_id());
-        assertEquals(1, assignment.getCourse_id());
+        new QRCreator(null, 0);
     }
 
 }
