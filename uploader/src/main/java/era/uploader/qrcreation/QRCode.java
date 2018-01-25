@@ -1,4 +1,4 @@
-package era.uploader.creation;
+package era.uploader.qrcreation;
 
 import com.google.common.base.Preconditions;
 import era.uploader.data.model.Assignment;

@@ -1,4 +1,4 @@
-package era.uploader.creation;
+package era.uploader.qrcreation;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -43,7 +43,7 @@ public class QRDisplayIT {
                 .withName("ebrbrbrbrbrbrbrb")
                 .create("CS", "111", "001");
         int sequenceNumber = 1;
-        QRCreator creator = new QRCreator(course, Collections.singletonList(robMcGuy),"", sequenceNumber);
+        QRCreator creator = new QRCreator(course, Collections.singletonList(robMcGuy),"", sequenceNumber, AveryConstants.Shipping.QR_HEIGHT, AveryConstants.Shipping.QR_WIDTH);
 
         QRCode robsQRCode = Iterables.getOnlyElement(creator.call());
         String uniqueOutputPath = path + " " + LocalDateTime.now() + ".png";

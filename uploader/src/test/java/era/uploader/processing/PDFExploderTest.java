@@ -40,11 +40,11 @@ public class PDFExploderTest {
     @Test
     public void explode_FileNotFound() throws Exception {
         Path pdf = Paths.get(IOUtil.convertToLocal("src/test/resources/test-pdfs/100dpi.pdf"));
-        PDDocument document = PDDocument.load(pdf.toFile());
         boolean notFound = false;
         Map<Integer, String> pages = null;
 
         try {
+            PDDocument document = PDDocument.load(pdf.toFile());
             pages = PDFExploder.explodeFile(Optional.of(document));
         } catch (IOException e) {
             notFound = true;

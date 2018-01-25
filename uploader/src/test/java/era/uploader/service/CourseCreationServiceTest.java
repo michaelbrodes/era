@@ -46,7 +46,7 @@ public class CourseCreationServiceTest {
         Course two = new Course("CHEM", "131", "002", currentSemester);
         Course notExist = new Course("Spooky spooky ghosts", "101", "001", currentSemester);
 
-        Multimap<Course, Student> coursesToStudents = service.createCourses(Paths.get(roster), currentSemester);
+        Multimap<Course, Student> coursesToStudents = service.createCourses(Paths.get(roster), currentSemester, false);
 
         Map<Course, Collection<Student>> coursesToStudentsMap = coursesToStudents.asMap();
         // 002 and 018 each have one member while 018 has two

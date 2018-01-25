@@ -1,4 +1,4 @@
-package era.uploader.creation;
+package era.uploader.qrcreation;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -29,8 +29,19 @@ public class QRCreator implements Callable<List<QRCode>> {
     private final String assignment;
     private final Course course;
     private final int pageSize;
+    private final int qrHeight;
+    private final int qrWidth;
 
-    public QRCreator(Course course, List<Student> student, String assignmentName, int pageSize) {
+    public QRCreator(
+            Course course,
+            // TODO should be one student.
+            List<Student> student,
+            // TODO - should be moved over to a list of Assignment objects each with a name and number of pages
+            String assignmentName,
+            int pageSize,
+            int qrHeight,
+            int qrWidth
+    ) {
         Preconditions.checkNotNull(student);
         Preconditions.checkNotNull(course);
         Preconditions.checkNotNull(assignmentName);
@@ -39,6 +50,8 @@ public class QRCreator implements Callable<List<QRCode>> {
         this.course = course;
         this.assignment = assignmentName;
         this.pageSize = pageSize;
+        this.qrHeight = qrHeight;
+        this.qrWidth = qrWidth;
     }
 
     /**
@@ -53,9 +66,11 @@ public class QRCreator implements Callable<List<QRCode>> {
     @Override
     public List<QRCode> call() throws Exception {
         ImmutableList.Builder<QRCode> qrCodesBuilder = ImmutableList.builder();
+        // TODO - iterate through every assignment for that single student
         for (Student student : students) {
+            // TODO - pass in assignmentName and student
             Assignment studentAssignment = createAssignmentForStudent(student);
-            for (int i = 0; i < pageSize; i++) {
+            for (int i = 1; i < pageSize + 1; i++) {
                 qrCodesBuilder.add(generateQRCode(course, student, studentAssignment, i));
             }
         }
@@ -129,8 +144,8 @@ public class QRCreator implements Callable<List<QRCode>> {
         BitMatrix qrBitMatrix = writer.encode(
                 uuid,
                 BarcodeFormat.QR_CODE,
-                AveryConstants.QR_WIDTH,
-                AveryConstants.QR_HEIGHT
+                qrWidth,
+                qrHeight
         );
 
         return MatrixToImageWriter.toBufferedImage(qrBitMatrix);

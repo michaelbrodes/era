@@ -2,14 +2,13 @@ package era.uploader.controller;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.QRCodeMappingDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
-import era.uploader.data.model.Student;
+import era.uploader.qrcreation.AveryTemplate;
 import era.uploader.service.QRCreationService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,6 +19,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,11 @@ public class AssignmentCreationController {
     private ComboBox<Integer> numPagesComboBox;
 
     @FXML
+    private ComboBox<String> averyTemplateComboBox;
+
+    @FXML
     private Button createAssignmentButton;
+
 
     @FXML
     void initialize() {
@@ -67,12 +72,18 @@ public class AssignmentCreationController {
 
         numPagesComboBox.setItems(pageNums);
 
+        EnumSet<AveryTemplate> templates = EnumSet.allOf(AveryTemplate.class);
+        final Map<String, AveryTemplate> templateDescriptions = Maps.uniqueIndex(templates, AveryTemplate::description);
+        ObservableList<String> descriptions = FXCollections.observableArrayList(templateDescriptions.keySet());
+        averyTemplateComboBox.setItems(descriptions);
+
         // When the user clicks 'create assignment'
         createAssignmentButton.setOnAction(event -> {
 
             // If the user does not enter values for each field
             if (courseNamesComboBox.getValue() == null ||
                     numPagesComboBox.getValue() == null ||
+                    averyTemplateComboBox.getValue() == null ||
                     assignmentName.getCharacters().length() == 0) {
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                 errorAlert.setHeaderText("Assignment Creation Error");
@@ -83,16 +94,20 @@ public class AssignmentCreationController {
 
             String currentCourseName = courseNamesComboBox.getValue();
             Course currentCourse = nameToCourse.get(currentCourseName);
+            AveryTemplate template = templateDescriptions.get(averyTemplateComboBox.getValue());
 
             QRCreationService qrs = new QRCreationService(QR_CODE_MAPPING_DAO);
-            Multimap<Student, QRCodeMapping> mmap = qrs.createQRs(
+            Collection<QRCodeMapping> qrCodesForStudents = qrs.createQRs(
                     currentCourse,
                     assignmentName.getText(),
-                    numPagesComboBox.getValue()
+                    numPagesComboBox.getValue(),
+                    template
             );
 
-            for (QRCodeMapping qrCodeMapping : mmap.values()) {
+            for (QRCodeMapping qrCodeMapping : qrCodesForStudents) {
                 try {
+                    // this is a deprecated method but is still used to make it easier to create test documents.
+                    // in the future this will no longer be here.
                     qrs.saveQRCodeMapping(qrCodeMapping);
                 } catch (IOException e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);
@@ -100,12 +115,12 @@ public class AssignmentCreationController {
                     errorAlert.setContentText("The QRCode failed to save");
                     errorAlert.showAndWait();
                 }
-            };
+            }
 
             Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
             infoAlert.setHeaderText("QRCodes Saved Successfully");
             infoAlert.setContentText(
-                    mmap.values().size()
+                    qrCodesForStudents.size()
                     + " QR Codes have been saved to "
                     + qrs.assignmentFileName(assignmentName.getText())
             );

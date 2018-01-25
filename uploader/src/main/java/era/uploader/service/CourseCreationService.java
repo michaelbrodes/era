@@ -2,6 +2,9 @@ package era.uploader.service;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
+import era.uploader.common.UploaderProperties;
+import era.uploader.coursecreation.CSVParser;
+import era.uploader.coursecreation.CourseUploader;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
@@ -12,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static era.uploader.common.MultimapCollector.toMultimap;
@@ -33,7 +37,7 @@ public class CourseCreationService {
      * @return a map of courses to students.
      * @throws IOException We couldn't find the file you inputted.
      */
-    public Multimap<Course, Student> createCourses(@Nonnull Path filePath, Semester semester) throws IOException {
+    public Multimap<Course, Student> createCourses(@Nonnull Path filePath, Semester semester, boolean isUploadingEnabled) throws IOException {
         Preconditions.checkNotNull(filePath);
         // ignore the title record
         final int firstRecord = 1;
@@ -48,8 +52,10 @@ public class CourseCreationService {
                     .filter(Objects::nonNull)
                     .collect(toMultimap());
         }
-        courseDAO.insertCourseAndStudents(courseToStudents, semester);
-        CourseUploader.uploadCourses(courseToStudents.keySet(), HOSTNAME);
+
+        if (isUploadingEnabled) {
+            CourseUploader.uploadCourses(courseToStudents.keySet(), HOSTNAME);
+        }
         return courseToStudents;
     }
 }

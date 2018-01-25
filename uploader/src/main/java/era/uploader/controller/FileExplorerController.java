@@ -97,7 +97,7 @@ public class FileExplorerController {
     }
 
     /**
-     * Switch to the class creation view.
+     * Switch to the class qrcreation view.
      */
     public void createCourse(MouseEvent mouseEvent) {
         UINavigator nav = new UINavigator(allAssignments.getScene());
@@ -121,7 +121,7 @@ public class FileExplorerController {
     }
 
     /**
-     * Switch to the assignment creation view.
+     * Switch to the file explorer view. Wait what...
      */
     public void home(MouseEvent mouseEvent) {
         UINavigator nav = new UINavigator(allAssignments.getScene());

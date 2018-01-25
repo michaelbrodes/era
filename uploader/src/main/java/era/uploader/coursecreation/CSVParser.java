@@ -1,4 +1,4 @@
-package era.uploader.service;
+package era.uploader.coursecreation;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
@@ -32,7 +32,7 @@ public class CSVParser {
 
     private final Semester semester;
 
-    CSVParser(Semester semester) {
+    public CSVParser(Semester semester) {
         this.semester = semester;
     }
 

@@ -17,9 +17,11 @@ public class QRCodeMapping {
     private int sequenceNumber;
     // transient means that the BitMatrix should not be serialized over rest
     // calls and it should not be stored in the database
+    @Deprecated
     private transient BufferedImage qrCode;
     private String uuid;
     private String tempDocumentName;
+    @Deprecated
     private transient PDDocument document;
     private Integer studentId;
 

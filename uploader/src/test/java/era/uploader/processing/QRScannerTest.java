@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class QRScannerTest {
 
-    public static final String path = "src" + File.separator + "test"+ File.separator + "resources"+ File.separator +"single-page_300dpi.pdf";
+    public static final String path = "src" + File.separator + "test"+ File.separator + "resources"+ File.separator + "test-pdfs" + File.separator +"single-page_300dpi.pdf";
 
     @Test
     public void extractQRCodeInformation() {

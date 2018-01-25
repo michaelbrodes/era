@@ -1,4 +1,4 @@
-package era.uploader.creation;
+package era.uploader.qrcreation;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -23,7 +23,7 @@ public class QRCreatorTest {
     public void call_NotNullStudent() throws Exception {
         Student robMcGuy = Student.builder()
                 .withSchoolId("800999999")
-                .withFirstName("McGuy")
+                .withLastName("McGuy")
                 .withFirstName("Rob")
                 .create("rmcguy");
         Course course = Course.builder()
@@ -31,7 +31,7 @@ public class QRCreatorTest {
                 .withName("ebrbrbrbrbrbrbrb")
                 .create("CS", "111", "001");
         int sequenceNumber = 1;
-        QRCreator creator = new QRCreator(course, Collections.singletonList(robMcGuy), "Ambitions of a Rider", sequenceNumber);
+        QRCreator creator = new QRCreator(course, Collections.singletonList(robMcGuy), "Ambitions of a Rider", sequenceNumber, AveryConstants.Shipping.QR_HEIGHT, AveryConstants.Shipping.QR_WIDTH);
 
         QRCode robsQRCodeMapping = Iterables.getOnlyElement(creator.call());
 
@@ -48,7 +48,7 @@ public class QRCreatorTest {
      */
     @Test(expected = NullPointerException.class)
     public void call_NullStudent() throws Exception {
-        new QRCreator(null, null, null, 0);
+        new QRCreator(null, null, null, 0, AveryConstants.Shipping.QR_HEIGHT, AveryConstants.Shipping.QR_WIDTH);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class QRCreatorTest {
                 .withDatabaseId(1)
                 .create("CS", "111", "001");
         int pageSize = 9;
-        QRCreator creator = new QRCreator(course, Collections.singletonList(chance), assignmentName, pageSize);
+        QRCreator creator = new QRCreator(course, Collections.singletonList(chance), assignmentName, pageSize, AveryConstants.Shipping.QR_HEIGHT, AveryConstants.Shipping.QR_WIDTH);
 
         Assignment assignment = creator.createAssignmentForStudent(chance);
 

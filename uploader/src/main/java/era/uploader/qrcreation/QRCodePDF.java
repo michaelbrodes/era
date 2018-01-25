@@ -1,4 +1,4 @@
-package era.uploader.creation;
+package era.uploader.qrcreation;
 
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.MustBeClosed;
@@ -9,6 +9,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.WillClose;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -18,26 +19,25 @@ public class QRCodePDF implements Closeable {
     private PDDocument pdf;
     private PDPage currentPage;
     private int currentCell;
+    private final int cellsPerPage;
 
-    QRCodePDF() {
-        pdf = new PDDocument();
-    }
-
-    @Deprecated
-    QRCodePDF(String path) throws IOException {
-        pdf = PDDocument.load(new File(path));
-        currentPage = pdf.getPage(0);
-        currentCell = 0;
-    }
-
-    public void nextPage() {
-        currentPage = new PDPage();
-        currentCell = 0;
+    QRCodePDF(final int cellsPerPage) {
+        this.cellsPerPage = cellsPerPage;
+        this.pdf = new PDDocument();
+        this.currentPage = new PDPage();
         pdf.addPage(currentPage);
     }
 
-    public int nextCell() {
-        return currentCell++;
+    public PDPageContentStream nextPage(@WillClose PDPageContentStream editor) throws IOException{
+        editor.close();
+        currentPage = new PDPage();
+        currentCell = 0;
+        pdf.addPage(currentPage);
+        return getPageEditor();
+    }
+
+    public void nextCell() {
+        currentCell++;
     }
 
     @MustBeClosed
@@ -69,9 +69,7 @@ public class QRCodePDF implements Closeable {
         pdf.close();
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        pdf.close();
-        super.finalize();
+    public int getCellsPerPage() {
+        return cellsPerPage;
     }
 }

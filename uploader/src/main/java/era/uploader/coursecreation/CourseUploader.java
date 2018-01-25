@@ -1,4 +1,4 @@
-package era.uploader.service;
+package era.uploader.coursecreation;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

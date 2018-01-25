@@ -1,13 +1,15 @@
-package era.uploader.creation;
+package era.uploader.qrcreation;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
+import era.uploader.service.QRCreationService;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class QRSaverTest {
+public class ShippingLabelSaverTest {
 
     @Test
     public void onSuccess_oneImage() throws Exception {
@@ -29,11 +31,18 @@ public class QRSaverTest {
                 .create("bdude");
         Assignment assignment = Assignment.builder()
                 .create("how to be cool");
-        String qrFileName = assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
+        String qrFileName = QRCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
         System.out.println("one image pdf: " + qrFileName);
-        QRCodePDF shippingLabelPDF = new QRCodePDF();
-        QRSaver qrSaver = new QRSaver(shippingLabelPDF);
-        QRCreator creator = new QRCreator(course, Collections.singletonList(student), assignment.getName(), 1);
+        QRCodePDF shippingLabelPDF = new QRCodePDF(AveryConstants.Shipping.CELLS_PER_PAGE);
+        ShippingLabelSaver qrSaver = new ShippingLabelSaver(shippingLabelPDF);
+        QRCreator creator = new QRCreator(
+                course,
+                Collections.singletonList(student),
+                assignment.getName(),
+                1,
+                AveryConstants.Shipping.QR_HEIGHT,
+                AveryConstants.Shipping.QR_WIDTH
+        );
         QRCode qrcode = creator.generateQRCode(course,student, assignment, 1);
 
         qrSaver.onSuccess(Collections.singletonList(qrcode));
@@ -61,11 +70,18 @@ public class QRSaverTest {
 
         Assignment assignment = Assignment.builder()
                 .create("how to be cool");
-        String qrFileName = assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
+        String qrFileName = QRCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
         System.out.println("two image pdf: " + qrFileName);
-        QRCodePDF shippingLabelPDF = new QRCodePDF();
-        QRSaver qrSaver = new QRSaver(shippingLabelPDF);
-        QRCreator creator = new QRCreator(course, Arrays.asList(buddy, vic), assignment.getName(), 1);
+        QRCodePDF shippingLabelPDF = new QRCodePDF(AveryConstants.Shipping.CELLS_PER_PAGE);
+        ShippingLabelSaver qrSaver = new ShippingLabelSaver(shippingLabelPDF);
+        QRCreator creator = new QRCreator(
+                course,
+                Arrays.asList(buddy, vic),
+                assignment.getName(),
+                1,
+                AveryConstants.Shipping.QR_HEIGHT,
+                AveryConstants.Shipping.QR_WIDTH
+        );
         QRCode buddyQR = creator.generateQRCode(course, buddy, assignment, 1);
         QRCode vicQR = creator.generateQRCode(course, vic, assignment, 1);
 
@@ -98,11 +114,18 @@ public class QRSaverTest {
 
         Assignment assignment = Assignment.builder()
                 .create("how to be cool");
-        String qrFileName = assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
+        String qrFileName = QRCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
         System.out.println("three image pdf: " + qrFileName);
-        QRCodePDF shippingLabelPDF = new QRCodePDF();
-        QRSaver qrSaver = new QRSaver(shippingLabelPDF);
-        QRCreator creator = new QRCreator(course, Arrays.asList(buddy, vic, mike), assignment.getName(), 1);
+        QRCodePDF shippingLabelPDF = new QRCodePDF(AveryConstants.Shipping.CELLS_PER_PAGE);
+        ShippingLabelSaver qrSaver = new ShippingLabelSaver(shippingLabelPDF);
+        QRCreator creator = new QRCreator(
+                course,
+                Arrays.asList(buddy, vic, mike),
+                assignment.getName(),
+                1,
+                AveryConstants.Shipping.QR_HEIGHT,
+                AveryConstants.Shipping.QR_WIDTH
+        );
         QRCode buddyQR = creator.generateQRCode(course, buddy, assignment, 1);
         QRCode vicQR = creator.generateQRCode(course, vic, assignment, 1);
         QRCode mikeQR = creator.generateQRCode(course, mike, assignment, 1);
@@ -170,11 +193,18 @@ public class QRSaverTest {
 
         Assignment assignment = Assignment.builder()
                 .create("how to be cool");
-        String qrFileName = assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
+        String qrFileName = QRCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
         System.out.println("page + 1 image pdf: " + qrFileName);
-        QRCodePDF shippingLabelPDF = new QRCodePDF();
-        QRSaver qrSaver = new QRSaver(shippingLabelPDF);
-        QRCreator creator = new QRCreator(course, testList, assignment.getName(), 1);
+        QRCodePDF shippingLabelPDF = new QRCodePDF(AveryConstants.Shipping.CELLS_PER_PAGE);
+        ShippingLabelSaver qrSaver = new ShippingLabelSaver(shippingLabelPDF);
+        QRCreator creator = new QRCreator(
+                course,
+                testList,
+                assignment.getName(),
+                1,
+                AveryConstants.Shipping.QR_HEIGHT,
+                AveryConstants.Shipping.QR_WIDTH
+        );
         List<QRCode> toPrint = Lists.newArrayList();
         for (Student testStudent : testList) {
             toPrint.add(creator.generateQRCode(course, testStudent, assignment, 1));
@@ -186,6 +216,6 @@ public class QRSaverTest {
         Path qrPath = Paths.get(qrFileName);
         Assert.assertTrue(Files.exists(qrPath));
         Assert.assertEquals(1, shippingLabelPDF.getCurrentCell());
-//        Files.deleteIfExists(qrPath);
+        Files.deleteIfExists(qrPath);
     }
 }

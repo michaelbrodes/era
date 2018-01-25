@@ -1,6 +1,7 @@
 package era.uploader.controller;
 
 import com.google.common.collect.Multimap;
+import era.uploader.common.UploaderProperties;
 import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
@@ -148,7 +149,9 @@ public class CourseCreationController {
         }
         Multimap<Course, Student> coursesToStudents = null;
         try {
-            coursesToStudents = service.createCourses(inputPath, semester.get());
+            Optional<Boolean> uploadingEnabled = UploaderProperties.instance().isUploadingEnabled();
+            boolean isUploadingEnabled = uploadingEnabled.orElse(false);
+            coursesToStudents = service.createCourses(inputPath, semester.get(), isUploadingEnabled);
         } catch (IOException e) {
             // technically shouldn't be possible but we need to be defensive
             Alert fileOperationError = new Alert(Alert.AlertType.ERROR);
