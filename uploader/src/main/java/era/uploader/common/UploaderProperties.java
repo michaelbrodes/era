@@ -15,13 +15,18 @@ import java.util.Properties;
  * are either power users or developers but the option is there.
  */
 public class UploaderProperties {
-    // TODO: when we have authentication on the uploader enabled, opt for a GUI checkbox
     private Boolean uploadingEnabled = null;
     private static final String UPLOADING_ENABLED = "uploading.enabled";
     private String dbUrl = null;
     private static final String DB_URL = "db.url";
     private String emailSuffix = null;
     private static final String EMAIL_SUFFIX = "uploading.email.suffix";
+    private String serverHostname = null;
+    private static final String SERVER_HOSTNAME = "uploading.server.hostname";
+    private String serverPort = null;
+    private static final String SERVER_PORT = "uploading.server.port";
+    private String serverProtocol = null;
+    private static final String SERVER_PROTOCOL = "uploading.server.protocol";
     private static final String PROP_FILE = "uploader.properties";
     private static UploaderProperties INSTANCE;
 
@@ -73,6 +78,30 @@ public class UploaderProperties {
                             DB_URL, defaultPath
                     ));
             dbUrl = ret.orElse(null);
+        }
+
+        return ret;
+    }
+
+    public Optional<String> getServerURL () {
+        Optional<String> ret = Optional.empty();
+        if (serverHostname == null || serverPort == null || serverProtocol == null) {
+            Optional<Properties> configProperties = getProperties();
+            Optional<String> hostname = configProperties
+                    .map(props -> props.getProperty(SERVER_HOSTNAME, "localhost"));
+            Optional<String> port = configProperties
+                    .map(properties -> properties.getProperty(SERVER_PORT, "3001"));
+            Optional<String> protocol = configProperties
+                    .map(properties -> properties.getProperty(SERVER_PROTOCOL, "http"));
+            if (hostname.isPresent()
+                && port.isPresent()
+                && protocol.isPresent()) {
+                ret = Optional.of(protocol.get()
+                        + "//"
+                        + hostname.get()
+                        + ":"
+                        + port.get());
+            }
         }
 
         return ret;

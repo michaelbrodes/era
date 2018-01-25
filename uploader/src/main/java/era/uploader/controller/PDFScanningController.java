@@ -2,6 +2,7 @@ package era.uploader.controller;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import era.uploader.common.UploaderProperties;
 import era.uploader.data.model.Course;
 import era.uploader.processing.ScanningProgress;
 import era.uploader.service.PDFScanningService;
@@ -48,8 +49,6 @@ public class PDFScanningController {
     private TextField assignmentName;
 
 
-    //TODO update this to something not hardcoded you schlum... fu -Josh
-    private static final String HOST_NAME = "http://localhost:3001";
     private static final String NULL_HOST = null;
 
     private final PDFScanningService pdfServ = new PDFScanningService();
@@ -126,7 +125,8 @@ public class PDFScanningController {
                 if(currentCourse != null && currentAssignment != null) {
                     if(online.isSelected()){
 
-                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, HOST_NAME);
+                        String serverURL = UploaderProperties.instance().getServerURL().orElse(null);
+                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, serverURL);
                         URL url = getClass().getResource("/gui/pdf-progress.fxml");
 
                         FXMLLoader fxmlloader = new FXMLLoader();

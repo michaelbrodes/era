@@ -31,7 +31,6 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 /**
- * TODO implement this class over break
  * This class needs to have a GUI that will take in a CSV file. Generate a
  * bunch of students from that CSV file using
  * {@link era.uploader.service.CourseCreationService}, and then output the

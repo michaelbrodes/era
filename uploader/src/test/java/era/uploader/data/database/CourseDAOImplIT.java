@@ -37,8 +37,6 @@ import static era.uploader.data.database.jooq.tables.Semester.SEMESTER;
  * <strong>DR JONES DON'T RUN THIS TEST</strong> unless the database you are
  * using doesn't have useful information
  *
- * TODO: make sure to let Dr. Jones know not to run this test or just don't ship this test at all
- *
  * This class is ignored because we shouldn't run it each time we compile,
  * instead it should be ran <strong>only</strong> when we are testing the
  * behavior of the database directly
