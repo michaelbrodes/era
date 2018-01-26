@@ -1,0 +1,233 @@
+Index: ../server/src/main/java/era/server/data/access/AssignmentDAOImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package era.server.data.access;\n\nimport com.google.common.base.Preconditions;\nimport era.server.data.AssignmentDAO;\nimport era.server.data.model.Assignment;\nimport org.jooq.DSLContext;\n\nimport javax.annotation.ParametersAreNonnullByDefault;\n\nimport static era.server.data.database.Tables.ASSIGNMENT;\n\n/**\n * Provides CRUD functionality for Assignments inside a access.\n */\n@ParametersAreNonnullByDefault\npublic class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO{\n\n    public void storeAssignment(Assignment assignment) {\n        Preconditions.checkNotNull(assignment);\n        try (DSLContext ctx = connect()) {\n            Integer courseId = assignment.getCourse() == null ?\n                    assignment.getCourse_id() :\n                    assignment.getCourse().getUniqueId();\n            Integer studentId = assignment.getStudent() == null ?\n                    assignment.getStudent_id() :\n                    assignment.getStudent().getUniqueId();\n            ctx.insertInto(\n                    ASSIGNMENT,\n                    ASSIGNMENT.UNIQUE_ID,\n                    ASSIGNMENT.NAME,\n                    ASSIGNMENT.IMAGE_FILE_PATH,\n                    ASSIGNMENT.COURSE_ID,\n                    ASSIGNMENT.STUDENT_ID,\n                    ASSIGNMENT.CREATED_DATE_TIME\n            ).values(\n                    assignment.getUniqueId(),\n                    assignment.getName(),\n                    assignment.getImageFilePath(),\n                    (long) courseId,\n                    (long) studentId,\n                    assignment.getCreatedDateTimeStamp()\n            );\n        }\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../server/src/main/java/era/server/data/access/AssignmentDAOImpl.java	(date 1511933788000)
++++ ../server/src/main/java/era/server/data/access/AssignmentDAOImpl.java	(revision )
+@@ -18,10 +18,10 @@
+     public void storeAssignment(Assignment assignment) {
+         Preconditions.checkNotNull(assignment);
+         try (DSLContext ctx = connect()) {
+-            Integer courseId = assignment.getCourse() == null ?
++            long courseId = assignment.getCourse() == null ?
+                     assignment.getCourse_id() :
+                     assignment.getCourse().getUniqueId();
+-            Integer studentId = assignment.getStudent() == null ?
++            long studentId = assignment.getStudent() == null ?
+                     assignment.getStudent_id() :
+                     assignment.getStudent().getUniqueId();
+             ctx.insertInto(
+@@ -36,8 +36,8 @@
+                     assignment.getUniqueId(),
+                     assignment.getName(),
+                     assignment.getImageFilePath(),
+-                    (long) courseId,
+-                    (long) studentId,
++                    courseId,
++                    studentId,
+                     assignment.getCreatedDateTimeStamp()
+             );
+         }
+Index: ../server/src/main/java/era/server/data/access/CourseDAOImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package era.server.data.access;\n\nimport com.google.common.base.Preconditions;\nimport era.server.data.CourseDAO;\nimport era.server.data.model.Course;\nimport era.server.data.model.Student;\n\nimport javax.annotation.Nullable;\nimport javax.annotation.ParametersAreNonnullByDefault;\nimport java.util.HashSet;\nimport java.util.Set;\n\n/**\n * Provides CRUD functionality for {@link Course} objects stored in the\n * access. A course has many {@link Student}s and many Grader.\n */\n@ParametersAreNonnullByDefault\npublic class CourseDAOImpl implements CourseDAO {\n    private Set<Course> courses = new HashSet<>(); /* A set of Courses to act as the access table */\n\n    /* Create and Insert a new Course object into the access */\n\n    @Override\n    public void insert(Course course) {\n        Preconditions.checkNotNull(course);\n        courses.add(course);\n    }\n\n\n    /* Access data from existing Course object from access */\n    @Override\n    @Nullable\n    public Course read(long id) {\n        for (Course otherCourse :\n                courses) {\n            if (otherCourse.getUniqueId() == id) {\n                return otherCourse;\n            }\n        }\n        return null;\n    }\n\n    /* Modify data stored in already existing Course in access */\n    @Override\n    public void update(Course courseToChange, Course courseChanged) {\n        Preconditions.checkNotNull(courseToChange);\n        Preconditions.checkNotNull(courseChanged);\n        courses.remove(courseToChange);\n        courses.add(courseChanged);\n    }\n\n    /* Delete existing Course object in access */\n    @Override\n    public void delete(Course course) {\n        Preconditions.checkNotNull(course);\n        courses.remove(course);\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../server/src/main/java/era/server/data/access/CourseDAOImpl.java	(date 1511933788000)
++++ ../server/src/main/java/era/server/data/access/CourseDAOImpl.java	(revision )
+@@ -2,28 +2,149 @@
+ 
+ import com.google.common.base.Preconditions;
+ import era.server.data.CourseDAO;
++import era.server.data.database.tables.records.SemesterRecord;
++import era.server.data.database.tables.records.StudentRecord;
+ import era.server.data.model.Course;
++import era.server.data.model.Semester;
+ import era.server.data.model.Student;
++import org.jooq.Condition;
++import org.jooq.DSLContext;
++import org.jooq.impl.DSL;
+ 
+ import javax.annotation.Nullable;
+ import javax.annotation.ParametersAreNonnullByDefault;
+-import java.util.HashSet;
+-import java.util.Set;
++
++import static era.server.data.database.Tables.COURSE;
++import static era.server.data.database.Tables.SEMESTER;
++import static era.server.data.database.Tables.STUDENT;
+ 
+ /**
+  * Provides CRUD functionality for {@link Course} objects stored in the
+  * access. A course has many {@link Student}s and many Grader.
+  */
+ @ParametersAreNonnullByDefault
+-public class CourseDAOImpl implements CourseDAO {
+-    private Set<Course> courses = new HashSet<>(); /* A set of Courses to act as the access table */
++public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
+ 
+     /* Create and Insert a new Course object into the access */
+ 
+     @Override
+     public void insert(Course course) {
++        Preconditions.checkNotNull(course, "Cannot insert a null course");
++        Preconditions.checkNotNull(course.getSemester(), "Cannot resolve a null semester");
++        Preconditions.checkNotNull(course.getStudentsEnrolled(), "Cannot insert null students");
++        Preconditions.checkNotNull(course.getAssignments(), "Cannot insert null students");
++        try (DSLContext ctx = connect()) {
++
++            course.setUniqueId(
++                    ctx.insertInto(
++                            // table
++                            COURSE,
++                            // columns
++                            COURSE.DEPARTMENT,
++                            COURSE.COURSE_NUMBER,
++                            COURSE.SECTION_NUMBER,
++                            COURSE.NAME,
++                            COURSE.SEMESTER_ID
++                    ).values(
++                            course.getDepartment(),
++                            course.getCourseNumber(),
++                            course.getSectionNumber(),
++                            course.getName(),
++                            semester.getUniqueId()
++                    ).returning(
++                            COURSE.UNIQUE_ID
++                    ).fetchOne()
++                            .getUniqueId()
++            );
++
++            for (Student student : course.getStudentsEnrolled()) {
++                StudentRecord studentRecord = ctx.selectFrom(STUDENT).
++                        where(STUDENT.SCHOOL_ID.eq(student.getSchoolId())).fetchOne();
++                if (studentRecord == null) {
++                    student.setUniqueId(ctx.insertInto(
++                            // table
++                            STUDENT,
++                            // columns
++                            STUDENT.FIRST_NAME,
++                            STUDENT.LAST_NAME,
++                            STUDENT.USERNAME,
++                            STUDENT.SCHOOL_ID,
++                            STUDENT.EMAIL
++                    )
++                            .values(
++                                    student.getFirstName(),
++                                    student.getLastName(),
++                                    student.getUserName(),
++                                    student.getSchoolId(),
++                                    student.getEmail()
++                            )
++                            .returning(
++                                    STUDENT.UNIQUE_ID
++                            )
++                            .fetchOne().getUniqueId());
++                } else {
++                    student.setUniqueId(studentRecord.getUniqueId());
++                }
++
++                ctx.insertInto(
++                        // table
++                        COURSE_STUDENT,
++                        // columns
++                        COURSE_STUDENT.COURSE_ID,
++                        COURSE_STUDENT.STUDENT_ID
++                )
++                        .values(
++                                course.getUniqueId(),
++                                student.getUniqueId()
++                        )
++                        .execute();
++            }
++        }
++    }
++
++    @Nullable
++    public Semester resolveOrInsertSemester(Course course) {
+         Preconditions.checkNotNull(course);
+-        courses.add(course);
++        final Semester semesterToResolve = course.getSemester();
++        Semester dbSemester = null;
++        Condition filterer = DSL.and(
++                SEMESTER.TERM.eq(semesterToResolve.getTermString()),
++                SEMESTER.YEAR.eq(semesterToResolve.getYearInt())
++        );
++
++        try (DSLContext ctx = connect()) {
++            // try to find the semester if it exists, otherwise insert it
++            dbSemester = ctx.selectFrom(SEMESTER)
++                    .where(filterer)
++                    .fetchOptional()
++                    .orElseGet(() -> {
++                        SemesterRecord semesterRecord = ctx.insertInto(
++                                SEMESTER,
++                                SEMESTER.TERM,
++                                SEMESTER.YEAR
++                        ).values(
++                                semesterToResolve.getTermString(),
++                                semesterToResolve.getYearInt()
++                        ).returning(
++                                SEMESTER.UNIQUE_ID
++                        ).fetchOne();
++
++                        semesterRecord.setTerm(semesterToResolve.getTermString());
++                        semesterRecord.setYear(semesterToResolve.getYearInt());
++                        return semesterRecord;
++                    })
++                    .map((record) -> {
++                        SemesterRecord semesterRecord = record.into(SEMESTER);
++                        return new Semester(
++                                semesterRecord.getUniqueId(),
++                                semesterRecord.getTerm(),
++                                semesterRecord.getYear()
++                        );
++                    });
++        }
++
++        return dbSemester;
++
+     }
+ 
+ 
+Index: ../server/src/main/java/era/server/data/model/Semester.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package era.server.data.model;\n\nimport com.google.common.base.Preconditions;\nimport com.google.common.collect.ComparisonChain;\n\nimport javax.annotation.Nonnull;\nimport javax.annotation.Nullable;\nimport javax.annotation.ParametersAreNonnullByDefault;\nimport java.time.Year;\n\n/**\n * The semester that a {@link Course} belongs to. We represent this data as\n * a class (and also table in the database) so we can easily order it and\n * group by it.\n */\n@ParametersAreNonnullByDefault\npublic class Semester implements Comparable<Semester> {\n\n    public enum Term {\n        FALL,\n        SPRING;\n\n        public final String humanReadable() {\n            return this.name().substring(0, 1)\n                    + this.name().substring(1).toLowerCase();\n        }\n\n        public static Term humanValueOf(String humanReadable) {\n            return Term.valueOf(humanReadable.toUpperCase());\n        }\n    }\n\n    private int uniqueId;\n    private Term term;\n    private Year year;\n\n    public Semester(Term term, Year year) {\n        Preconditions.checkNotNull(term, \"Term cannot be null!\");\n        Preconditions.checkNotNull(year, \"Year cannot be null!\");\n        this.term = term;\n        this.year = year;\n    }\n\n    public Semester(int uniqueId, String term, @Nullable Integer year) {\n        Preconditions.checkArgument(uniqueId > 0, \"A database id cannot be less than 1!\");\n        Preconditions.checkNotNull(term, \"Term cannot be null!\");\n        this.uniqueId = uniqueId;\n        this.term = Term.valueOf(term);\n        // now is the only sensible default.\n        this.year = year == null ? Year.now() : Year.of(year);\n    }\n\n    public static Semester of(Term term, Year year) {\n        return new Semester(term, year);\n    }\n\n    public int getUniqueId() {\n        return uniqueId;\n    }\n\n    public void setUniqueId(int uniqueId) {\n        Preconditions.checkArgument(uniqueId > 0, \"A database id cannot be less than 1!\");\n        this.uniqueId = uniqueId;\n    }\n\n    @Nonnull\n    public Term getTerm() {\n        return term;\n    }\n\n    @Nonnull\n    public String getTermString() {\n        return term.name();\n    }\n\n    public void setTerm(Term term) {\n        Preconditions.checkNotNull(term);\n        this.term = term;\n    }\n\n    @Nonnull\n    public Year getYear() {\n        return year;\n    }\n\n    public int getYearInt() {\n        return year.getValue();\n    }\n\n    public void setYear(Year year) {\n        Preconditions.checkNotNull(year);\n        this.year = year;\n    }\n\n    @Override\n    public boolean equals(Object o) {\n        if (this == o) return true;\n        if (o == null || getClass() != o.getClass()) return false;\n\n        Semester semester = (Semester) o;\n\n        return uniqueId == semester.uniqueId && term == semester.term && year.equals(semester.year);\n    }\n\n    @Override\n    public int hashCode() {\n        int result = term.hashCode();\n        result = 31 * result + year.hashCode();\n        return result;\n    }\n\n    @Override\n    public int compareTo(Semester that) {\n        return ComparisonChain.start()\n                .compare(this.year, that.year)\n                .compare(this.term.ordinal(), that.term.ordinal())\n                .result();\n    }\n\n    @Override\n    public String toString() {\n        return term.humanReadable() + year.toString();\n    }\n}\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../server/src/main/java/era/server/data/model/Semester.java	(date 1511933788000)
++++ ../server/src/main/java/era/server/data/model/Semester.java	(revision )
+@@ -30,7 +30,7 @@
+         }
+     }
+ 
+-    private int uniqueId;
++    private long uniqueId;
+     private Term term;
+     private Year year;
+ 
+@@ -41,7 +41,7 @@
+         this.year = year;
+     }
+ 
+-    public Semester(int uniqueId, String term, @Nullable Integer year) {
++    public Semester(long uniqueId, String term, @Nullable Integer year) {
+         Preconditions.checkArgument(uniqueId > 0, "A database id cannot be less than 1!");
+         Preconditions.checkNotNull(term, "Term cannot be null!");
+         this.uniqueId = uniqueId;
+@@ -54,7 +54,7 @@
+         return new Semester(term, year);
+     }
+ 
+-    public int getUniqueId() {
++    public long getUniqueId() {
+         return uniqueId;
+     }
+ 
