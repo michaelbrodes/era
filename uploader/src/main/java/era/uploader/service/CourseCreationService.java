@@ -53,6 +53,8 @@ public class CourseCreationService {
                     .collect(toMultimap());
         }
 
+        courseDAO.insertCourseAndStudents(courseToStudents, semester);
+
         if (isUploadingEnabled) {
             CourseUploader.uploadCourses(courseToStudents.keySet(), HOSTNAME);
         }
