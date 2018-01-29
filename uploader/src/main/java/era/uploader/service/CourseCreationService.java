@@ -2,9 +2,8 @@ package era.uploader.service;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
-import era.uploader.common.UploaderProperties;
-import era.uploader.coursecreation.CSVParser;
-import era.uploader.coursecreation.CourseUploader;
+import era.uploader.service.coursecreation.CSVParser;
+import era.uploader.communication.CourseUploader;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static era.uploader.common.MultimapCollector.toMultimap;

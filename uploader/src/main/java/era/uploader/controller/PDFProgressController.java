@@ -1,7 +1,7 @@
 package era.uploader.controller;
 
 import era.uploader.data.viewmodel.ErrorMetaData;
-import era.uploader.processing.ScanningProgress;
+import era.uploader.service.processing.ScanningProgress;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

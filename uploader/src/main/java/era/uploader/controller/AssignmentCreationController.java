@@ -8,7 +8,7 @@ import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.QRCodeMappingDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
-import era.uploader.qrcreation.AveryTemplate;
+import era.uploader.service.assignment.AveryTemplate;
 import era.uploader.service.QRCreationService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

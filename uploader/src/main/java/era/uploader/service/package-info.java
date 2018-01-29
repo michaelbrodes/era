@@ -1,7 +1,7 @@
 /**
  * This package provides entry points to the core business logic of the
- * application. These entry points are irrespective of the type of user
- * interface being used (that is how they are different from the
- * controller package).
+ * application. We keep this business logic out of the controller layer to
+ * completely decouple UI from business logic. Each service will have its
+ * own subpackage for related classes.
  */
 package era.uploader.service;

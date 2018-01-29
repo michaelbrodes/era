@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import era.uploader.common.UploaderProperties;
 import era.uploader.data.model.Course;
-import era.uploader.processing.ScanningProgress;
+import era.uploader.service.processing.ScanningProgress;
 import era.uploader.service.PDFScanningService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

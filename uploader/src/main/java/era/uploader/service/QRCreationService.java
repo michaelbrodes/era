@@ -4,7 +4,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -13,12 +12,13 @@ import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
-import era.uploader.qrcreation.AbstractQRSaver;
-import era.uploader.qrcreation.AveryTemplate;
-import era.uploader.qrcreation.QRCode;
-import era.uploader.qrcreation.QRCreator;
-import era.uploader.qrcreation.QRSaverFactory;
-import era.uploader.qrcreation.ShippingLabelSaver;
+import era.uploader.service.assignment.AbstractQRSaver;
+import era.uploader.service.assignment.AveryTemplate;
+import era.uploader.service.assignment.QRCode;
+import era.uploader.service.assignment.QRCreator;
+import era.uploader.service.assignment.QRSaverFactory;
+import era.uploader.service.assignment.AddressLabelSaver;
+import era.uploader.service.assignment.ShippingLabelSaver;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.imageio.ImageIO;
@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -38,7 +39,11 @@ import java.util.stream.Collectors;
 
 /**
  * This class contains the business logic for QR Creation.
+ *
+ * @deprecated please use {@link AssignmentCreationService}
  */
+@SuppressWarnings("DeprecatedIsStillUsed")
+@Deprecated
 @ParametersAreNonnullByDefault
 public class QRCreationService {
     private final QRCodeMappingDAO qrCodeMappingDAO;
@@ -52,28 +57,48 @@ public class QRCreationService {
     }
 
     /**
-     * Provided a course with students, an assignment name, and a number of
-     * pages on that assignment: this method generates all the QR codes each
-     * student would need on an assignment. The QR codes will encode
-     * <em>Universally Unique IDs</em> to match students to their assignment
-     * page. Universally Unique IDs make it so that students can't easily
-     * reverse engineer the qr codes and student pages can be anywhere in the
-     * large pdf that is processed through this system.
+     * In order to match students to their assignments we create QR codes that
+     * should be attached to those assignments. In order to allow Graders to
+     * put in assignment pages out of order, we generate a unique QR code for
+     * each page of an assignment.
      *
-     * <strong>NOTE</strong>: Because we need to match UUIDs to pages at a
-     * later date and time we end up creating new QRCodeMapping entries in the
-     * database that aren't matched to a particular assignment that has been
-     * handed in.
+     * This method takes in a list of assignments that are part of a course
+     * and generates qr codes for every page of every assignment for every
+     * student in that. These QR codes are then printed out into a PDF in a
+     * format that allows them to be printed on Avery Labels. We support
+     * templates of 2" by 4" shipping labels and of 1" by 2.625" address
+     * labels.
      *
-     * @see java.util.UUID
-     * @param course    A set of students that are in a course.
-     * @param numberOfPages the number of pages in a single assignment
-     * @param template
-     * @return numberOfPages * course#getStudentsEnrolled()#size worth of
-     *         QRCodeMappings grouped by the Students they are
-     *         associated with.
-     * @see Multimap to find out how a multimap works.
+     * Each QR code encodes an "Universally Unique ID" {@link UUID} that is
+     * unique per page. UUIDs prevent students from easily reverse engineering
+     * who has what QR code. Each QR code will be saved in our database as a
+     * {@link QRCodeMapping} row. QRCodeMappings store the QR code's UUID, the
+     * student associated with it, and the page number that the QR code was put
+     * on.
+     *
+     * NOTE: Despite what it may seem, we actually don't create Assignments in
+     * this method. We will eventually create assignments when we implement the
+     * "Multi-page Ordering" feature of this project.
+     *
+     * @param course the course that contains the students we want to map QR
+     *               codes to
+     * @param assignmentName the name of this assignment.
+     * @param numberOfPages the number of pages for this particular assignment
+     * @param template the type of Avery Label template we want to save QR
+     *                    codes on. This will allow us to determine if we want
+     *                    an {@link AddressLabelSaver}
+     *                    or a {@link ShippingLabelSaver}
+     *                    strategy at runtime. Strategies are instantiated
+     *                    using {@link QRSaverFactory}
+     * @return the QR code -> student mappings for each page of every
+     * assignment in the "assignments" parameter.
+     * @see QRCreator for the QR code creation logic
+     * @see AbstractQRSaver for the general strategy
+     * of saving QR codes.
+     * @see era.uploader.service.assignment for all classes used in this process
+     * @deprecated please use {@link AssignmentCreationService#generateQRsForAssignments(List, Course, AveryTemplate)}
      */
+    @Deprecated
     public List<QRCodeMapping> createQRs(
             Course course,
             String assignmentName,
@@ -235,7 +260,7 @@ public class QRCreationService {
             try {
                 List<QRCodeMapping> mappings = futureQRCodeBatch.get()
                         .stream()
-                        .map(QRCode::createQRCodeMapping)
+                        .map(QRCode::asQRCodeMapping)
                         .collect(Collectors.toList());
 
                 studentQRMappings.addAll(mappings);
@@ -271,7 +296,7 @@ public class QRCreationService {
         String path = directory.getAbsolutePath() + File.separator + qrCodeMapping.getStudent().getUserName() +"_" + qrCodeMapping.getUuid() + ".PNG";
 
         BufferedImage byteMatrix = qrCodeMapping.getQrCode();
-        File file = new File (QRCODEDIRECTORY + File.separator + qrCodeMapping.getUuid() + ".png");
+        File file = new File (QRCODEDIRECTORY + path);
         ImageIO.write(byteMatrix, "png", file);
     }
 }

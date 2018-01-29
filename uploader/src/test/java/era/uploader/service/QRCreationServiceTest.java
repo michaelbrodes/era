@@ -3,12 +3,11 @@ package era.uploader.service;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import era.uploader.data.database.MockCourseDAOImpl;
 import era.uploader.data.database.MockQRCodeMappingDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
-import era.uploader.qrcreation.AveryTemplate;
+import era.uploader.service.assignment.AveryTemplate;
 import org.junit.Before;
 import org.junit.Test;
 
