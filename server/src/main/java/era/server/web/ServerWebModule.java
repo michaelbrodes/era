@@ -84,11 +84,11 @@ public class ServerWebModule implements ServerModule {
     }
 
     public void setUpCASRoutes(Config config) {
-        Spark.before("/student*", new SecurityFilter(config, "CasClient"));
+        Spark.before("/student/login", new SecurityFilter(config, "CasClient"));
 
         final CallbackRoute cr = new CallbackRoute(config);
-        Spark.get("/casCallback", cr);
-        Spark.post("/casCallback", cr);
+        Spark.get("/student/login", cr);
+        Spark.post("/student/login", cr);
 
         Spark.get("/logout", new LogoutRoute(config, "/"));
     }

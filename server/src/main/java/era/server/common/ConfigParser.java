@@ -37,6 +37,8 @@ class ConfigParser {
                 case ConfigOpts.PASSWORD_OPT:
                     putArg(ConfigOpts.PASSWORD, i);
                     break;
+                case ConfigOpts.CAS_ENABLED_OPT:
+                    putArg(ConfigOpts.CAS_ENABLED, i);
                 default:
                     // NO-OP as there is no option to parse.
                     break;
