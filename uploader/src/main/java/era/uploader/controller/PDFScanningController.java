@@ -19,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -47,7 +48,8 @@ public class PDFScanningController {
     private Button browseButton;
     @FXML
     private TextField assignmentName;
-
+    @FXML
+    private Label modeLabel;
 
     private static final String NULL_HOST = null;
 
@@ -121,9 +123,12 @@ public class PDFScanningController {
 
             else if (fullFileName != null)
                 try {
-
+                boolean uploading = false;
                 if(currentCourse != null && currentAssignment != null) {
-                    if(online.isSelected()){
+                    if (UploaderProperties.instance().isUploadingEnabled() != null) {
+                        uploading = UploaderProperties.instance().isUploadingEnabled();
+                    }
+                    if(uploading) {
 
                         String serverURL = UploaderProperties.instance().getServerURL().orElse(null);
                         final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, serverURL);
@@ -161,6 +166,15 @@ public class PDFScanningController {
                     errorAlert.showAndWait();
                 }
         });
+
+        if (UploaderProperties.instance().isUploadingEnabled()){
+            modeLabel.setText("Online");
+            modeLabel.setTextFill(Color.web("#228b22"));
+        }
+        else {
+            modeLabel.setText("Offline");
+            modeLabel.setTextFill(Color.web("#ff0000"));
+        }
     }
 
     public void home() throws IOException {

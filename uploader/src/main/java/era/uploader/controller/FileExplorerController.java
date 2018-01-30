@@ -1,6 +1,7 @@
 package era.uploader.controller;
 
 import com.google.common.base.Preconditions;
+import era.uploader.common.UploaderProperties;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.database.AssignmentDAOImpl;
 import era.uploader.data.viewmodel.AssignmentMetaData;
@@ -8,15 +9,17 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.awt.Desktop;
+import java.io.*;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +33,9 @@ public class FileExplorerController {
     @FXML
     private TableView<AssignmentMetaData> allAssignments;
     private static final AssignmentDAO ASSIGNMENT_DAO = AssignmentDAOImpl.instance();
+
+    @FXML
+    private Label modeLabel;
 
     @FXML
     void initialize() {
@@ -51,6 +57,16 @@ public class FileExplorerController {
 
             return row;
         });
+
+        if (UploaderProperties.instance().isUploadingEnabled()){
+            modeLabel.setText("Online");
+            modeLabel.setTextFill(Color.web("#228b22"));
+        }
+        else {
+            modeLabel.setText("Offline");
+            modeLabel.setTextFill(Color.web("#ff0000"));
+        }
+
         ObservableList<AssignmentMetaData> assignments = allAssignments.getItems();
         assignments.addAll(loadFromDB());
 
@@ -87,48 +103,46 @@ public class FileExplorerController {
     /**
      * Switch to the pdf scanning view.
      */
-    public void scanPDF(MouseEvent mouseEvent) {
+    public void scanPDF() throws IOException {
         UINavigator nav = new UINavigator(allAssignments.getScene());
-        try {
-            nav.changeToScan();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        nav.changeToScan();
     }
 
     /**
      * Switch to the class qrcreation view.
      */
-    public void createCourse(MouseEvent mouseEvent) {
+    public void createCourse() throws IOException {
         UINavigator nav = new UINavigator(allAssignments.getScene());
-        try {
-            nav.changeToCreateCourse();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        nav.changeToCreateCourse();
     }
 
     /**
      * Switch to the assignment creation view.
      */
-    public void createAssignment(MouseEvent mouseEvent) {
+    public void createAssignment() throws IOException {
         UINavigator nav = new UINavigator(allAssignments.getScene());
-        try {
-            nav.changeToCreateAssignment();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        nav.changeToCreateAssignment();
+    }
+
+    /**
+     * Switch to the online version of the application
+     */
+    public void changeToOnline() {
+        UploaderProperties.instance().setUploadingEnabled(true);
+        if (UploaderProperties.instance().isUploadingEnabled()){
+            modeLabel.setText("Online");
+            modeLabel.setTextFill(Color.web("#228b22"));
         }
     }
 
     /**
-     * Switch to the file explorer view. Wait what...
+     * Switch to the offline version of the application
      */
-    public void home(MouseEvent mouseEvent) {
-        UINavigator nav = new UINavigator(allAssignments.getScene());
-        try {
-            nav.changeToHome();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void changeToOffline() {
+        UploaderProperties.instance().setUploadingEnabled(false);
+        if (!UploaderProperties.instance().isUploadingEnabled()){
+            modeLabel.setText("Offline");
+            modeLabel.setTextFill(Color.web("#ff0000"));
         }
     }
 }

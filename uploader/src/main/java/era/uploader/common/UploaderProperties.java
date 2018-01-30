@@ -1,9 +1,6 @@
 package era.uploader.common;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -40,7 +37,7 @@ public class UploaderProperties {
         return INSTANCE;
     }
 
-    public Optional<Boolean> isUploadingEnabled() {
+    public Boolean isUploadingEnabled() {
         Optional<Boolean> ret = Optional.ofNullable(uploadingEnabled);
         if (!ret.isPresent()) {
             ret = getProperties()
@@ -51,7 +48,7 @@ public class UploaderProperties {
             uploadingEnabled = ret.orElse(null);
         }
 
-        return ret;
+        return uploadingEnabled;
     }
 
     public String getEmailSuffix() {
@@ -124,5 +121,25 @@ public class UploaderProperties {
 
     public File getFile() {
         return new File(PROP_FILE);
+    }
+
+    public void setUploadingEnabled(Boolean uploadingEnabled) {
+        this.uploadingEnabled = uploadingEnabled;
+        Optional<Properties> properties = getProperties();
+        if (properties.isPresent()) {
+            properties.get().setProperty("uploading.enabled", uploadingEnabled.toString());
+            storeProperties(properties.get());
+        }
+    }
+
+    public void storeProperties(Properties properties){
+        try {
+            FileOutputStream out = new FileOutputStream("uploader.properties");
+            properties.store(out, "uploader.properties updated");
+        }
+        catch (IOException e)
+        {
+            System.out.println("error when trying to update uploader.properties");
+        }
     }
 }

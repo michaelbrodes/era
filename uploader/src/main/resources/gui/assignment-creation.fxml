@@ -13,6 +13,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuItem?>
 <AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.AssignmentCreationController">
+
     <Button layoutX="873.0" layoutY="53.0" mnemonicParsing="false" onAction="#home" prefHeight="27.0" prefWidth="107.0" text="Home" />
     <ComboBox fx:id="averyTemplateComboBox" layoutX="210.0" layoutY="430.0" prefHeight="25.0" prefWidth="275.0" promptText="Avery Label Template" />
    <Label layoutX="60.0" layoutY="434.0" text="Avery Label Template" />
@@ -52,6 +53,7 @@
                 </Menu>
             </menus>
         </MenuBar>
-
+        <Label layoutX="852.0" layoutY="6.0" text="Current Mode:" />
+        <Label fx:id="modeLabel" layoutX="950.0" layoutY="6.0" text="null" />
     </children>
 </AnchorPane>

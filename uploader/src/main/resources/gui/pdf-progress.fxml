@@ -35,4 +35,6 @@
       </TableView>
       <Label layoutX="312.0" layoutY="209.0" prefHeight="17.0" prefWidth="124.0" text="Error Messages" />
    </children>
+   <Label layoutX="852.0" layoutY="6.0" text="Current Mode:" />
+   <Label fx:id="modeLabel" layoutX="950.0" layoutY="6.0" text="null" />
 </AnchorPane>

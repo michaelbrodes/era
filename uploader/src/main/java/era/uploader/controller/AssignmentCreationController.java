@@ -2,6 +2,7 @@ package era.uploader.controller;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import era.uploader.common.UploaderProperties;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.database.CourseDAOImpl;
@@ -16,7 +17,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -44,6 +47,8 @@ public class AssignmentCreationController {
     @FXML
     private Button createAssignmentButton;
 
+    @FXML
+    private Label modeLabel;
 
     @FXML
     void initialize() {
@@ -128,6 +133,14 @@ public class AssignmentCreationController {
 
         });
 
+        if (UploaderProperties.instance().isUploadingEnabled()){
+            modeLabel.setText("Online");
+            modeLabel.setTextFill(Color.web("#228b22"));
+        }
+        else {
+            modeLabel.setText("Offline");
+            modeLabel.setTextFill(Color.web("#ff0000"));
+        }
     }
 
     public void home() throws IOException {

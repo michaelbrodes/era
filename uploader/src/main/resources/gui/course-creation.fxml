@@ -20,7 +20,6 @@
       <font>
          <Font size="24.0" />
       </font></Label>
-
     <TableView fx:id="output" layoutX="318.0" layoutY="95.0" prefHeight="483.0" prefWidth="662.0">
     <columns>
         <TableColumn prefWidth="240.0" text="Student Name">
@@ -58,4 +57,6 @@
             </Menu>
         </menus>
     </MenuBar>
+    <Label layoutX="852.0" layoutY="6.0" text="Current Mode:" />
+    <Label fx:id="modeLabel" layoutX="950.0" layoutY="6.0" text="null" />
 </AnchorPane>

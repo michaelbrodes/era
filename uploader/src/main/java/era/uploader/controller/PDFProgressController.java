@@ -1,5 +1,6 @@
 package era.uploader.controller;
 
+import era.uploader.common.UploaderProperties;
 import era.uploader.data.viewmodel.ErrorMetaData;
 import era.uploader.service.processing.ScanningProgress;
 import javafx.application.Platform;
@@ -13,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 
@@ -24,6 +26,8 @@ public class PDFProgressController {
     private ProgressBar errorProgress;
     @FXML
     private Label numPercent;
+    @FXML
+    private Label modeLabel;
 
     private ScanningProgress scanningProgress;
 
@@ -31,7 +35,14 @@ public class PDFProgressController {
 
     @FXML
     void intialize(){
-
+        if (UploaderProperties.instance().isUploadingEnabled()){
+            modeLabel.setText("Online");
+            modeLabel.setTextFill(Color.web("#228b22"));
+        }
+        else {
+            modeLabel.setText("Offline");
+            modeLabel.setTextFill(Color.web("#ff0000"));
+        }
     }
     void setScanningProgress(ScanningProgress scanningProgress) {
         this.scanningProgress = scanningProgress;

@@ -38,12 +38,6 @@ public class PDFScanningService {
             String assignment,
             String host
     ) {
-        Optional<Boolean> uploadingEnabled = UploaderProperties
-                .instance()
-                .isUploadingEnabled();
-        if (!uploadingEnabled.orElse(Boolean.FALSE)) {
-            host = null;
-        }
 
         return PDFProcessor.process(qrCodeMappingDAO, assignmentDAO, pdf, course, assignment, host);
     }

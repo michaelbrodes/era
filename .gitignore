@@ -75,3 +75,9 @@ server/build/*
 **/crashlytics.properties
 **/crashlytics-build.properties
 **/fabric.properties
+
+#jar files
+*.jar
+
+#emacs generated files
+*~

@@ -18,6 +18,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -51,6 +52,8 @@ public class CourseCreationController {
     private ComboBox<String> termDropdown;
     @FXML
     private ComboBox<Integer> yearDropdown;
+    @FXML
+    private Label modeLabel;
 
 
     private final FileChooser chooser = new FileChooser();
@@ -81,6 +84,15 @@ public class CourseCreationController {
                 .forEach(availableYears::add);
         yearDropdown.setPromptText("Year...");
         yearDropdown.setItems(availableYears);
+
+        if (UploaderProperties.instance().isUploadingEnabled()){
+            modeLabel.setText("Online");
+            modeLabel.setTextFill(Color.web("#228b22"));
+        }
+        else {
+            modeLabel.setText("Offline");
+            modeLabel.setTextFill(Color.web("#ff0000"));
+        }
     }
 
     /**
@@ -147,10 +159,12 @@ public class CourseCreationController {
             return;
         }
         Multimap<Course, Student> coursesToStudents = null;
+        boolean uploading = false;
         try {
-            Optional<Boolean> uploadingEnabled = UploaderProperties.instance().isUploadingEnabled();
-            boolean isUploadingEnabled = uploadingEnabled.orElse(false);
-            coursesToStudents = service.createCourses(inputPath, semester.get(), isUploadingEnabled);
+            if (UploaderProperties.instance().isUploadingEnabled() != null) {
+                uploading = UploaderProperties.instance().isUploadingEnabled();
+            }
+            coursesToStudents = service.createCourses(inputPath, semester.get(), uploading);
         } catch (IOException e) {
             // technically shouldn't be possible but we need to be defensive
             Alert fileOperationError = new Alert(Alert.AlertType.ERROR);
