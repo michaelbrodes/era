@@ -3,9 +3,9 @@ package era.uploader.service.assignment;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.WillClose;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -24,11 +24,12 @@ public class ShippingLabelSaver extends AbstractQRSaver {
         super(finishedLatch);
     }
 
-    @VisibleForTesting
-    ShippingLabelSaver(QRCodePDF aggregator) {
-        super(aggregator);
+   @VisibleForTesting
+   ShippingLabelSaver(@WillClose QRCodePDF aggregator) {
+        super(new CountDownLatch(Integer.MAX_VALUE));
+        Preconditions.checkNotNull(aggregator);
+        this.pdf = aggregator;
     }
-
     /**
      * Calculates the next x coordinate to write a QR code. If the current cell
      * being written to is even then the cell is on the right hand side of the
@@ -91,32 +92,28 @@ public class ShippingLabelSaver extends AbstractQRSaver {
         Preconditions.checkNotNull(qrCode.getQrCode(), "The QR code generated got wiped");
         Preconditions.checkNotNull(editor);
 
-        // BufferedImage of the QR code to a PDImageXObject for the document.
-        PDImageXObject pdfQrImage = createQRImage(qrCode);
-        editor.drawImage(pdfQrImage, xPosition, yPosition - AveryConstants.Shipping.QR_HEIGHT);
+        drawQRCode(editor, qrCode, xPosition, yPosition - AveryConstants.Shipping.QR_HEIGHT);
 
-        editor.beginText();
-        editor.setLeading(AveryConstants.NEW_LINE_OFFSET);
-        editor.setFont(AveryConstants.FONT, AveryConstants.FONT_SIZE);
-
+        beginText(editor, AveryConstants.Shipping.NEW_LINE_OFFSET, AveryConstants.Shipping.FONT_SIZE);
         editor.newLineAtOffset(
-                xPosition + AveryConstants.Shipping.QR_WIDTH + AveryConstants.QR_CODE_TEXT_PADDING,
-                yPosition - AveryConstants.Shipping.TEXT_PADDING_FROM_TOP_OF_LABEL
+                xPosition + AveryConstants.Shipping.QR_WIDTH + AveryConstants.TEXT_MARGIN_LEFT,
+                yPosition - AveryConstants.Shipping.TEXT_MARGIN_TOP
         );
         editor.showText("Student: " + qrCode.getStudentName());
-
         editor.newLine();
+
         editor.showText("Course: " + qrCode.getCourseName());
-
         editor.newLine();
+
         editor.showText("Assignment: " + qrCode.getAssignmentName());
         editor.newLine();
+
         editor.showText("Page Number: " + qrCode.getPageNumber());
         editor.endText();
     }
 
     @Override
-    protected void writeHeader(PDPageContentStream editor) {
+    protected void writeHeader(PDPageContentStream editor, float height, float width) {
         // no-op each student has their own name on the label
     }
 
