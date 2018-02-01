@@ -1,11 +1,11 @@
 package era.uploader.service.assignment;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.WillNotClose;
@@ -64,7 +64,8 @@ public abstract class AbstractQRSaver implements FutureCallback<List<QRCode>> {
      * @param batch a batch of qr codes for a particular student.
      * @throws IOException something bad happened when writing qr codes.
      */
-    private void writeBatch(@Nonnull List<QRCode> batch) throws IOException {
+    private void writeBatch(List<QRCode> batch) throws IOException {
+        Preconditions.checkNotNull(batch);
         // start streaming content to the aggregator file
         PDPageContentStream editor = pdf.getPageEditor();
         writeHeader(editor, pdf.getHeight(), pdf.getWidth());
@@ -111,12 +112,19 @@ public abstract class AbstractQRSaver implements FutureCallback<List<QRCode>> {
             float x,
             float y
     ) throws IOException {
+        Preconditions.checkNotNull(editor);
+
         PDImageXObject qrImage = pdf.newImage(code);
         editor.drawImage(qrImage, x, y);
     }
 
+    /**
+     * Change the editor to "Text Mode" and setup the new line offset and font size.
+     */
     @SuppressWarnings("WeakerAccess")
     protected void beginText(PDPageContentStream editor, float newLineOffset, float fontSize) throws IOException {
+        Preconditions.checkNotNull(editor);
+
         editor.beginText();
         editor.setLeading(newLineOffset);
         editor.setFont(AveryConstants.FONT, fontSize);
@@ -126,6 +134,8 @@ public abstract class AbstractQRSaver implements FutureCallback<List<QRCode>> {
      * Saves and closes the aggregating PDF using the supplied assignmentName.
      */
     public void save(String assignmentName) throws IOException {
+        Preconditions.checkNotNull(assignmentName);
+
         final Path path = Paths.get(assignmentName);
         if(!Files.exists(path.getParent())){
             Files.createDirectory(path.getParent());
@@ -163,23 +173,23 @@ public abstract class AbstractQRSaver implements FutureCallback<List<QRCode>> {
      * Calculates the y coordinate of the next cell (label) to be written to
      * on the PDF.
      *
-     * @param currentCell the current cell to be written to
+     * @param nextCell the current cell to be written to
      * @return the y coordinate of that current cell. It is a float because
      * that is required by PDFBox
      * @see QRCodePDF for the class that wraps the meta data of a PDF.
      */
-    protected abstract float calcNextY(int currentCell, float height);
+    protected abstract float calcNextY(int nextCell, float height);
 
     /**
      * Calculates the x coordinate of the next cell (label) to be written to
      * on the PDF.
      *
-     * @param currentCell the next cell to be written to
+     * @param nextCell the next cell to be written to
      * @return the x coordinate of that cell. It is a float because that is
      * required by PDFBox
      * @see QRCodePDF for the class that wraps the meta data of a PDF.
      */
-    protected abstract float calcNextX(int currentCell, float width);
+    protected abstract float calcNextX(int nextCell, float width);
 
     /**
      * The number of cells on a single page of {@link #pdf}

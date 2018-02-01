@@ -37,18 +37,18 @@ public class ShippingLabelSaver extends AbstractQRSaver {
      *
      * @see AveryConstants.Shipping#CELLS_PER_ROW
      * @see AveryConstants.Shipping#POINTS_FROM_LEFT_EDGE
-     * @see AveryConstants.Shipping#POINTS_TO_RIGHT_CELL
-     * @param currentCell the current cell being written to
+     * @see AveryConstants.Shipping#POINTS_TO_NEXT_COLUMN
+     * @param nextCell the current cell being written to
      * @return the y coordinate of that cell. It is a float because that is
      * required by PDFBox.
      */
     @Override
-    protected float calcNextX(int currentCell, float width) {
-        if (currentCell % AveryConstants.Shipping.CELLS_PER_ROW == 0) {
+    protected float calcNextX(int nextCell, float width) {
+        if (nextCell % AveryConstants.Shipping.CELLS_PER_ROW == 0) {
             return AveryConstants.Shipping.POINTS_FROM_LEFT_EDGE;
         } else {
             return AveryConstants.Shipping.POINTS_FROM_LEFT_EDGE
-                    + AveryConstants.Shipping.POINTS_TO_RIGHT_CELL;
+                    + AveryConstants.Shipping.POINTS_TO_NEXT_COLUMN;
         }
     }
 
@@ -64,17 +64,17 @@ public class ShippingLabelSaver extends AbstractQRSaver {
      * same y coordinate, and there is an ~150pt gap between the middles of
      * two cells that are vertically adjacent to each other.
      *
-     * @param currentCell the current cell to be written to
+     * @param nextCell the current cell to be written to
      * @return the y coordinate of that current cell. It is a float because
      * that is required by PDFBox
      */
     @Override
-    protected float calcNextY(int currentCell, float height) {
+    protected float calcNextY(int nextCell, float height) {
         return height
                 - AveryConstants.Shipping.POINTS_FROM_TOP
-                - currentCell
+                - nextCell
                 / AveryConstants.Shipping.CELLS_PER_ROW
-                * AveryConstants.Shipping.POINTS_TO_JUMP;
+                * AveryConstants.Shipping.POINTS_TO_NEXT_ROW;
     }
 
     /**
@@ -96,7 +96,7 @@ public class ShippingLabelSaver extends AbstractQRSaver {
 
         beginText(editor, AveryConstants.Shipping.NEW_LINE_OFFSET, AveryConstants.Shipping.FONT_SIZE);
         editor.newLineAtOffset(
-                xPosition + AveryConstants.Shipping.QR_WIDTH + AveryConstants.TEXT_MARGIN_LEFT,
+                xPosition + AveryConstants.Shipping.QR_WIDTH + AveryConstants.Shipping.TEXT_MARGIN_LEFT,
                 yPosition - AveryConstants.Shipping.TEXT_MARGIN_TOP
         );
         editor.showText("Student: " + qrCode.getStudentName());

@@ -8,8 +8,21 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * {@link AbstractQRSaver} defines a <em>general</em> strategy for saving QR
+ * Codes. {@link AddressLabelSaver} and {@link ShippingLabelSaver} are the
+ * specific <em>instances</em> of that strategy. The user can pick the saving
+ * strategy of choice using a specific {@link AveryTemplate} which contains
+ * the name and description of each strategy. Call
+ * {@link #saver(AveryTemplate, CountDownLatch, Course, Student)} to get your
+ * strategy of choice.
+ */
 @ParametersAreNonnullByDefault
 public class QRSaverFactory {
+    /**
+     * Creates a new {@link AbstractQRSaver} based off the provided
+     * {@link AveryTemplate}
+     */
     public static AbstractQRSaver saver(
             AveryTemplate template,
             CountDownLatch finishedLatch,
@@ -28,6 +41,13 @@ public class QRSaverFactory {
         }
     }
 
+    /**
+     * Creates a new {@link AbstractQRSaver} based off the provided
+     * {@link AveryTemplate}
+     *
+     * @deprecated use {@link #saver(AveryTemplate, CountDownLatch, Course, Student)}
+     */
+    @Deprecated
     public static AbstractQRSaver saver(AveryTemplate template, CountDownLatch finishedLatch) {
         return saver(template, finishedLatch, null, null);
     }
