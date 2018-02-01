@@ -40,10 +40,8 @@ import java.util.stream.Collectors;
 /**
  * This class contains the business logic for QR Creation.
  *
- * @deprecated please use {@link AssignmentCreationService}
  */
 @SuppressWarnings("DeprecatedIsStillUsed")
-@Deprecated
 @ParametersAreNonnullByDefault
 public class QRCreationService {
     private final QRCodeMappingDAO qrCodeMappingDAO;
@@ -96,9 +94,7 @@ public class QRCreationService {
      * @see AbstractQRSaver for the general strategy
      * of saving QR codes.
      * @see era.uploader.service.assignment for all classes used in this process
-     * @deprecated please use {@link AssignmentCreationService#generateQRsForAssignments(List, Course, AveryTemplate)}
      */
-    @Deprecated
     public List<QRCodeMapping> createQRs(
             Course course,
             String assignmentName,

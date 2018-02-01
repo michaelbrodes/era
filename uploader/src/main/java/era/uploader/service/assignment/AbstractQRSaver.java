@@ -1,7 +1,6 @@
 package era.uploader.service.assignment;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
@@ -9,7 +8,6 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.WillClose;
 import javax.annotation.WillNotClose;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,20 +30,12 @@ import java.util.concurrent.CountDownLatch;
  */
 @ParametersAreNonnullByDefault
 public abstract class AbstractQRSaver implements FutureCallback<List<QRCode>> {
-    private final QRCodePDF pdf;
+    protected QRCodePDF pdf;
     private final CountDownLatch finishedLatch;
 
     public AbstractQRSaver(CountDownLatch finishedLatch) {
         this.finishedLatch = finishedLatch;
         this.pdf = new QRCodePDF(numberOfCells());
-    }
-
-    @VisibleForTesting
-    AbstractQRSaver(@Nonnull @WillClose QRCodePDF aggregator) {
-        Preconditions.checkNotNull(aggregator);
-        this.pdf = aggregator;
-        // will never be used by an outside source.
-        this.finishedLatch = new CountDownLatch(Integer.MAX_VALUE);
     }
 
     /**
@@ -77,7 +67,7 @@ public abstract class AbstractQRSaver implements FutureCallback<List<QRCode>> {
     private void writeBatch(@Nonnull List<QRCode> batch) throws IOException {
         // start streaming content to the aggregator file
         PDPageContentStream editor = pdf.getPageEditor();
-        writeHeader(editor);
+        writeHeader(editor, pdf.getHeight(), pdf.getWidth());
 
         for (QRCode code : batch) {
             float x = calcNextX(pdf.getCurrentCell(), pdf.getWidth());
@@ -112,21 +102,24 @@ public abstract class AbstractQRSaver implements FutureCallback<List<QRCode>> {
      * want to expose the actually PDF instance variable to the subclasses.
      *
      * @param code the QRCode that we need an image of
-     * @return an image, containing that QRCode, that can be inserted into the
-     * PDF document.
      * @throws IOException something bad happened when creating a new Image
      */
     @SuppressWarnings("WeakerAccess")
-    protected PDImageXObject createQRImage(QRCode code) throws IOException {
-        return pdf.newImage(code);
+    protected void drawQRCode(
+            PDPageContentStream editor,
+            QRCode code,
+            float x,
+            float y
+    ) throws IOException {
+        PDImageXObject qrImage = pdf.newImage(code);
+        editor.drawImage(qrImage, x, y);
     }
 
-    /**
-     * Get the height of the current page in the PDF document.
-     */
     @SuppressWarnings("WeakerAccess")
-    protected float getPDFHeight() {
-        return pdf.getHeight();
+    protected void beginText(PDPageContentStream editor, float newLineOffset, float fontSize) throws IOException {
+        editor.beginText();
+        editor.setLeading(newLineOffset);
+        editor.setFont(AveryConstants.FONT, fontSize);
     }
 
     /**
@@ -163,7 +156,8 @@ public abstract class AbstractQRSaver implements FutureCallback<List<QRCode>> {
      *
      * @param editor the editor that allows us to write to the header.
      */
-    protected abstract void writeHeader (@WillNotClose PDPageContentStream editor);
+    @VisibleForTesting
+    abstract void writeHeader (@WillNotClose PDPageContentStream editor, float height, float width) throws IOException;
 
     /**
      * Calculates the y coordinate of the next cell (label) to be written to
@@ -180,12 +174,12 @@ public abstract class AbstractQRSaver implements FutureCallback<List<QRCode>> {
      * Calculates the x coordinate of the next cell (label) to be written to
      * on the PDF.
      *
-     * @param nextCell the next cell to be written to
+     * @param currentCell the next cell to be written to
      * @return the x coordinate of that cell. It is a float because that is
      * required by PDFBox
      * @see QRCodePDF for the class that wraps the meta data of a PDF.
      */
-    protected abstract float calcNextX(int nextCell, float width);
+    protected abstract float calcNextX(int currentCell, float width);
 
     /**
      * The number of cells on a single page of {@link #pdf}
