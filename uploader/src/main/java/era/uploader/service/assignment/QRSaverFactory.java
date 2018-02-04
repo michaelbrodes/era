@@ -41,6 +41,17 @@ public class QRSaverFactory {
         }
     }
 
+    public static AbstractQRSaver saver(AveryTemplate template, CountDownLatch finishedLatch, Student student) {
+        switch (template) {
+            case ADDRESS_LABELS:
+                return new AddressLabelSaver(finishedLatch, student, null);
+            case SHIPPING_LABELS:
+                return new ShippingLabelSaver(finishedLatch, student, null);
+            default:
+                throw new IllegalArgumentException("AveryTemplate does not exist");
+        }
+    }
+
     /**
      * Creates a new {@link AbstractQRSaver} based off the provided
      * {@link AveryTemplate}

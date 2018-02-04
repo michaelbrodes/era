@@ -3,6 +3,8 @@ package era.uploader.service.assignment;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
+import era.uploader.data.model.Course;
+import era.uploader.data.model.Student;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
@@ -33,9 +35,40 @@ public abstract class AbstractQRSaver implements FutureCallback<List<QRCode>> {
     protected QRCodePDF pdf;
     private final CountDownLatch finishedLatch;
 
+    private final Course course;
+
+    private final Student student;
+
     public AbstractQRSaver(CountDownLatch finishedLatch) {
         this.finishedLatch = finishedLatch;
         this.pdf = new QRCodePDF(numberOfCells());
+        this.student = null;
+        this.course = null;
+    }
+
+    public AbstractQRSaver(CountDownLatch finishedLatch, Student student, Course course) {
+        this.finishedLatch = finishedLatch;
+        this.pdf = new QRCodePDF(numberOfCells());
+        this.student = student;
+        this.course = course;
+    }
+
+    @VisibleForTesting
+    AbstractQRSaver(@Nonnull @WillClose QRCodePDF aggregator) {
+        Preconditions.checkNotNull(aggregator);
+        this.pdf = aggregator;
+        // will never be used by an outside source.
+        this.finishedLatch = new CountDownLatch(Integer.MAX_VALUE);
+        this.student = null;
+        this.course = null;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public Course getCourse() {
+        return course;
     }
 
     /**

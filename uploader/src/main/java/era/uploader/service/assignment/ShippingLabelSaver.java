@@ -2,6 +2,8 @@ package era.uploader.service.assignment;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import era.uploader.data.model.Course;
+import era.uploader.data.model.Student;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -22,6 +24,10 @@ public class ShippingLabelSaver extends AbstractQRSaver {
 
     ShippingLabelSaver(CountDownLatch finishedLatch) {
         super(finishedLatch);
+    }
+
+    ShippingLabelSaver(CountDownLatch finishedLatch, Student student, Course course) {
+        super(finishedLatch, student, course);
     }
 
    @VisibleForTesting
