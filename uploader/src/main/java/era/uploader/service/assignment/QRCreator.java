@@ -2,12 +2,14 @@ package era.uploader.service.assignment;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import era.uploader.data.model.QRCodeMapping;
+import era.uploader.data.model.Assignment;
+import era.uploader.data.model.Course;
 import era.uploader.data.model.Student;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -18,7 +20,8 @@ import java.util.concurrent.Callable;
 
 /**
  * A multithreaded QRCode creator. It generates the UUIDs to be stored in the
- * QR code and then will eventually put those QR codes into a PDF
+ * QR code and creates an image of those QR codes. It processes QR Codes in
+ * batches based off of how many cpu cores are on the machine generating them.
  */
 @ParametersAreNonnullByDefault
 public class QRCreator implements Callable<List<QRCode>> {
@@ -73,7 +76,8 @@ public class QRCreator implements Callable<List<QRCode>> {
         try {
             qrCode.setQRCode(createNewQRCodeImage(uuid));
         } catch (WriterException e) {
-            System.out.println("Issue writing QR Code");
+            System.err.println("Issue writing QR Code");
+            throw e;
         }
 
         return qrCode;

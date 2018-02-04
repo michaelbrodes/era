@@ -1,5 +1,6 @@
 package era.server.data;
 
+import era.server.common.AppConfig;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.jooq.ConnectionProvider;
 import org.jooq.exception.DataAccessException;
@@ -7,14 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class ConnectionPool implements ConnectionProvider{
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionPool.class);
@@ -25,17 +20,18 @@ public class ConnectionPool implements ConnectionProvider{
     private final BasicDataSource dataSource;
 
     private ConnectionPool() {
-        Properties serverProperties = readServerProperties();
+        AppConfig serverConfig = AppConfig.instance();
+
         dataSource = new BasicDataSource();
         dataSource.setDriverClassName("org.mariadb.jdbc.Driver");
         dataSource.setUrl(
-                serverProperties.getProperty("db.url", DEFAULT_URL)
+                serverConfig.getConnectionURL()
         );
         dataSource.setUsername(
-                serverProperties.getProperty("db.user", DEFAULT_USER)
+                serverConfig.getDbUser()
         );
         dataSource.setPassword(
-                serverProperties.getProperty("db.password", DEFAULT_PASS)
+                serverConfig.getDbPassword()
         );
         dataSource.setMinIdle(5);
         dataSource.setMaxIdle(10);
@@ -43,27 +39,12 @@ public class ConnectionPool implements ConnectionProvider{
         LOGGER.info("Connection pool started.");
     }
 
-    private Properties readServerProperties() {
-        Properties properties = new Properties();
-        try {
-            InputStream propsFile = Files.newInputStream(
-                    Paths.get("server.properties"),
-                    StandardOpenOption.READ
-            );
-            properties.load(propsFile);
-        } catch (IOException e) {
-            LOGGER.error("Couldn't open server properties file, we need to die");
-            System.exit(1);
-        }
-
-        return properties;
-    }
-
     @Override
     public Connection acquire() throws DataAccessException {
         try {
             return dataSource.getConnection();
         } catch (SQLException e) {
+            e.printStackTrace();
             LOGGER.error("Cannot connect to data source");
             System.exit(1);
             return null;

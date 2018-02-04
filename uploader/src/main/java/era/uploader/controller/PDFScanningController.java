@@ -51,20 +51,14 @@ public class PDFScanningController {
     @FXML
     private Label modeLabel;
 
-<<<<<<< HEAD
     private static final String NULL_HOST = null;
-=======
-
-    //TODO update this to something not hardcoded you schlum
-    private static final String HOST_NAME = "http://localhost:3000";
->>>>>>> 6baa53e4c4158430a45cf6e605563d75b5219003
 
     private final PDFScanningService pdfServ = new PDFScanningService();
 
     private Path fullPath;
     private String fullFileName;
+    //private Course currentCourse;
     //private String currentAssignment;
-   //private Course currentCourse;
 
 
     @FXML
@@ -131,7 +125,6 @@ public class PDFScanningController {
                 try {
                 boolean uploading = false;
                 if(currentCourse != null && currentAssignment != null) {
-<<<<<<< HEAD
                     if (UploaderProperties.instance().isUploadingEnabled() != null) {
                         uploading = UploaderProperties.instance().isUploadingEnabled();
                     }
@@ -163,19 +156,6 @@ public class PDFScanningController {
                         ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
                         mainScene.setRoot(root);
                     }
-=======
-                    final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, HOST_NAME);
-                    URL url = getClass().getResource("/gui/pdf-progress.fxml");
-
-                    FXMLLoader fxmlloader = new FXMLLoader();
-                    fxmlloader.setLocation(url);
-                    //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
-                    Parent root = fxmlloader.load();
-                    Scene mainScene = scanButton.getScene();
-                    // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
-                    ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
-                    mainScene.setRoot(root);
->>>>>>> 6baa53e4c4158430a45cf6e605563d75b5219003
 
                 }
 

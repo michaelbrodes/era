@@ -32,7 +32,7 @@ public class AssignmentUploader {
             File file = new File(current.getImageFilePath());
             String assignmentName = current.getName();
             int assignmentId = current.getUniqueId();
-            String studentId = current.getStudent().getSchoolId();
+            String studentId = Integer.toString(current.getStudent().getUniqueId());
 
             post.addHeader("X-Assignment-Id", assignmentId + "" );
             post.addHeader("X-Assignment-Name", assignmentName);
