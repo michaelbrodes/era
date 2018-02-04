@@ -8,8 +8,10 @@ import era.uploader.data.model.Student;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.WillClose;
 import javax.annotation.WillNotClose;
 import java.io.IOException;
 import java.nio.file.Files;
