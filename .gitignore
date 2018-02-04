@@ -78,6 +78,83 @@ server/build/*
 
 #jar files
 *.jar
+<<<<<<< HEAD
 
 #emacs generated files
 *~
+=======
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+### Xcode ###
+# Xcode
+#
+# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
+
+## Build generated
+DerivedData/
+
+## Various settings
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+
+## Other
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+### Xcode Patch ###
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/contents.xcworkspacedata
+/*.gcno
+
+# End of https://www.gitignore.io/api/java,xcode,netbeans,intellij+all
+
+.idea/
+.gradle/
+gradlew 
+gradlew.bat
+gradle/
+server/libraries
+server/modules
+
+*.iml
+.DS_Store
+*.db
+uploader/src/test/resources/split
+uploader.db
+# got to stop committing this files! 
+uploader/src/test/resources/test-pdfs
+
+# database files for server
+server/docker/db
+server/docker/.env
+
+*.pdf
+
+uploader/QRCode Directory/
+uploader/out/*
+server/out/*
+>>>>>>> 6baa53e4c4158430a45cf6e605563d75b5219003

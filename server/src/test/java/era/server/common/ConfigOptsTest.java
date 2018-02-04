@@ -9,13 +9,11 @@ public class ConfigOptsTest {
     @Test
     public void parseArgs() throws Exception {
         String[] args = new String[] {
-                ConfigOpts.SERVER_PORT_OPT,
-                "80",
-                ConfigOpts.HOST_OPT,
+                "--host",
                 "localhost",
-                ConfigOpts.DB_PORT_OPT,
+                "--port",
                 "3001",
-                ConfigOpts.USER_OPT,
+                "--user",
                 "root",
         };
 
@@ -26,10 +24,10 @@ public class ConfigOptsTest {
                 "localhost",
                 configOptsMap.get(ConfigOpts.HOST)
         );
-        Assert.assertNotNull(configOptsMap.get(ConfigOpts.DB_PORT));
+        Assert.assertNotNull(configOptsMap.get(ConfigOpts.PORT));
         Assert.assertEquals(
                 "3001",
-                configOptsMap.get(ConfigOpts.DB_PORT)
+                configOptsMap.get(ConfigOpts.PORT)
         );
         Assert.assertNotNull(configOptsMap.get(ConfigOpts.USER));
         Assert.assertEquals(

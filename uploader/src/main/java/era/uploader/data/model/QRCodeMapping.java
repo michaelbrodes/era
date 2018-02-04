@@ -1,11 +1,11 @@
 package era.uploader.data.model;
 
 import com.google.common.base.Preconditions;
+import com.google.zxing.common.BitMatrix;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNullableByDefault;
-import java.awt.image.BufferedImage;
 
 /**
  * An individual page for an assignment. A page has a QR code that encodes a
@@ -71,11 +71,11 @@ public class QRCodeMapping {
     }
 
 
-    public BufferedImage getQrCode() {
+    public BitMatrix getQrCode() {
         return qrCode;
     }
 
-    public void setQrCode( BufferedImage qrCode) {
+    public void setQrCode( BitMatrix qrCode) {
         this.qrCode = qrCode;
     }
 
@@ -136,7 +136,7 @@ public class QRCodeMapping {
         private Student student;
         private Integer studentId;
         private int sequenceNumber;
-        private BufferedImage qrCode;
+        private BitMatrix qrCode;
         private PDDocument document;
         private String tempDocumentName;
 
@@ -160,10 +160,11 @@ public class QRCodeMapping {
             return this;
         }
 
-        public Builder withQRCodeImage(BufferedImage qrCode) {
+        public Builder withQRCode(BitMatrix qrCode) {
             this.qrCode = qrCode;
             return this;
         }
+
         public Builder withTempDocumentName(String name) {
             this.tempDocumentName = name;
             return this;

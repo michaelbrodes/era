@@ -2,7 +2,6 @@
 
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -10,8 +9,10 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
+
 <AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.CourseCreationController">
    <Button fx:id="homeButton" layoutX="873.0" layoutY="53.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="107.0" text="Home" onAction="#home" />
     <Button fx:id="browseFiles" layoutX="17.0" layoutY="254.0" onMouseClicked="#findrosterFile" text="Browse Files" />

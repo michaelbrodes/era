@@ -34,7 +34,6 @@ public class Assignment {
     public Assignment() {
 
     }
-
     /**
      * Creates a new Assignment object. All Nonnull arguments are required
      * arguments and match "NOT NULL" columns in the database.

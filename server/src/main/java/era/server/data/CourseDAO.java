@@ -4,7 +4,6 @@ import era.server.data.model.Course;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.sql.SQLException;
 
 /**
  * Provides CRUD access functionality for {@link Course} objects. Abstracted
@@ -12,16 +11,21 @@ import java.sql.SQLException;
  */
 @ParametersAreNonnullByDefault
 public interface CourseDAO {
-    /**
-     * Create and Insert a new Course object into the database. This method
-     * will also insert all students and assignments attached to a course, so
-     * <em>use wisely</em>.
-     */
-    void insert(Course course) throws SQLException;
+    void insert(Course course);
 
     /**
      * Access data from existing Course object from access
      */
     @Nullable
     Course read(long id);
+
+    /**
+     * Modify data stored in already existing Course in access
+     */
+    void update(Course courseToChange, Course courseChanged);
+
+    /**
+     * Delete existing Course object in access
+     */
+    void delete(Course course);
 }
