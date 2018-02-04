@@ -1,6 +1,8 @@
 package era.uploader.service.assignment;
 
 import com.google.common.annotations.VisibleForTesting;
+import era.uploader.data.model.Course;
+import era.uploader.data.model.Student;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 import javax.annotation.Nonnull;
@@ -13,6 +15,10 @@ public class AddressLabelSaver extends AbstractQRSaver {
 
     AddressLabelSaver(CountDownLatch finishedLatch) {
         super(finishedLatch);
+    }
+
+    AddressLabelSaver(CountDownLatch finishedLatch, Student student, Course course) {
+        super(finishedLatch, student, course);
     }
 
     @VisibleForTesting

@@ -1,6 +1,5 @@
 package era.uploader.service;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -9,9 +8,11 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import era.uploader.data.QRCodeMappingDAO;
+import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.Student;
+import era.uploader.data.viewmodel.AssignmentPrintoutMetaData;
 import era.uploader.service.assignment.AbstractQRSaver;
 import era.uploader.service.assignment.AveryTemplate;
 import era.uploader.service.assignment.QRCode;
@@ -27,23 +28,17 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 
 /**
  * This class contains the business logic for QR Creation.
  *
- * @deprecated please use {@link AssignmentCreationService}
  */
-@SuppressWarnings("DeprecatedIsStillUsed")
-@Deprecated
 @ParametersAreNonnullByDefault
 public class QRCreationService {
     private final QRCodeMappingDAO qrCodeMappingDAO;
@@ -54,6 +49,24 @@ public class QRCreationService {
     public QRCreationService(QRCodeMappingDAO qrCodeMappingDAO) {
         Preconditions.checkNotNull(qrCodeMappingDAO);
         this.qrCodeMappingDAO = qrCodeMappingDAO;
+    }
+
+    //TODO: assignment qrcodes aren't being saved to the pdf file, figure it out and fix it, also fix unit tests that I broke changing around code
+    public void printAndSaveQRCodes(List<AssignmentPrintoutMetaData> assignmentsList, AveryTemplate averyTemplate){
+         createQRs( groupAssignmentByStudent( assignmentsList ), averyTemplate ); //groups Assignments by student then creates the QRCodes for each student, then saves those QRCodes
+    }
+
+    public Map<Student, List<AssignmentPrintoutMetaData>> groupAssignmentByStudent (List<AssignmentPrintoutMetaData> assignmentsList){
+        Map< Student, List<AssignmentPrintoutMetaData>> assignmentsToPrint = new HashMap<>();
+        for ( AssignmentPrintoutMetaData assignment : assignmentsList ) {
+            for ( Student student: assignment.getCourse().getStudentsEnrolled() ) {
+                if ( !assignmentsToPrint.containsKey(student) ){
+                    assignmentsToPrint.put(student, new LinkedList<>());
+                }
+                assignmentsToPrint.get(student).add(assignment);
+            }
+        }
+        return assignmentsToPrint;
     }
 
     /**
@@ -80,10 +93,8 @@ public class QRCreationService {
      * this method. We will eventually create assignments when we implement the
      * "Multi-page Ordering" feature of this project.
      *
-     * @param course the course that contains the students we want to map QR
-     *               codes to
-     * @param assignmentName the name of this assignment.
-     * @param numberOfPages the number of pages for this particular assignment
+     * TODO: Josh add in the changed params for this mehtod please -past Josh
+     *
      * @param template the type of Avery Label template we want to save QR
      *                    codes on. This will allow us to determine if we want
      *                    an {@link AddressLabelSaver}
@@ -96,87 +107,119 @@ public class QRCreationService {
      * @see AbstractQRSaver for the general strategy
      * of saving QR codes.
      * @see era.uploader.service.assignment for all classes used in this process
-     * @deprecated please use {@link AssignmentCreationService#generateQRsForAssignments(List, Course, AveryTemplate)}
      */
-    @Deprecated
-    public List<QRCodeMapping> createQRs(
-            Course course,
-            String assignmentName,
-            int numberOfPages,
+
+    public List<QRCode> createQRs(
+            Map<Student, List<AssignmentPrintoutMetaData>> groupAssignmentByStudent,
             AveryTemplate template
     ) {
-        Preconditions.checkNotNull(course);
-        Preconditions.checkNotNull(course.getStudentsEnrolled());
-        Preconditions.checkNotNull(assignmentName);
+        Preconditions.checkNotNull(groupAssignmentByStudent);
         Preconditions.checkNotNull(template);
 
         int processors = Runtime.getRuntime().availableProcessors();
 
         // A thread pool of N threads where N is the number of processors on a system.
-        ListeningExecutorService creatorThreads = MoreExecutors.listeningDecorator(
+        ListeningExecutorService threadPool = MoreExecutors.listeningDecorator(
                 Executors.newFixedThreadPool(processors)
         );
 
-        // The one single thread used for saving. This is so we can pause the main thread.
-        // TODO - you will probably need to replace this with the previous thread pool once we have a saver for each student.
-        ListeningExecutorService saverThread = MoreExecutors.listeningDecorator(
-                Executors.newSingleThreadExecutor()
-        );
 
-        // this next variable kind of blows but here is a break done:
+
+        // this next variable kind of blows but here is a break down:
         // QRCode - a QR code that should be attached to a single page on a single assignment
         // List<QRCode> - every QR code for every assignment for a single student
         // Future<List<QRCode>> - the **PROMISE** of every QR code for a single student once QRCreator#call is done
         // List<Future<List<QRCode>>> - every promise for every student in the course that we will get back every
         // QR Code from QRCreator#call
-        // TODO - Josh please make this so. Right now it is every QRCode from every batch.
         List<Future<List<QRCode>>> futures =
                 Lists.newArrayList();
 
-        // TODO - this should be replace by a single list of all students. That way we can save every QR code for a particular student into one PDF
-        List<List<Student>> studentBatches = bucketStudentsIntoLabelBatches(
-                course.getStudentsEnrolled(),
-                processors
+        // Changing the assignments in gropuAssignmentsByStudents Map to instead map to QRCodes
+        Map<Student, List<QRCode>> studentBatches = mapStudentsToQrCodes(
+                groupAssignmentByStudent
         );
         // a latch that will force the main thread to wait until all QR Codes have been saved to PDFs
         CountDownLatch finishedLatch = new CountDownLatch(studentBatches.size());
+        List<AbstractQRSaver> abstractQRSavers = new ArrayList<>();
 
         // distribute out the labor of creating and saving.
         // TODO - saver creation should be done in the loop
-        AbstractQRSaver saver = QRSaverFactory.saver(template, finishedLatch);
-        for (List<Student> students : studentBatches) {
+        for (Map.Entry<Student, List<QRCode>> qrCode : studentBatches.entrySet()) {
             QRCreator creator = new QRCreator(
-                    course,
-                    students,
-                    assignmentName,
-                    numberOfPages,
+                    qrCode.getValue(),
                     template.getQRHeight(),
                     template.getQRWidth()
             );
-            ListenableFuture<List<QRCode>> creationFuture = creatorThreads.submit(creator);
+            AbstractQRSaver saver = QRSaverFactory.saver(template, finishedLatch, qrCode.getKey());
+            abstractQRSavers.add(saver);
+            ListenableFuture<List<QRCode>> creationFuture = threadPool.submit(creator);
             // once a AbstractQRSaver's corresponding QRCreator has finished it
             // will be scheduled to save. See https://github.com/google/guava/wiki/ListenableFutureExplained
-            Futures.addCallback(creationFuture, saver, saverThread);
+            Futures.addCallback(creationFuture, saver, threadPool);
             futures.add(creationFuture);
         }
 
         waitTillSavingIsDone(finishedLatch);
 
         // gather the results of each QRCreator#call into one list of QRCodeMappings and insert them into the DB
-        ImmutableList<QRCodeMapping> studentQRMappings = gatherMappings(futures);
-        qrCodeMappingDAO.insertAll(studentQRMappings);
+        ImmutableList<QRCode> studentQRCodes = gatherQrCodes(futures);
+        saveQRCodes(studentQRCodes, abstractQRSavers);
 
-        // start calling QRSaver#save to save the PDF documents to the disk
-        // TODO - replace with loop that goes through all students and saves individual PDFs
-        String assignmentFileName = assignmentFileName(assignmentName);
-        try {
-            saver.save(assignmentFileName);
-            Desktop.getDesktop().open(new File(assignmentFileName));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        return studentQRCodes;
+    }
+
+    public Map<Student, List<QRCode>> mapStudentsToQrCodes(Map<Student, List<AssignmentPrintoutMetaData>> groupAssignmentByStudent){
+        Map<Student, List<QRCode>> studentToQRCodes = new HashMap<>();
+        for ( Map.Entry<Student, List<AssignmentPrintoutMetaData>> entry: groupAssignmentByStudent.entrySet() ) {
+            List<QRCode> qrCodes = new ArrayList<>();
+            for (AssignmentPrintoutMetaData assignment: entry.getValue() ) {
+                Assignment currentAssignment =  createAssignmentForStudent(entry.getKey(), assignment);
+                for (int i = 1; i <= assignment.getNumPages(); i++){
+                    qrCodes.add(new QRCode(assignment.getCourse(), entry.getKey(), currentAssignment, assignment.getNumPages()));
+                }
+            }
+            studentToQRCodes.put(entry.getKey(), qrCodes );
+        }
+        return studentToQRCodes;
+    }
+
+    Assignment createAssignmentForStudent(Student student, AssignmentPrintoutMetaData assignmentPrintoutMetaData) {
+        Preconditions.checkNotNull(student);
+        Course course = assignmentPrintoutMetaData.getCourse();
+        Assignment.Builder assignmentBuilder = Assignment.builder()
+                .withCourse(course)
+                .withStudent(student);
+
+        // anything less than 0 is an invalid database id
+        if (course.getUniqueId() > 0) {
+            assignmentBuilder.withCourse_id(course.getUniqueId());
         }
 
-        return studentQRMappings;
+        if (student.getUniqueId() > 0) {
+            assignmentBuilder.withStudent_id(student.getUniqueId());
+        }
+
+        return assignmentBuilder.create(assignmentPrintoutMetaData.getAssignmentName());
+    }
+
+    //TODO: save qr code correctly
+    public void saveQRCodes(Collection <QRCode> qrCodes, List<AbstractQRSaver>abstractQRSavers){
+        List <QRCodeMapping> qrCodeMappings = new ArrayList<QRCodeMapping>();
+
+        for ( QRCode qrCode : qrCodes ) {
+            qrCodeMappings.add(qrCode.asQRCodeMapping());
+        }
+        qrCodeMappingDAO.insertAll(qrCodeMappings);
+        // start calling QRSaver#save to save the PDF documents to the disk
+        for (AbstractQRSaver saver: abstractQRSavers ) {
+            String assignmentFileName = studentFileName(saver.getStudent());
+            try {
+                saver.save(assignmentFileName);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
@@ -201,46 +244,13 @@ public class QRCreationService {
      *
      * {@code assignments/{{studentEID}}_{{assignmentName}}_{{todaysDate}}.pdf}
      *
-     * @param assignmentName the name of the assignment which should be used to
-     *                      generate the filename
+     * @param student The student associated with the file containing all their assignment QRCodes
      */
-    public String assignmentFileName(String assignmentName) {
+    public String studentFileName(Student student) {
         String assignmentDate = LocalDate.now().toString();
-        return ASSIGNMENTS_DIR + File.separator + assignmentName + "-" + assignmentDate + ".pdf";
+        return ASSIGNMENTS_DIR + File.separator + student.getUserName() + "-" + assignmentDate + ".pdf";
     }
 
-
-    /**
-     * Divides the students up into batches that can be split evenly into the
-     * different processors on this system. The idea is that we want to evenly
-     * distribute the labor of creating new QR codes amongst the processors.
-     *
-     * @param students all the students in a course.
-     * @param processors the number of processors on this system.
-     * @return all the students in the course bucketed into buckets of size:
-     * students.size()/processors.
-     */
-    @VisibleForTesting
-    List<List<Student>> bucketStudentsIntoLabelBatches(Collection<Student> students, int processors) {
-        Preconditions.checkNotNull(students);
-
-        // each batch (bucket) will have students#size()/processors number of
-        // students. For instance, on a quad core system a class of 500
-        // students will have batches of 125
-        List<Student> studentList = Lists.newArrayList(students);
-        List<List<Student>> buckets = Lists.newArrayListWithExpectedSize(processors);
-        for (int i = 0; i < processors; i++) {
-            buckets.add(Lists.newLinkedList());
-        }
-
-        for (int i = 0; i < students.size(); i++) {
-            Student currentStudent = studentList.get(i);
-            int bucketIndex = i % processors;
-            buckets.get(bucketIndex).add(currentStudent);
-        }
-
-        return buckets;
-    }
 
     /**
      * Flattens out the each result for every {@link QRCreator#call()} into one
@@ -250,20 +260,17 @@ public class QRCreationService {
      * @return a flattened out list that contains all QRCodes (as
      * {@link QRCodeMapping}s) that were in the qrCreationFutures parameter
      */
-    private ImmutableList<QRCodeMapping> gatherMappings(List<Future<List<QRCode>>> qrCreationFutures) {
+    private ImmutableList<QRCode> gatherQrCodes(List<Future<List<QRCode>>> qrCreationFutures) {
         Preconditions.checkNotNull(qrCreationFutures);
 
-        ImmutableList.Builder<QRCodeMapping> studentQRMappings =
+        ImmutableList.Builder<QRCode> studentQRCodes =
                 ImmutableList.builder();
 
         for (Future<List<QRCode>> futureQRCodeBatch : qrCreationFutures) {
             try {
-                List<QRCodeMapping> mappings = futureQRCodeBatch.get()
-                        .stream()
-                        .map(QRCode::asQRCodeMapping)
-                        .collect(Collectors.toList());
+                List<QRCode> mappings = new ArrayList<>(futureQRCodeBatch.get());
 
-                studentQRMappings.addAll(mappings);
+                studentQRCodes.addAll(mappings);
             } catch (InterruptedException e) {
                 System.err.println("Tread Interrrupted Before Shutdown");
             } catch (ExecutionException e) {
@@ -271,7 +278,7 @@ public class QRCreationService {
             }
         }
 
-        return studentQRMappings.build();
+        return studentQRCodes.build();
     }
 
     /**

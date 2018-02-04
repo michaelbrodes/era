@@ -24,7 +24,7 @@ public class QRCode {
     private String uuid;
     private BufferedImage qrCode;
 
-    QRCode(Course course, Student student, Assignment assignment, int pageNumber) {
+    public QRCode(Course course, Student student, Assignment assignment, int pageNumber) {
         Preconditions.checkNotNull(course);
         Preconditions.checkNotNull(student);
         Preconditions.checkNotNull(assignment);

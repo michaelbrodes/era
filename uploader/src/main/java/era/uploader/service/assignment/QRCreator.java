@@ -25,31 +25,19 @@ import java.util.concurrent.Callable;
  */
 @ParametersAreNonnullByDefault
 public class QRCreator implements Callable<List<QRCode>> {
-    private final List<Student> students;
-    private final String assignment;
-    private final Course course;
-    private final int pageSize;
+    private final List<QRCode> qrCodes;
     private final int qrHeight;
     private final int qrWidth;
 
     public QRCreator(
-            Course course,
-            // TODO should be one student.
-            List<Student> student,
             // TODO - should be moved over to a list of Assignment objects each with a name and number of pages
-            String assignmentName,
-            int pageSize,
+            List<QRCode> qrCodes,
             int qrHeight,
             int qrWidth
     ) {
-        Preconditions.checkNotNull(student);
-        Preconditions.checkNotNull(course);
-        Preconditions.checkNotNull(assignmentName);
+        Preconditions.checkNotNull(qrCodes);
 
-        this.students = student;
-        this.course = course;
-        this.assignment = assignmentName;
-        this.pageSize = pageSize;
+        this.qrCodes = qrCodes;
         this.qrHeight = qrHeight;
         this.qrWidth = qrWidth;
     }
@@ -65,41 +53,11 @@ public class QRCreator implements Callable<List<QRCode>> {
      */
     @Override
     public List<QRCode> call() throws Exception {
-        ImmutableList.Builder<QRCode> qrCodesBuilder = ImmutableList.builder();
         // TODO - iterate through every assignment for that single student
-        for (Student student : students) {
-            // TODO - pass in assignmentName and student
-            Assignment studentAssignment = createAssignmentForStudent(student);
-            for (int i = 1; i < pageSize + 1; i++) {
-                qrCodesBuilder.add(generateQRCode(course, student, studentAssignment, i));
-            }
+        for (QRCode qrCode: qrCodes ) {
+            generateQRCode(qrCode);
         }
-
-        return qrCodesBuilder.build();
-    }
-
-    /**
-     * Creates a new {@link Assignment} object for a student. It bases it off of the given course
-     * and assignmentName given to the object during construction.
-     */
-    @VisibleForTesting
-    Assignment createAssignmentForStudent(Student student) {
-        Preconditions.checkNotNull(student);
-
-        Assignment.Builder assignmentBuilder = Assignment.builder()
-                .withCourse(course)
-                .withStudent(student);
-
-        // anything less than 0 is an invalid database id
-        if (course.getUniqueId() > 0) {
-            assignmentBuilder.withCourse_id(course.getUniqueId());
-        }
-
-        if (student.getUniqueId() > 0) {
-            assignmentBuilder.withStudent_id(student.getUniqueId());
-        }
-
-        return assignmentBuilder.create(assignment);
+        return qrCodes;
     }
 
     /**
@@ -110,23 +68,19 @@ public class QRCreator implements Callable<List<QRCode>> {
      */
     @VisibleForTesting
     QRCode generateQRCode(
-            Course course,
-            Student student,
-            Assignment assignment,
-            int pageNumber
+        QRCode qrCode
     ) throws WriterException {
-        QRCode qrcode = new QRCode(course, student, assignment, pageNumber);
         String uuid = UUID.randomUUID().toString();
-        qrcode.setUUID(uuid);
+        qrCode.setUUID(uuid);
 
         try {
-            qrcode.setQRCode(createNewQRCodeImage(uuid));
+            qrCode.setQRCode(createNewQRCodeImage(uuid));
         } catch (WriterException e) {
             System.err.println("Issue writing QR Code");
             throw e;
         }
 
-        return qrcode;
+        return qrCode;
     }
 
     /**

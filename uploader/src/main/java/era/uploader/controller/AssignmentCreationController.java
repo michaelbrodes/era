@@ -8,15 +8,14 @@ import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.QRCodeMappingDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
+import era.uploader.data.viewmodel.AssignmentMetaData;
+import era.uploader.data.viewmodel.AssignmentPrintoutMetaData;
 import era.uploader.service.assignment.AveryTemplate;
 import era.uploader.service.QRCreationService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -44,6 +43,11 @@ public class AssignmentCreationController {
     @FXML
     private Button createAssignmentButton;
 
+    @FXML
+    private TableView<AssignmentPrintoutMetaData> assignmentList;
+
+    @FXML
+    private Button createQRCodePageButton;
 
     @FXML
     void initialize() {
@@ -77,13 +81,15 @@ public class AssignmentCreationController {
         ObservableList<String> descriptions = FXCollections.observableArrayList(templateDescriptions.keySet());
         averyTemplateComboBox.setItems(descriptions);
 
+        QRCreationService qrs = new QRCreationService(QR_CODE_MAPPING_DAO);
+
+
         // When the user clicks 'create assignment'
         createAssignmentButton.setOnAction(event -> {
 
             // If the user does not enter values for each field
             if (courseNamesComboBox.getValue() == null ||
                     numPagesComboBox.getValue() == null ||
-                    averyTemplateComboBox.getValue() == null ||
                     assignmentName.getCharacters().length() == 0) {
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                 errorAlert.setHeaderText("Assignment Creation Error");
@@ -94,40 +100,66 @@ public class AssignmentCreationController {
 
             String currentCourseName = courseNamesComboBox.getValue();
             Course currentCourse = nameToCourse.get(currentCourseName);
-            AveryTemplate template = templateDescriptions.get(averyTemplateComboBox.getValue());
 
-            QRCreationService qrs = new QRCreationService(QR_CODE_MAPPING_DAO);
-            Collection<QRCodeMapping> qrCodesForStudents = qrs.createQRs(
-                    currentCourse,
-                    assignmentName.getText(),
-                    numPagesComboBox.getValue(),
-                    template
-            );
-
-            for (QRCodeMapping qrCodeMapping : qrCodesForStudents) {
-                try {
-                    // this is a deprecated method but is still used to make it easier to create test documents.
-                    // in the future this will no longer be here.
-                    qrs.saveQRCodeMapping(qrCodeMapping);
-                } catch (IOException e) {
-                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                    errorAlert.setHeaderText("QRCode Save Error");
-                    errorAlert.setContentText("The QRCode failed to save");
-                    errorAlert.showAndWait();
-                }
-            }
-
-            Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
-            infoAlert.setHeaderText("QRCodes Saved Successfully");
-            infoAlert.setContentText(
-                    qrCodesForStudents.size()
-                    + " QR Codes have been saved to "
-                    + qrs.assignmentFileName(assignmentName.getText())
-            );
-            infoAlert.showAndWait();
+            AssignmentPrintoutMetaData apmd = new AssignmentPrintoutMetaData(assignmentName.getText(), numPagesComboBox.getValue(), currentCourse);
+            assignmentList.getItems().add(apmd);
 
         });
 
+        createQRCodePageButton.setOnAction(event -> {
+
+                    // If the user does not enter values for each field
+                    if (assignmentList.getItems().size() == 0) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                        errorAlert.setHeaderText("Assignment Creation Error");
+                        errorAlert.setContentText("Please make sure you have created at least one assignment.");
+                        errorAlert.showAndWait();
+                        return;
+                    }
+                    AveryTemplate template = templateDescriptions.get(averyTemplateComboBox.getValue());
+                    qrs.printAndSaveQRCodes(assignmentList.getItems(), template);
+            Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
+            infoAlert.setHeaderText("QRCodes Saved Successfully");
+            infoAlert.setContentText( "QRCode PDFs saved to " + qrs.ASSIGNMENTS_DIR);
+            infoAlert.showAndWait();
+                });
+//
+//            String currentCourseName = courseNamesComboBox.getValue();
+//            Course currentCourse = nameToCourse.get(currentCourseName);
+//            AveryTemplate template = templateDescriptions.get(averyTemplateComboBox.getValue());
+//
+//            QRCreationService qrs = new QRCreationService(QR_CODE_MAPPING_DAO);
+//            Collection<QRCodeMapping> qrCodesForStudents = qrs.createQRs(
+//                    currentCourse,
+//                    assignmentName.getText(),
+//                    numPagesComboBox.getValue(),
+//                    template
+//            );
+//
+//            for (QRCodeMapping qrCodeMapping : qrCodesForStudents) {
+//                try {
+//                    // this is a deprecated method but is still used to make it easier to create test documents.
+//                    // in the future this will no longer be here.
+//                    qrs.saveQRCodeMapping(qrCodeMapping);
+//                } catch (IOException e) {
+//                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+//                    errorAlert.setHeaderText("QRCode Save Error");
+//                    errorAlert.setContentText("The QRCode failed to save");
+//                    errorAlert.showAndWait();
+//                }
+//            }
+//
+//            Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
+//            infoAlert.setHeaderText("QRCodes Saved Successfully");
+//            infoAlert.setContentText(
+//                    qrCodesForStudents.size()
+//                            + " QR Codes have been saved to "
+//                            + qrs.studentFileName(assignmentName.getText())
+//            );
+//            infoAlert.showAndWait();
+//
+//        });
+//
     }
 
     public void home() throws IOException {
