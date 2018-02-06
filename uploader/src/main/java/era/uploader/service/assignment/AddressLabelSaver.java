@@ -17,8 +17,6 @@ import java.util.concurrent.CountDownLatch;
  */
 @ParametersAreNonnullByDefault
 public class AddressLabelSaver extends AbstractQRSaver {
-    private final Student owner;
-
     /**
      * Testing constructor to make the saver start with an existing PDF
      * document (good for overlaying QR Codes on top of a template provided by
@@ -26,10 +24,9 @@ public class AddressLabelSaver extends AbstractQRSaver {
      */
     @VisibleForTesting
     AddressLabelSaver(QRCodePDF aggregator, @Nullable Student student, @Nullable Course course) {
-        super(new CountDownLatch(Integer.MAX_VALUE));
+        super(new CountDownLatch(Integer.MAX_VALUE), student, course);
         Preconditions.checkNotNull(aggregator);
         this.pdf = aggregator;
-        this.owner = student;
     }
 
     /**
@@ -38,8 +35,7 @@ public class AddressLabelSaver extends AbstractQRSaver {
      * they need for a single course.
      */
     AddressLabelSaver(CountDownLatch finishedLatch, @Nullable Student student, @Nullable Course course) {
-        super(finishedLatch);
-        this.owner = student;
+        super(finishedLatch, student, course);
     }
 
     /**
@@ -97,14 +93,14 @@ public class AddressLabelSaver extends AbstractQRSaver {
     @Override
     void writeHeader(@WillNotClose PDPageContentStream editor, float height, float width) throws IOException {
         // Old versions of QRSaverFactory#saver do not supply the owner, so we need to check for null.
-        if (owner != null) {
+        if (getStudent() != null) {
             beginText(editor, AveryConstants.Address.NEW_LINE_OFFSET, AveryConstants.Address.FONT_SIZE);
             editor.newLineAtOffset(
                     width/2.0f - AveryConstants.Address.HEADER_MARGIN_CENTER,
                     height - AveryConstants.Address.HEADER_MARGIN_TOP
             );
 
-            editor.showText("Student: " + owner.getLastName() + ", " + owner.getFirstName());
+            editor.showText("Student: " + getStudent().getLastName() + ", " + getStudent().getFirstName());
             editor.newLine();
             editor.endText();
         }

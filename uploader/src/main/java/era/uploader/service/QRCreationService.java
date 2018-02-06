@@ -181,7 +181,7 @@ public class QRCreationService {
             for (AssignmentPrintoutMetaData assignment: entry.getValue() ) {
                 Assignment currentAssignment =  createAssignmentForStudent(entry.getKey(), assignment);
                 for (int i = 1; i <= assignment.getNumPages(); i++){
-                    qrCodes.add(new QRCode(assignment.getCourse(), entry.getKey(), currentAssignment, assignment.getNumPages()));
+                    qrCodes.add(new QRCode(assignment.getCourse(), entry.getKey(), currentAssignment, i));
                 }
             }
             studentToQRCodes.put(entry.getKey(), qrCodes );
