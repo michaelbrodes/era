@@ -94,7 +94,7 @@ public class UploaderProperties {
                 && port.isPresent()
                 && protocol.isPresent()) {
                 ret = Optional.of(protocol.get()
-                        + "//"
+                        + "://"
                         + hostname.get()
                         + ":"
                         + port.get());

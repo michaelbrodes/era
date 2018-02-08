@@ -177,6 +177,16 @@ public class CourseCreationController {
             return;
         }
 
+        try {
+            service.uploadIfEnabled(coursesToStudents.keySet());
+        } catch (IOException e) {
+            Alert fileOperationError = new Alert(Alert.AlertType.ERROR);
+            fileOperationError.setHeaderText("Cannot connect to Server.");
+            fileOperationError.setContentText("There was an error connecting " +
+                    "to the remote server. Please make sure that server is up " +
+                    "and that the right URL is shown in uploader.properties");
+            fileOperationError.showAndWait();
+        }
         ObservableList<StudentMetaData> students = StudentMetaData.fromMultimap(coursesToStudents);
         output.setItems(students);
     }
