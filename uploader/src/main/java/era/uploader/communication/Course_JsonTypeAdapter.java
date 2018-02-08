@@ -1,4 +1,4 @@
-package era.uploader.service.coursecreation;
+package era.uploader.communication;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -13,19 +13,19 @@ public class Course_JsonTypeAdapter extends TypeAdapter <Course>{
     @Override
     public void write(JsonWriter out, Course value) throws IOException {
         out.beginObject();
-            out.name("uniqueId").value(value.getUniqueId());
+            out.name("uuid").value(value.getUuid());
             out.name("name").value(value.getName());
             out.name("studentsEnrolled").beginArray();
                 for (Student student : value.getStudentsEnrolled()){
                     out.beginObject();
                     out.name("userName").value(student.getUserName());
                     out.name("email").value(student.getEmail());
-                    out.name("uniqueId").value(student.getUniqueId());
+                    out.name("uuid").value(student.getUuid());
                     out.endObject();
                 }
             out.endArray();
             out.name("semester").beginObject();
-                out.name("uniqueId").value(value.getSemester().getUniqueId());
+                out.name("uuid").value(value.getSemester().getUuid());
                 out.name("term").value(value.getSemester().getTerm().name());
                 out.name("year").beginObject();
                     out.name("year").value(value.getSemester().getYear().getValue());

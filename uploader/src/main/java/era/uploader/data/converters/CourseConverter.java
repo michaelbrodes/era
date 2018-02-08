@@ -30,7 +30,8 @@ public class CourseConverter
                 .create(
                         courseRecord.getDepartment(),
                         courseRecord.getCourseNumber(),
-                        courseRecord.getSectionNumber()
+                        courseRecord.getSectionNumber(),
+                        courseRecord.getUuid()
                 );
     }
 
@@ -52,6 +53,7 @@ public class CourseConverter
             );
         }
         courseRecord.setSectionNumber(course.getSectionNumber());
+        courseRecord.setUuid(course.getUuid());
 
         return courseRecord;
     }

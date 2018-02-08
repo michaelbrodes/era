@@ -4,7 +4,7 @@ import java.util.Map;
 
 public interface Model {
     String ENDPOINT = "";
-    long getUniqueId();
+    String getUuid();
     default String getEndpoint() {
         return ENDPOINT;
     }

@@ -1,5 +1,6 @@
 package era.server.data.model;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -7,6 +8,7 @@ import com.google.common.collect.Sets;
 import era.server.data.Model;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNullableByDefault;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,65 +19,32 @@ import java.util.stream.Collectors;
  * builder QR codes, and match the information inside of each code to its
  * respective student.
  */
+@ParametersAreNullableByDefault
 public class Student implements Model {
     public static final String ENDPOINT = "/student";
     /* Class Fields */
-    private String userName;
+    private final String userName;
     private String email;
-    private long uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
     // every course that the student belongs to
-    private Set<Course> courses = Sets.newHashSet();
+    private final Set<Course> courses;
+    private final String uuid;
 
     /* Constructors */
-    /**
-     * This is basically our default constructor because it just takes the
-     * only required field.
-     *
-     * @param userName the only required field to create a valid student.
-     */
-    public Student(@Nonnull String userName) {
-        Preconditions.checkNotNull(userName);
-        this.userName = userName;
-    }
-
-    public Student(
-            @Nonnull String userName,
-            String email,
-            int uniqueId,
-            Set<Course> courses
-    ) {
+    private Student(@Nonnull String userName, @Nonnull String uuid, Builder builder) {
         Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
+        Preconditions.checkNotNull(uuid, "UUID cannot be null for a student");
         this.userName = userName;
-        this.uniqueId = uniqueId;
-        this.email = email;
-        this.courses = courses == null ? Sets.newHashSet() : courses;
-    }
-
-    public Student(
-            @Nonnull String userName,
-            String email,
-            int uniqueId
-    ) {
-        Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
-        this.userName = userName;
-        this.email = email;
-        this.uniqueId = uniqueId;
-    }
-
-    private Student(@Nonnull String userName, Builder builder) {
-        Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
-        this.userName = userName;
+        this.uuid = uuid;
         this.email = builder.email;
         this.courses = builder.courses == null ? Sets.newHashSet() : builder.courses;
-        this.uniqueId = builder.uniqueId;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public long getUniqueId() {
-        return uniqueId;
+    public String getUuid() {
+        return uuid;
     }
 
     @Override
@@ -86,25 +55,16 @@ public class Student implements Model {
                 .collect(Collectors.toList()));
 
         return ImmutableMap.of(
-                "uniqueId", uniqueId,
+                "uuid", uuid,
                 "userName", userName,
                 "email", email,
                 "courses", courseNames
         );
     }
 
-    public void setUniqueId(long uniqueId) {
-        this.uniqueId = uniqueId;
-    }
-
     @Nonnull
     public String getUserName() {
         return userName;
-    }
-
-    public void setUserName(@Nonnull String userName) {
-        Preconditions.checkNotNull(userName);
-        this.userName = userName;
     }
 
     /**
@@ -119,32 +79,22 @@ public class Student implements Model {
 
     @Nonnull
     public Set<Course> getCourses() {
-        if (courses == null) {
-            courses = Sets.newHashSet();
-        }
         return courses;
-    }
-
-    public void setCourses(Set<Course> courses) {
-        this.courses = courses == null ? Sets.newHashSet() : courses;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Student student = (Student) o;
-
-        return getUniqueId() == student.getUniqueId() && getUserName().equals(student.getUserName()) && getEmail().equals(student.getEmail());
+        return Objects.equal(getUserName(), student.getUserName()) &&
+                Objects.equal(getEmail(), student.getEmail()) &&
+                Objects.equal(getUuid(), student.getUuid());
     }
 
     @Override
     public int hashCode() {
-        int result = getUserName().hashCode();
-        result = 31 * result + getEmail().hashCode();
-        result = 31 * result + (int) (getUniqueId() ^ (getUniqueId() >>> 32));
-        return result;
+        return Objects.hashCode(getUserName(), getEmail(), getUuid());
     }
 
     /**
@@ -161,7 +111,6 @@ public class Student implements Model {
      * {@link #create}.
      */
     public static class Builder {
-        private long uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
         private String email;
         // every course that the student belongs to
         private Set<Course> courses = Sets.newHashSet();
@@ -175,12 +124,9 @@ public class Student implements Model {
             return this;
         }
 
-        public Builder withUniqueId(long uniqueId) {
-            this.uniqueId = uniqueId;
-            return this;
-        }
+        public Builder withCourses(@Nonnull Set<Course> courses) {
+            Preconditions.checkNotNull(courses);
 
-        public Builder withCourses(Set<Course> courses) {
             this.courses.addAll(courses);
             return this;
         }
@@ -190,9 +136,8 @@ public class Student implements Model {
             return this;
         }
 
-        public Student create(@Nonnull String userName) {
-            Preconditions.checkNotNull(userName);
-            return new Student(userName, this);
+        public Student create(@Nonnull String userName, @Nonnull String uuid) {
+            return new Student(userName, uuid, this);
         }
     }
 }

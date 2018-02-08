@@ -9,6 +9,7 @@ import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
+import era.uploader.data.model.Term;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -93,54 +94,54 @@ public class AssignmentDAOImplIT {
                 .withFirstName("Mallory")
                 .withLastName("Archer")
                 .withSchoolId("800111222")
-                .create("marcher");
+                .createUnique("marcher");
 
         Student student2 = Student.builder()
                 .withFirstName("Fun person")
                 .withLastName("Archer")
                 .withSchoolId("800111999")
-                .create("farcher");
+                .createUnique("farcher");
 
         Student student3 = Student.builder()
                 .withFirstName("I am a bird")
                 .withLastName("Archer")
                 .withSchoolId("800111555")
-                .create("iarcher");
+                .createUnique("iarcher");
 
         Student student4 = Student.builder()
                 .withFirstName("Sterling")
                 .withLastName("Archer")
                 .withSchoolId("800111444")
-                .create("sarcher");
+                .createUnique("sarcher");
 
         Course course1 = Course.builder()
                 .withName("cells and stuff")
-                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
+                .withSemester(Semester.of(Term.FALL, Year.now()))
                 .withStudents(ImmutableSet.of(
                         student1,
                         student2,
                         student3,
                         student4
                 ))
-                .create("BIO", "234", "002");
+                .createUnique("BIO", "234", "002");
 
         Course course2 = Course.builder()
                 .withName("cells and stuff")
                 .withStudents(ImmutableSet.of(
                         student4
                 ))
-                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
-                .create("BIO", "234", "003");
+                .withSemester(Semester.of(Term.FALL, Year.now()))
+                .createUnique("BIO", "234", "003");
 
         Course course3 = Course.builder()
                 .withName("cells and stuff")
-                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
+                .withSemester(Semester.of(Term.FALL, Year.now()))
                 .withStudents(ImmutableSet.of(
                         student1,
                         student2,
                         student3
                 ))
-                .create("BIO", "234", "001");
+                .createUnique("BIO", "234", "001");
 
         Set<Course> courses = ImmutableSet.of(
                 course1,
@@ -151,27 +152,27 @@ public class AssignmentDAOImplIT {
                 .withCourse(course1)
                 .withStudent(student1)
                 .withImageFilePath("i am a unique file path")
-                .create("do cells exist?");
+                .createUnique("do cells exist?");
         Assignment assignment2 = Assignment.builder()
                 .withCourse(course1)
                 .withStudent(student2)
                 .withImageFilePath("i am a unique file path")
-                .create("do cells exist?");
+                .createUnique("do cells exist?");
         Assignment assignment3 = Assignment.builder()
                 .withCourse(course1)
                 .withStudent(student3)
                 .withImageFilePath("i am a unique file path")
-                .create("do cells exist?");
+                .createUnique("do cells exist?");
         Assignment assignment4 = Assignment.builder()
                 .withCourse(course1)
                 .withStudent(student4)
                 .withImageFilePath("i am a unique file path")
-                .create("do cells exist?");
+                .createUnique("do cells exist?");
         Assignment assignment5 = Assignment.builder()
                 .withCourse(course2)
                 .withStudent(student4)
                 .withImageFilePath("i am a unique file path")
-                .create("I don't know");
+                .createUnique("I don't know");
 
         Set<Assignment> assignments = ImmutableSet.of(
                 assignment1,

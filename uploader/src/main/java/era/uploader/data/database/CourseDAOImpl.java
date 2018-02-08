@@ -69,13 +69,15 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                             COURSE.COURSE_NUMBER,
                             COURSE.SECTION_NUMBER,
                             COURSE.NAME,
-                            COURSE.SEMESTER_ID
+                            COURSE.SEMESTER_ID,
+                            COURSE.UUID
                     ).values(
                             course.getDepartment(),
                             course.getCourseNumber(),
                             course.getSectionNumber(),
                             course.getName(),
-                            course.getSemester().getUniqueId()
+                            course.getSemester().getUniqueId(),
+                            course.getUuid()
                     ).returning(
                             COURSE.UNIQUE_ID
                     ).fetchOne()
@@ -136,14 +138,16 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                             STUDENT.LAST_NAME,
                             STUDENT.USERNAME,
                             STUDENT.SCHOOL_ID,
-                            STUDENT.EMAIL
+                            STUDENT.EMAIL,
+                            STUDENT.UUID
                     )
                             .values(
                                     student.getFirstName(),
                                     student.getLastName(),
                                     student.getUserName(),
                                     student.getSchoolId(),
-                                    student.getEmail()
+                                    student.getEmail(),
+                                    student.getUuid()
                             )
                             .returning(
                                     STUDENT.UNIQUE_ID
@@ -216,13 +220,16 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                     .where(filterer)
                     .fetchOptional()
                     .orElseGet(() -> {
+                        sem.makeUnique();
                         SemesterRecord semesterRecord = ctx.insertInto(
                                 SEMESTER,
                                 SEMESTER.TERM,
-                                SEMESTER.YEAR
+                                SEMESTER.YEAR,
+                                SEMESTER.UUID
                         ).values(
                                 sem.getTermString(),
-                                sem.getYearInt()
+                                sem.getYearInt(),
+                                sem.getUuid()
                         ).returning(
                                 SEMESTER.UNIQUE_ID
                         ).fetchOne();
@@ -236,7 +243,8 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                         return new Semester(
                                 semesterRecord.getUniqueId(),
                                 semesterRecord.getTerm(),
-                                semesterRecord.getYear()
+                                semesterRecord.getYear(),
+                                semesterRecord.getUuid()
                         );
                     });
 
@@ -296,12 +304,14 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                                 .where(filterer)
                                 .fetchOptional()
                                 .map(Record1::value1)
-                                .orElseGet(() -> ctx.insertInto(SEMESTER, SEMESTER.TERM, SEMESTER.YEAR)
-                                        .values(semester.getTermString(), semester.getYearInt())
+                                .orElseGet(() -> {
+                                    semester.makeUnique();
+                                    return ctx.insertInto(SEMESTER, SEMESTER.TERM, SEMESTER.YEAR, SEMESTER.UUID)
+                                        .values(semester.getTermString(), semester.getYearInt(), semester.getUuid())
                                         .returning(SEMESTER.UNIQUE_ID)
                                         .fetchOne()
-                                        .getUniqueId()
-                                )
+                                        .getUniqueId();
+                                })
                 );
             }
 

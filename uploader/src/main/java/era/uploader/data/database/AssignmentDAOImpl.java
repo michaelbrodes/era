@@ -74,14 +74,16 @@ public class AssignmentDAOImpl extends DatabaseDAO<AssignmentRecord, Assignment>
                     ASSIGNMENT.IMAGE_FILE_PATH,
                     ASSIGNMENT.COURSE_ID,
                     ASSIGNMENT.STUDENT_ID,
-                    ASSIGNMENT.CREATED_DATE_TIME
+                    ASSIGNMENT.CREATED_DATE_TIME,
+                    ASSIGNMENT.UUID
                     )
                     .values(
                             assignment.getName(),
                             assignment.getImageFilePath(),
                             courseId,
                             studentId,
-                            assignment.getCreatedDateTimeString()
+                            assignment.getCreatedDateTimeString(),
+                            assignment.getUuid()
                     )
                     .returning(
                             ASSIGNMENT.UNIQUE_ID

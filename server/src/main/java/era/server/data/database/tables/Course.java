@@ -15,6 +15,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Schema;
@@ -38,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Course extends TableImpl<CourseRecord> {
 
-    private static final long serialVersionUID = -1722714983;
+    private static final long serialVersionUID = -925966460;
 
     /**
      * The reference instance of <code>era.course</code>
@@ -54,11 +55,6 @@ public class Course extends TableImpl<CourseRecord> {
     }
 
     /**
-     * The column <code>era.course.unique_id</code>.
-     */
-    public final TableField<CourseRecord, Long> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
-
-    /**
      * The column <code>era.course.uuid</code>.
      */
     public final TableField<CourseRecord, String> UUID = createField("uuid", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid()", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
@@ -71,7 +67,7 @@ public class Course extends TableImpl<CourseRecord> {
     /**
      * The column <code>era.course.semester_id</code>.
      */
-    public final TableField<CourseRecord, Long> SEMESTER_ID = createField("semester_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<CourseRecord, String> SEMESTER_ID = createField("semester_id", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false), this, "");
 
     /**
      * Create a <code>era.course</code> table reference
@@ -115,7 +111,7 @@ public class Course extends TableImpl<CourseRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.COURSE_PRIMARY);
+        return Arrays.<Index>asList(Indexes.COURSE_COURSE_SEMESTER_FK, Indexes.COURSE_PRIMARY);
     }
 
     /**
@@ -132,6 +128,14 @@ public class Course extends TableImpl<CourseRecord> {
     @Override
     public List<UniqueKey<CourseRecord>> getKeys() {
         return Arrays.<UniqueKey<CourseRecord>>asList(Keys.KEY_COURSE_PRIMARY);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ForeignKey<CourseRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<CourseRecord, ?>>asList(Keys.COURSE_SEMESTER_FK);
     }
 
     /**

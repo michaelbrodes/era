@@ -49,9 +49,6 @@ public class UploadController {
 
 
     public String uploadAssignment(Request request, Response response) {
-        long courseIdLong = 0;
-        long studentIdLong = 0;
-        int assignmentId = 0;
         String contentType = request.contentType();
         String courseId = request.params(":courseId");
 
@@ -60,33 +57,23 @@ public class UploadController {
             return "";
         }// if :coursId is null malformed request, return 400
 
+        if (!contentType.contains("multipart/form-data")) {
+            response.status(415);
+            return "";
+        }
+
         String assignmentIdHeader = request.headers("X-Assignment-Id");
         String assignmentNameHeader = request.headers("X-Assignment-Name");
         String studentIdHeader = request.headers("X-Student-Id");
         String assignmentFileNameHeader = request.headers("X-Assignment-File-Name");
 
-        try {
-            if (!contentType.contains("multipart/form-data")) {
-                response.status(415);
-                return "";
-            }
-
-            courseIdLong = Long.valueOf(courseId);
-            studentIdLong = Long.valueOf(studentIdHeader);
-            assignmentId = Integer.valueOf(assignmentIdHeader);
-        } catch (NumberFormatException e) {
-            e.getMessage();
-            response.status(400);
-            return "";
-        }
-
         request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("temp"));
         try (InputStream is = request.raw().getPart("pdf").getInputStream()) {
-            Course course = courseDAO.read(courseIdLong);
-            Student student = studentDAO.read(studentIdLong);
+            Course course = courseDAO.read(courseId);
+            Student student = studentDAO.read(studentIdHeader);
             if (course != null && student != null) {
                 Assignment assignment = new Assignment(
-                        assignmentId,
+                        assignmentIdHeader,
                         assignmentFileNameHeader,
                         assignmentNameHeader,
                         course,
@@ -141,7 +128,7 @@ public class UploadController {
             if (course != null
                     && course.getName() != null
                     && course.getSemester() != null
-                    && course.getUniqueId() != 0) {
+                    && course.getUuid() != null) {
                 try {
                     courseDAO.insert(course);
                 } catch (SQLException e) {

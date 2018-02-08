@@ -8,6 +8,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.File;
@@ -21,22 +22,22 @@ public class AssignmentUploader {
 
         for (Assignment current: assignments) {
 
-            HttpClient client = HttpClientBuilder.create().build();
+            CloseableHttpClient client = HttpClientBuilder.create().build();
 
-            String courseId = current.getCourse().getUniqueId() + "";
+            String courseServerId = current.getCourse().getUuid();
 
-            host += "/api/course/" + courseId + "/assignment";
+            host += "/api/course/" + courseServerId + "/assignment";
 
             HttpPost post = new HttpPost(host);
 
             File file = new File(current.getImageFilePath());
             String assignmentName = current.getName();
-            int assignmentId = current.getUniqueId();
-            String studentId = Integer.toString(current.getStudent().getUniqueId());
+            String assignmentServerId = current.getUuid();
+            String studentServerId = current.getStudent().getUuid();
 
-            post.addHeader("X-Assignment-Id", assignmentId + "" );
+            post.addHeader("X-Assignment-Id", assignmentServerId);
             post.addHeader("X-Assignment-Name", assignmentName);
-            post.addHeader("X-Student-Id", studentId);
+            post.addHeader("X-Student-Id", studentServerId);
             post.addHeader("X-Assignment-File-Name", current.getImageFilePath());
 
 
@@ -57,7 +58,7 @@ public class AssignmentUploader {
                 throw new RuntimeException("Entity was not created due to " + response.getStatusLine().getReasonPhrase());
 
             }
-
+            client.close();
         }
     }
 

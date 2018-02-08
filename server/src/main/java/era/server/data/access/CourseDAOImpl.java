@@ -7,6 +7,7 @@ import era.server.data.model.Assignment;
 import era.server.data.model.Course;
 import era.server.data.model.Semester;
 import era.server.data.model.Student;
+import era.server.data.model.Term;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -52,13 +53,13 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
             Semester dbSemester = resolveOrInsertSemester(course.getSemester());
             int affected = create.insertInto(
                            COURSE,
-                           COURSE.UNIQUE_ID,
+                           COURSE.UUID,
                            COURSE.SEMESTER_ID,
                            COURSE.NAME
                     )
                     .values(
-                            course.getUniqueId(),
-                            dbSemester.getUniqueId(),
+                            course.getUuid(),
+                            dbSemester.getUuid(),
                             course.getName()
                     )
                     .execute();
@@ -70,17 +71,18 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                 create.insertInto(
                         STUDENT,
                         STUDENT.EMAIL,
-                        STUDENT.UNIQUE_ID,
+                        STUDENT.UUID,
                         STUDENT.USERNAME
                         )
-                        .values(student.getEmail(), student.getUniqueId(), student.getUserName())
+                        .values(student.getEmail(), student.getUuid(), student.getUserName())
                         .execute();
+
                 create.insertInto(
                         COURSE_STUDENT,
                         COURSE_STUDENT.COURSE_ID,
                         COURSE_STUDENT.STUDENT_ID
                         )
-                        .values(course.getUniqueId(), student.getUniqueId())
+                        .values(course.getUuid(), student.getUuid())
                         .execute();
             }
 
@@ -90,7 +92,7 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                                 ASSIGNMENT.NAME,
                                 ASSIGNMENT.IMAGE_FILE_PATH,
                                 ASSIGNMENT.CREATED_DATE_TIME,
-                                ASSIGNMENT.UNIQUE_ID,
+                                ASSIGNMENT.UUID,
                                 ASSIGNMENT.STUDENT_ID,
                                 ASSIGNMENT.COURSE_ID
                         )
@@ -98,7 +100,7 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                                 assignment.getName(),
                                 assignment.getImageFilePath(),
                                 assignment.getCreatedDateTimeStamp(),
-                                assignment.getUniqueId(),
+                                assignment.getUuid(),
                                 assignment.getStudent_id(),
                                 assignment.getCourse_id()
                         )
@@ -111,40 +113,39 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
     /* Access data from existing Course object from access */
     @Override
     @Nullable
-    public Course read(long id) {
+    public Course read(String id) {
         try (DSLContext create = connect()) {
             Optional<Course.Builder> builder = create.select()
                     .from(COURSE)
                     .join(SEMESTER)
-                    .on(SEMESTER.UNIQUE_ID.eq(COURSE.SEMESTER_ID))
-                    .where(COURSE.UNIQUE_ID.eq(id))
+                    .on(SEMESTER.UUID.eq(COURSE.SEMESTER_ID))
+                    .where(COURSE.UUID.eq(id))
                     .fetchOptional()
                     .map(record -> {
-                        Semester.Term term = Semester.Term.valueOf(record.get(SEMESTER.TERM));
+                        Term term = Term.valueOf(record.get(SEMESTER.TERM));
                         Year year = Year.of(record.get(SEMESTER.YEAR));
 
                         return Course.builder()
-                                .withDatabaseId(record.get(COURSE.UNIQUE_ID))
-                                .withSemester(Semester.of(term, year))
-                                .withName(record.get(COURSE.NAME));
+                                .withSemester(new Semester(record.get(SEMESTER.UUID), term, year))
+                                .withName(record.get(COURSE.NAME))
+                                .withUuid(record.get(COURSE.UUID));
                     });
 
             builder.ifPresent((courseBuilder) -> {
-                Set<Student> studentSet = create.select(STUDENT.UNIQUE_ID, STUDENT.EMAIL, STUDENT.USERNAME)
+                Set<Student> studentSet = create.select(STUDENT.UUID, STUDENT.EMAIL, STUDENT.USERNAME)
                         .from(STUDENT)
                         .join(COURSE_STUDENT)
-                        .on(COURSE_STUDENT.STUDENT_ID.eq(STUDENT.UNIQUE_ID))
+                        .on(COURSE_STUDENT.STUDENT_ID.eq(STUDENT.UUID))
                         .where(COURSE_STUDENT.COURSE_ID.eq(courseBuilder.getDatabaseId()))
                         .fetchLazy()
                         .stream()
                         .map(record -> {
-                            Long studentId = record.get(STUDENT.UNIQUE_ID);
+                            String studentId = record.get(STUDENT.UUID);
                             String email = record.get(STUDENT.EMAIL);
                             String username = record.get(STUDENT.USERNAME);
                             return Student.builder()
-                                    .withUniqueId(studentId)
                                     .withEmail(email)
-                                    .create(username);
+                                    .create(username, studentId);
                         })
                         .collect(Collectors.toSet());
                 courseBuilder.withStudents(studentSet);
@@ -152,7 +153,7 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
 
             builder.ifPresent((courseBuilder) -> {
                 Set<Assignment> assignmentSet = create.select(
-                        ASSIGNMENT.UNIQUE_ID,
+                        ASSIGNMENT.UUID,
                         ASSIGNMENT.NAME,
                         ASSIGNMENT.CREATED_DATE_TIME,
                         ASSIGNMENT.IMAGE_FILE_PATH,
@@ -163,17 +164,16 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                         .fetchLazy()
                         .stream()
                         .map(record -> {
-                            Long assignmentId = record.get(ASSIGNMENT.UNIQUE_ID);
+                            String assignmentId = record.get(ASSIGNMENT.UUID);
                             String assignmentName = record.get(ASSIGNMENT.NAME);
                             Timestamp createdDateTime = record.get(ASSIGNMENT.CREATED_DATE_TIME);
                             String path = record.get(ASSIGNMENT.IMAGE_FILE_PATH);
 
                             return Assignment.builder()
-                                    .withUniqueId(assignmentId)
                                     .withCourse_id(courseBuilder.getDatabaseId())
                                     .withCreatedDateTime(createdDateTime.toLocalDateTime())
                                     .withImageFilePath(path)
-                                    .create(assignmentName);
+                                    .create(assignmentName, assignmentId);
                         })
                         .collect(Collectors.toSet());
                 courseBuilder.withAssignments(assignmentSet);
@@ -198,17 +198,17 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                     .orElseGet(() -> {
                         ctx.insertInto(
                                 SEMESTER,
-                                SEMESTER.UNIQUE_ID,
+                                SEMESTER.UUID,
                                 SEMESTER.TERM,
                                 SEMESTER.YEAR
                         ).values(
                                 // uniqueId is sent over the API
-                                semesterToResolve.getUniqueId(),
+                                semesterToResolve.getUuid(),
                                 semesterToResolve.getTermString(),
                                 semesterToResolve.getYearInt()
                         ).execute();
                         SemesterRecord semesterRecord = new SemesterRecord();
-                        semesterRecord.setUniqueId(semesterToResolve.getUniqueId());
+                        semesterRecord.setUuid(semesterToResolve.getUuid());
                         semesterRecord.setTerm(semesterToResolve.getTermString());
                         semesterRecord.setYear(semesterToResolve.getYearInt());
                         return semesterRecord;
@@ -216,9 +216,9 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                     .map((record) -> {
                         SemesterRecord semesterRecord = record.into(SEMESTER);
                         return new Semester(
-                                semesterRecord.getUniqueId(),
-                                semesterRecord.getTerm(),
-                                semesterRecord.getYear()
+                                semesterRecord.getUuid(),
+                                Term.valueOf(semesterRecord.getTerm()),
+                                Year.of(semesterRecord.getYear())
                         );
                     });
         }

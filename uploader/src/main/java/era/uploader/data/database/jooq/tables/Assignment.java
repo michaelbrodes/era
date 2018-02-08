@@ -5,6 +5,7 @@ package era.uploader.data.database.jooq.tables;
 
 
 import era.uploader.data.database.jooq.DefaultSchema;
+import era.uploader.data.database.jooq.Indexes;
 import era.uploader.data.database.jooq.Keys;
 import era.uploader.data.database.jooq.tables.records.AssignmentRecord;
 
@@ -15,7 +16,7 @@ import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Schema;
 import org.jooq.Table;
@@ -38,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Assignment extends TableImpl<AssignmentRecord> {
 
-    private static final long serialVersionUID = 1947219123;
+    private static final long serialVersionUID = -2063222395;
 
     /**
      * The reference instance of <code>assignment</code>
@@ -56,7 +57,7 @@ public class Assignment extends TableImpl<AssignmentRecord> {
     /**
      * The column <code>assignment.unique_id</code>.
      */
-    public final TableField<AssignmentRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+    public final TableField<AssignmentRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>assignment.name</code>.
@@ -82,6 +83,11 @@ public class Assignment extends TableImpl<AssignmentRecord> {
      * The column <code>assignment.created_date_time</code>.
      */
     public final TableField<AssignmentRecord, String> CREATED_DATE_TIME = createField("created_date_time", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>assignment.uuid</code>.
+     */
+    public final TableField<AssignmentRecord, String> UUID = createField("uuid", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * Create a <code>assignment</code> table reference
@@ -124,8 +130,8 @@ public class Assignment extends TableImpl<AssignmentRecord> {
      * {@inheritDoc}
      */
     @Override
-    public Identity<AssignmentRecord, Integer> getIdentity() {
-        return Keys.IDENTITY_ASSIGNMENT;
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.SQLITE_AUTOINDEX_ASSIGNMENT_1);
     }
 
     /**

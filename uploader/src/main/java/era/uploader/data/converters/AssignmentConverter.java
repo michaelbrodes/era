@@ -25,7 +25,7 @@ public class AssignmentConverter
                 .withImageFilePath(assignmentRecord.getImageFilePath())
                 .withUniqueId(assignmentRecord.getUniqueId())
                 .withCreatedDateTime(LocalDateTime.parse(assignmentRecord.getCreatedDateTime()))
-                .create(assignmentRecord.getName());
+                .create(assignmentRecord.getName(), assignmentRecord.getUuid());
     }
 
     @Override
@@ -38,6 +38,7 @@ public class AssignmentConverter
         assignmentRecord.setCreatedDateTime(
                 assignment.getCreatedDateTimeString()
         );
+        assignmentRecord.setUuid(assignment.getUuid());
 
         if (assignment.getUniqueId() != 0) {
             assignmentRecord.setUniqueId(assignment.getUniqueId());

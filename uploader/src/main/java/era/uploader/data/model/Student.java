@@ -1,7 +1,9 @@
 package era.uploader.data.model;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+import era.uploader.common.UUIDGenerator;
 import era.uploader.common.UploaderProperties;
 
 import javax.annotation.Nonnull;
@@ -14,70 +16,18 @@ import java.util.Set;
  * respective student.
  */
 public class Student {
+    private final String uuid;
     /* Class Fields */
-    private String firstName; /* Student's first name */
-    private String lastName;  /* Student's last name */
-    private String schoolId;  /* Identifier for each student provided by the school */
-    private String userName;
-    private String email;     /* Student's SIUE email */
+    private final String firstName; /* Student's first name */
+    private final String lastName;  /* Student's last name */
+    private final String schoolId;  /* Identifier for each student provided by the school */
+    private final String userName;
+    private final String email;     /* Student's SIUE email */
     private int uniqueId;/* Identifier that we generate to uniquely identify each student inside the QR code */
     // every course that the student belongs to
-    private Set<Course> courses = Sets.newHashSet();
+    private Set<Course> courses;
 
-    /* Constructors */
-    /**
-     * This is basically our default constructor because it just takes the
-     * only required field.
-     *
-     * @param userName the only required field to create a valid student.
-     */
-    public Student(@Nonnull String userName) {
-        Preconditions.checkNotNull(userName);
-        this.userName = userName;
-        this.email = userName
-                + "@"
-                + UploaderProperties.instance().getEmailSuffix();
-    }
-
-    public Student(
-            String firstName,
-            String lastName,
-            String schoolId,
-            @Nonnull String userName,
-            int uniqueId,
-            Set<Course> courses
-    ) {
-        Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.schoolId = schoolId;
-        this.userName = userName;
-        this.uniqueId = uniqueId;
-        this.courses = courses == null ? Sets.newHashSet() : courses;
-        this.email = userName
-                + "@"
-                + UploaderProperties.instance().getEmailSuffix();
-    }
-
-    public Student(
-            String firstName,
-            String lastName,
-            String schoolId,
-            @Nonnull String userName,
-            int uniqueId
-    ) {
-        Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.schoolId = schoolId;
-        this.userName = userName;
-        this.uniqueId = uniqueId;
-        this.email = userName
-                + "@"
-                + UploaderProperties.instance().getEmailSuffix();
-    }
-
-    private Student(@Nonnull String userName, Builder builder) {
+    private Student(@Nonnull String userName, @Nonnull String uuid, Builder builder) {
         Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
         this.userName = userName;
         this.courses = builder.courses == null ? Sets.newHashSet() : builder.courses;
@@ -86,6 +36,7 @@ public class Student {
         this.lastName = builder.lastName;
         this.uniqueId = builder.uniqueId;
         this.email = builder.email;
+        this.uuid = uuid;
     }
 
     public static Builder builder() {
@@ -98,26 +49,14 @@ public class Student {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     @Nullable
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
     @Nullable
     public String getSchoolId() {
         return schoolId;
-    }
-
-    public void setSchoolId(String schoolId) {
-        this.schoolId = schoolId;
     }
 
     public int getUniqueId() {
@@ -126,26 +65,6 @@ public class Student {
 
     public void setUniqueId(int uniqueId) {
         this.uniqueId = uniqueId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Student student = (Student) o;
-
-        return uniqueId == student.uniqueId && student.schoolId.equals(schoolId);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getFirstName() != null ? getFirstName().hashCode() : 0;
-        result = 31 * result + (getLastName() != null ? getLastName().hashCode() : 0);
-        result = 31 * result + (getSchoolId() != null ? getSchoolId().hashCode() : 0);
-        result = 31 * result + getUserName().hashCode();
-        result = 31 * result + getUniqueId();
-        return result;
     }
 
     @Nonnull
@@ -162,11 +81,6 @@ public class Student {
         return userName;
     }
 
-    public void setUserName(@Nonnull String userName) {
-        Preconditions.checkNotNull(userName);
-        this.userName = userName;
-    }
-
     /**
      * A getter for the email of a student. It defaults to an SIUE type email.
      *
@@ -177,8 +91,36 @@ public class Student {
         return this.email;
     }
 
-    public void setEmail(String email){
-        this.email = email;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return getUniqueId() == student.getUniqueId() &&
+                Objects.equal(getUuid(), student.getUuid()) &&
+                Objects.equal(getSchoolId(), student.getSchoolId()) &&
+                Objects.equal(getUserName(), student.getUserName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getUuid(), getSchoolId(), getUserName(), getUniqueId());
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "uuid='" + uuid + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", userName='" + userName + '\'' +
+                ", uniqueId=" + uniqueId +
+                '}';
     }
 
     /**
@@ -188,7 +130,7 @@ public class Student {
      * fields. For each nullable field an exponential amount of constructor
      * overloads could be required. If you would like to do those constructor
      * overloads then more power to you, but I am too lazy for that.
-     *
+     * <p>
      * Our convention is that each field that can be null will have a Builder
      * setter prefixed by the word <code>with</code> and suffixed by the field
      * name in camel case. All nonnull fields will be specified in
@@ -200,10 +142,11 @@ public class Student {
         private String schoolId;  /* Identifier for each student provided by the school */
         private String email;     /* Student's SIUE email */
         private int uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
+        private String uuid;
         // every course that the student belongs to
         private Set<Course> courses = Sets.newHashSet();
 
-        public Builder() {
+        private Builder() {
 
         }
 
@@ -242,12 +185,17 @@ public class Student {
             return this;
         }
 
-        public Student create(@Nonnull String userName) {
+        public Student create(@Nonnull String userName, @Nonnull String uuid) {
             Preconditions.checkNotNull(userName);
             this.email = userName
                     + "@"
                     + UploaderProperties.instance().getEmailSuffix();
-            return new Student(userName, this);
+            return new Student(userName, uuid, this);
+        }
+
+        public Student createUnique(@Nonnull String userName) {
+            Preconditions.checkNotNull(userName);
+            return create(userName, UUIDGenerator.uuid());
         }
     }
 }

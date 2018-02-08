@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Assignment extends TableImpl<AssignmentRecord> {
 
-    private static final long serialVersionUID = 423226952;
+    private static final long serialVersionUID = 929339353;
 
     /**
      * The reference instance of <code>era.assignment</code>
@@ -54,11 +54,6 @@ public class Assignment extends TableImpl<AssignmentRecord> {
     public Class<AssignmentRecord> getRecordType() {
         return AssignmentRecord.class;
     }
-
-    /**
-     * The column <code>era.assignment.unique_id</code>.
-     */
-    public final TableField<AssignmentRecord, Long> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>era.assignment.uuid</code>.
@@ -76,19 +71,19 @@ public class Assignment extends TableImpl<AssignmentRecord> {
     public final TableField<AssignmentRecord, String> IMAGE_FILE_PATH = createField("image_file_path", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * The column <code>era.assignment.course_id</code>.
+     * The column <code>era.assignment.created_date_time</code>.
      */
-    public final TableField<AssignmentRecord, Long> COURSE_ID = createField("course_id", org.jooq.impl.SQLDataType.BIGINT.defaultValue(org.jooq.impl.DSL.field("NULL", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<AssignmentRecord, Timestamp> CREATED_DATE_TIME = createField("created_date_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaultValue(org.jooq.impl.DSL.field("current_timestamp()", org.jooq.impl.SQLDataType.TIMESTAMP)), this, "");
 
     /**
      * The column <code>era.assignment.student_id</code>.
      */
-    public final TableField<AssignmentRecord, Long> STUDENT_ID = createField("student_id", org.jooq.impl.SQLDataType.BIGINT.defaultValue(org.jooq.impl.DSL.field("NULL", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<AssignmentRecord, String> STUDENT_ID = createField("student_id", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false), this, "");
 
     /**
-     * The column <code>era.assignment.created_date_time</code>.
+     * The column <code>era.assignment.course_id</code>.
      */
-    public final TableField<AssignmentRecord, Timestamp> CREATED_DATE_TIME = createField("created_date_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaultValue(org.jooq.impl.DSL.field("current_timestamp()", org.jooq.impl.SQLDataType.TIMESTAMP)), this, "");
+    public final TableField<AssignmentRecord, String> COURSE_ID = createField("course_id", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false), this, "");
 
     /**
      * Create a <code>era.assignment</code> table reference
@@ -132,7 +127,7 @@ public class Assignment extends TableImpl<AssignmentRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.ASSIGNMENT_ASSIGNMENT_COURSE_FK, Indexes.ASSIGNMENT_ASSIGNMENT_STUDENT_FK, Indexes.ASSIGNMENT_PRIMARY);
+        return Arrays.<Index>asList(Indexes.ASSIGNMENT_ASSIGNMENT_COURSE_FK, Indexes.ASSIGNMENT_ASSIGNMENT_STUDENT_IDX, Indexes.ASSIGNMENT_PRIMARY);
     }
 
     /**
@@ -156,7 +151,7 @@ public class Assignment extends TableImpl<AssignmentRecord> {
      */
     @Override
     public List<ForeignKey<AssignmentRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<AssignmentRecord, ?>>asList(Keys.ASSIGNMENT_COURSE_FK, Keys.ASSIGNMENT_STUDENT_FK);
+        return Arrays.<ForeignKey<AssignmentRecord, ?>>asList(Keys.ASSIGNMENT_STUDENT_FK, Keys.ASSIGNMENT_COURSE_FK);
     }
 
     /**

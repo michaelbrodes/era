@@ -79,21 +79,6 @@ public class QRCodeMapping {
         this.qrCode = qrCode;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof QRCodeMapping)) return false;
-
-        QRCodeMapping QRCodeMapping = (QRCodeMapping) o;
-
-        return uuid.equals(QRCodeMapping.uuid);
-    }
-
-    @Override
-    public int hashCode() {
-        return uuid.hashCode();
-    }
-
     public PDDocument getDocument() {
         return document;
     }
@@ -116,6 +101,21 @@ public class QRCodeMapping {
 
     public Integer getStudentId() {
         return studentId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof QRCodeMapping)) return false;
+
+        QRCodeMapping QRCodeMapping = (QRCodeMapping) o;
+
+        return uuid.equals(QRCodeMapping.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid.hashCode();
     }
 
 

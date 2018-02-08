@@ -3,7 +3,6 @@ package era.uploader.communication;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import era.uploader.data.model.Course;
-import era.uploader.service.coursecreation.Course_JsonTypeAdapter;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -36,6 +35,7 @@ public class CourseUploader {
         {
             throw new RuntimeException("Server unable to parse Json sent \n code: " + response.getStatusLine().getStatusCode());
         }
+        response.close();
         client.close();
     }
 

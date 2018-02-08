@@ -2,14 +2,11 @@ package era.server.data.access;
 
 
 import era.server.data.StudentDAO;
-import era.server.data.model.Course;
 import era.server.data.model.Student;
 import org.jooq.DSLContext;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.HashSet;
-import java.util.Set;
 
 import static era.server.data.database.Tables.STUDENT;
 
@@ -37,11 +34,11 @@ public class StudentDAOImpl extends DatabaseDAO implements StudentDAO {
          try (DSLContext create = connect()) {
              create.insertInto(
                      STUDENT,
-                     STUDENT.UNIQUE_ID,
+                     STUDENT.UUID,
                      STUDENT.EMAIL,
                      STUDENT.USERNAME
              ).values(
-                     student.getUniqueId(),
+                     student.getUuid(),
                      student.getEmail(),
                      student.getUserName()
              )
@@ -54,15 +51,14 @@ public class StudentDAOImpl extends DatabaseDAO implements StudentDAO {
      */
     @Override
     @Nullable
-    public Student read(long id) {
+    public Student read(String id) {
         try (DSLContext create = connect()) {
             return create.selectFrom(STUDENT)
-                    .where(STUDENT.UNIQUE_ID.eq(id))
+                    .where(STUDENT.UUID.eq(id))
                     .fetchOptional()
                     .map((record) -> Student.builder()
                             .withEmail(record.getEmail())
-                            .withUniqueId(record.getUniqueId())
-                            .create(record.getUsername())
+                            .create(record.getUsername(), record.getUuid())
                     )
                     .orElse(null);
         }

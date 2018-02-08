@@ -20,5 +20,5 @@ public interface StudentDAO {
      * @param id id of a student in the database
      * @return a student from the database.
      */
-    Student read(long id);
+    Student read(String id);
 }

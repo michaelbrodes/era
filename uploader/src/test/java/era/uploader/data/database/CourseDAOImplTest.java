@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
+import era.uploader.data.model.Term;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,38 +22,38 @@ public class CourseDAOImplTest {
         Course crush = Course.builder()
                 .withDatabaseId(1)
                 .withName("Crush Odin")
-                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
-                .create("CHEM", "111", "001");
+                .withSemester(Semester.of(Term.FALL, Year.now()))
+                .createUnique("CHEM", "111", "001");
         Course chem = Course.builder()
                 .withDatabaseId(1)
                 .withName("General chemistry")
-                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
-                .create("CHEM", "121", "001");
+                .withSemester(Semester.of(Term.FALL, Year.now()))
+                .createUnique("CHEM", "121", "001");
         Student lana = Student.builder()
                 .withFirstName("Lana")
                 .withLastName("Kane")
                 .withSchoolId("800542124")
-                .create("lkane");
+                .createUnique("lkane");
         Student archer = Student.builder()
                 .withFirstName("Sterling")
                 .withLastName("Archer")
                 .withSchoolId("800444444")
-                .create("sarcher");
+                .createUnique("sarcher");
         Student pam = Student.builder()
                 .withFirstName("Pam")
                 .withLastName("Poovey")
                 .withSchoolId("800666666")
-                .create("ppoovey");
+                .createUnique("ppoovey");
         Student cheryl = Student.builder()
                 .withFirstName("Cheryl")
                 .withLastName("Tunt")
                 .withSchoolId("800777777")
-                .create("ctunt");
+                .createUnique("ctunt");
         Student cyril = Student.builder()
                 .withFirstName("Cyril")
                 .withLastName("Figgis")
                 .withSchoolId("800888888")
-                .create("cfiggis");
+                .createUnique("cfiggis");
         ImmutableMultimap.Builder<Course, Student> coursesToStudentsBuilder = ImmutableMultimap.builder();
         coursesToStudentsBuilder.put(chem, lana);
         coursesToStudentsBuilder.put(chem, pam);

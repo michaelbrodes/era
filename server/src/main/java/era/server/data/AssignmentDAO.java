@@ -1,8 +1,6 @@
 package era.server.data;
 
 import era.server.data.model.Assignment;
-import era.server.data.model.Course;
-import era.server.data.model.Student;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

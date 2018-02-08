@@ -5,6 +5,7 @@ package era.uploader.data.database.jooq.tables;
 
 
 import era.uploader.data.database.jooq.DefaultSchema;
+import era.uploader.data.database.jooq.Indexes;
 import era.uploader.data.database.jooq.Keys;
 import era.uploader.data.database.jooq.tables.records.CourseRecord;
 
@@ -15,7 +16,7 @@ import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Schema;
 import org.jooq.Table;
@@ -38,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Course extends TableImpl<CourseRecord> {
 
-    private static final long serialVersionUID = -1936678712;
+    private static final long serialVersionUID = -430950381;
 
     /**
      * The reference instance of <code>course</code>
@@ -56,7 +57,7 @@ public class Course extends TableImpl<CourseRecord> {
     /**
      * The column <code>course.unique_id</code>.
      */
-    public final TableField<CourseRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+    public final TableField<CourseRecord, Integer> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>course.name</code>.
@@ -82,6 +83,11 @@ public class Course extends TableImpl<CourseRecord> {
      * The column <code>course.semester_id</code>.
      */
     public final TableField<CourseRecord, Integer> SEMESTER_ID = createField("semester_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
+     * The column <code>course.uuid</code>.
+     */
+    public final TableField<CourseRecord, String> UUID = createField("uuid", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * Create a <code>course</code> table reference
@@ -124,8 +130,8 @@ public class Course extends TableImpl<CourseRecord> {
      * {@inheritDoc}
      */
     @Override
-    public Identity<CourseRecord, Integer> getIdentity() {
-        return Keys.IDENTITY_COURSE;
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.SQLITE_AUTOINDEX_COURSE_1, Indexes.SQLITE_AUTOINDEX_COURSE_2);
     }
 
     /**

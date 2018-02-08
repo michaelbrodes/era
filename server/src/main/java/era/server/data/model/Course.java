@@ -1,5 +1,6 @@
 package era.server.data.model;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -25,62 +26,31 @@ public class Course implements Model {
     public static final String ENDPOINT = "/course";
     /* Class Fields */
     // will be an unsigned int in the database.
-    private long uniqueId;
+    private final String uuid;
     private String name;                                    /* Name of Course */
     private Semester semester;
     private Set<Student> studentsEnrolled = Sets.newHashSet(); /* Set of Students in the Class */
     private Set<Assignment> assignments = Sets.newHashSet();
 
     /* Constructor */
-    public Course(
-            @Nonnull String name,
-            @Nonnull String semester,
-            Set<Assignment> assignments
-    ) {
-        Preconditions.checkNotNull(name, "Cannot create a course with a null name");
-        Preconditions.checkNotNull(semester, "Cannot create a course with a null semester");
-        this.name = name;
-        this.semester = Semester.of(Semester.Term.valueOf(semester), Year.now());
-        this.assignments = assignments == null ? Sets.newHashSet() : assignments;
-    }
-
-    /**
-     * Essentially our default constructor for a course object. It is just
-     * supplied only the required fields of this object.
-     *
-     * @param name the name of the course (typically of the form
-     *             &lt;department&gt;-&lt;courseNumber&gt;-&lt;sectionNumber&gt;
-     * @param semester the semester that the course belongs to
-     */
-    public Course (
-            @Nonnull String name,
-            @Nonnull Semester semester
-    ) {
-        Preconditions.checkNotNull(name, "Cannot create a course with a null name");
-        Preconditions.checkNotNull(semester, "Cannot create a course with a null semester");
-        // default as we are not in the database yet.
-        this.uniqueId = 0;
-        this.name = name;
-        this.studentsEnrolled = Sets.newHashSet();
-        this.assignments = Sets.newHashSet();
-        this.semester = semester;
-    }
-
     private Course(
             @Nonnull String name,
             @Nonnull Semester semester,
+            @Nonnull String uuid,
             @Nonnull Builder builder) {
         Preconditions.checkNotNull(name, "Cannot create a course with a null name");
         Preconditions.checkNotNull(semester, "Cannot create a course with a null semester");
+        Preconditions.checkNotNull(uuid, "Cannot create a course with a null uuid");
+
         this.name = name;
         this.semester = semester;
+        this.uuid = uuid;
         this.studentsEnrolled = builder.studentsEnrolled == null ?
                 Sets.newHashSet() :
                 builder.studentsEnrolled;
         this.assignments = builder.assignments == null ?
                 Sets.newHashSet() :
                 builder.assignments;
-        this.uniqueId = builder.uniqueId;
     }
 
 
@@ -120,13 +90,14 @@ public class Course implements Model {
         return assignments;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
 
-    public long getUniqueId() {
-        return uniqueId;
-    }
 
     @Override
     public Map<String, Object> toViewModel() {
@@ -141,7 +112,7 @@ public class Course implements Model {
                         .collect(Collectors.toList())
         );
         return ImmutableMap.of(
-                "uniqueId", uniqueId,
+                "uuid", uuid,
                 "name", name,
                 "semester", semester.toString(),
                 "studentsEnrolled", studentNames,
@@ -149,14 +120,10 @@ public class Course implements Model {
         );
     }
 
-    public void setUniqueId(long uniqueId) {
-        this.uniqueId = uniqueId;
-    }
-
     @Override
     public String toString() {
         return "Course{" +
-                "uniqueId=" + uniqueId +
+                "uuid=" + uuid +
                 ", name='" + name + '\'' +
                 ", semester=" + semester +
                 '}';
@@ -166,20 +133,15 @@ public class Course implements Model {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Course course = (Course) o;
-
-        return (uniqueId == 0 || uniqueId == course.uniqueId)
-                && (name != null ? name.equals(course.name) : course.name == null)
-                && semester.equals(course.semester);
+        return Objects.equal(getUuid(), course.getUuid()) &&
+                Objects.equal(getName(), course.getName()) &&
+                Objects.equal(getSemester(), course.getSemester());
     }
 
     @Override
     public int hashCode() {
-        int result = (int) uniqueId;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (semester != null ? semester.hashCode() : 0);
-        return result;
+        return Objects.hashCode(getUuid(), getName(), getSemester());
     }
 
     /**
@@ -196,20 +158,11 @@ public class Course implements Model {
      * {@link #create}.
      */
     public static class Builder {
-        private long uniqueId;
         private Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
         private Set<Assignment> assignments = new HashSet<>();
-        private String name;
         private Semester semester;
-
-        public long getDatabaseId() {
-            return uniqueId;
-        }
-
-        public Builder withDatabaseId(long uniqueId) {
-            this.uniqueId = uniqueId;
-            return this;
-        }
+        private String name;
+        private String uuid;
 
         public Builder withStudents(Set<Student> studentsEnrolled) {
             this.studentsEnrolled = studentsEnrolled;
@@ -221,30 +174,43 @@ public class Course implements Model {
             return this;
         }
 
+        public Builder withSemester(@Nonnull Semester semester) {
+            this.semester = semester;
+            return this;
+        }
+
         public Builder withName(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder withSemester(Semester semester) {
-            this.semester = semester;
+        public Builder withUuid(String uuid) {
+            this.uuid = uuid;
             return this;
+        }
+
+        public String getDatabaseId() {
+            return this.uuid;
         }
 
         public Course create(
                 @Nonnull String name,
+                @Nonnull String uuid,
                 @Nonnull Semester semester
         ) {
             Preconditions.checkNotNull(name, "Cannot create a course with a null name");
+            Preconditions.checkNotNull(uuid, "Cannot create a course with a null uuid");
             Preconditions.checkNotNull(semester, "Cannot create a course with a null semester");
-            return new Course(name, semester, this);
+
+            return new Course(name, semester, uuid, this);
         }
+
         public Course create() {
             Preconditions.checkNotNull(name, "Cannot create a course with a null name");
             Preconditions.checkNotNull(semester, "Cannot create a course with a null semester");
-            return new Course(name, semester, this);
-        }
 
+            return create(name, uuid, semester);
+        }
     }
 }
 

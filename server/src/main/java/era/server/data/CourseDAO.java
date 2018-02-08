@@ -23,5 +23,5 @@ public interface CourseDAO {
      * Access data from existing Course object from access
      */
     @Nullable
-    Course read(long id);
+    Course read(String id);
 }

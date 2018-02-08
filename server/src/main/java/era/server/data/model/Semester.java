@@ -1,5 +1,6 @@
 package era.server.data.model;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
@@ -19,46 +20,30 @@ import java.util.Map;
 @ParametersAreNonnullByDefault
 public class Semester implements Comparable<Semester>, Model {
 
-    private long uniqueId;
-    private Term term;
-    private Year year;
+    private final String uuid;
+    private final Term term;
+    private final Year year;
 
-    public Semester(Term term, Year year) {
+    public Semester(String uuid, Term term, @Nullable Year year) {
+        Preconditions.checkNotNull(uuid, "A database id cannot be null!");
         Preconditions.checkNotNull(term, "Term cannot be null!");
-        Preconditions.checkNotNull(year, "Year cannot be null!");
+        this.uuid = uuid;
         this.term = term;
-        this.year = year;
-    }
-
-    public Semester(long uniqueId, String term, @Nullable Integer year) {
-        Preconditions.checkArgument(uniqueId > 0, "A database id cannot be less than 1!");
-        Preconditions.checkNotNull(term, "Term cannot be null!");
-        this.uniqueId = uniqueId;
-        this.term = Term.valueOf(term);
         // now is the only sensible default.
-        this.year = year == null ? Year.now() : Year.of(year);
-    }
-
-    public static Semester of(Term term, Year year) {
-        return new Semester(term, year);
+        this.year = year == null ? Year.now() : year;
     }
 
     @Override
     public Map<String, Object> toViewModel() {
         return ImmutableMap.of(
-                "uniqueId", uniqueId,
+                "uuid", uuid,
                 "term", term.name(),
                 "year", year.getValue()
         );
     }
 
-    public long getUniqueId() {
-        return uniqueId;
-    }
-
-    public void setUniqueId(int uniqueId) {
-        Preconditions.checkArgument(uniqueId > 0, "A database id cannot be less than 1!");
-        this.uniqueId = uniqueId;
+    public String getUuid() {
+        return uuid;
     }
 
     @Nonnull
@@ -66,10 +51,6 @@ public class Semester implements Comparable<Semester>, Model {
         return term;
     }
 
-    public void setTerm(Term term) {
-        Preconditions.checkNotNull(term);
-        this.term = term;
-    }
 
     @Nonnull
     public String getTermString() {
@@ -81,11 +62,6 @@ public class Semester implements Comparable<Semester>, Model {
         return year;
     }
 
-    public void setYear(Year year) {
-        Preconditions.checkNotNull(year);
-        this.year = year;
-    }
-
     public int getYearInt() {
         return year.getValue();
     }
@@ -94,17 +70,14 @@ public class Semester implements Comparable<Semester>, Model {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Semester semester = (Semester) o;
-
-        return uniqueId == semester.uniqueId && term == semester.term && year.equals(semester.year);
+        return getTerm() == semester.getTerm() &&
+                Objects.equal(getYear(), semester.getYear());
     }
 
     @Override
     public int hashCode() {
-        int result = term.hashCode();
-        result = 31 * result + year.hashCode();
-        return result;
+        return Objects.hashCode(getTerm(), getYear());
     }
 
     @Override
@@ -120,20 +93,5 @@ public class Semester implements Comparable<Semester>, Model {
         return term.humanReadable() + " " + year.toString();
     }
 
-    public enum Term {
-        FALL,
-        SPRING,
-        SUMMER,
-        WINTER;
-
-        public static Term humanValueOf(String humanReadable) {
-            return Term.valueOf(humanReadable.toUpperCase());
-        }
-
-        public final String humanReadable() {
-            return this.name().substring(0, 1)
-                    + this.name().substring(1).toLowerCase();
-        }
-    }
 }
 

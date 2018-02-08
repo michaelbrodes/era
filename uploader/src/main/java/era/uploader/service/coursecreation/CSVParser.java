@@ -24,11 +24,10 @@ public class CSVParser {
     private static final int COURSE_ID = 4;
 
     // the sub field COURSE_ID
-    private static final int COURSE_ID_SIZE = 4;
+    private static final int COURSE_ID_SIZE = 3;
     private static final int DEPARTMENT = 0;
     private static final int COURSE_NBR = 1;
     private static final int SECTION_NBR = 2;
-    private static final int REFERENCE_NBR = 3;
 
     private final Semester semester;
 
@@ -53,17 +52,18 @@ public class CSVParser {
             if (courseRecord.length >= COURSE_ID_SIZE) {
                 ret = ArrayListMultimap.create();
                 ret.put(
-                        new Course(
-                                courseRecord[DEPARTMENT],
-                                courseRecord[COURSE_NBR],
-                                courseRecord[SECTION_NBR],
-                                semester
-                        ),
+                        Course.builder()
+                                .withSemester(semester)
+                                .createUnique(
+                                        courseRecord[DEPARTMENT],
+                                        courseRecord[COURSE_NBR],
+                                        courseRecord[SECTION_NBR]
+                                ),
                         Student.builder()
                                 .withLastName(fields[LAST_NAME])
                                 .withFirstName(fields[FIRST_NAME])
                                 .withSchoolId(fields[SCHOOL_ID])
-                                .create(fields[USER_NAME])
+                                .createUnique(fields[USER_NAME])
                 );
             } else {
                 System.err.println("Error Parsing Course CSV");

@@ -189,7 +189,7 @@ public class QRCreationService {
         return studentToQRCodes;
     }
 
-    Assignment createAssignmentForStudent(Student student, AssignmentPrintoutMetaData assignmentPrintoutMetaData) {
+    private Assignment createAssignmentForStudent(Student student, AssignmentPrintoutMetaData assignmentPrintoutMetaData) {
         Preconditions.checkNotNull(student);
         Course course = assignmentPrintoutMetaData.getCourse();
         Assignment.Builder assignmentBuilder = Assignment.builder()
@@ -205,7 +205,7 @@ public class QRCreationService {
             assignmentBuilder.withStudent_id(student.getUniqueId());
         }
 
-        return assignmentBuilder.create(assignmentPrintoutMetaData.getAssignmentName());
+        return assignmentBuilder.createUnique(assignmentPrintoutMetaData.getAssignmentName());
     }
 
     //TODO: save qr code correctly

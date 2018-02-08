@@ -6,6 +6,7 @@ import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
+import era.uploader.data.model.Term;
 import era.uploader.data.viewmodel.StudentMetaData;
 import era.uploader.service.CourseCreationService;
 import javafx.collections.FXCollections;
@@ -71,9 +72,9 @@ public class CourseCreationController {
         );
 
         ObservableList<String> availableTerms = FXCollections.observableArrayList();
-        EnumSet.allOf(Semester.Term.class)
+        EnumSet.allOf(Term.class)
                 .stream()
-                .map(Semester.Term::humanReadable)
+                .map(Term::humanReadable)
                 .forEach(availableTerms::add);
         termDropdown.setPromptText("Term...");
         termDropdown.setItems(availableTerms);
@@ -191,7 +192,7 @@ public class CourseCreationController {
         Optional<Semester> chosenSemester = Optional.empty();
 
         if (chosenTerm != null && chosenYear != null) {
-            Semester.Term term = Semester.Term.humanValueOf(chosenTerm);
+            Term term = Term.humanValueOf(chosenTerm);
             Year year = Year.of(chosenYear);
             chosenSemester = Optional.of(Semester.of(term, year));
         }

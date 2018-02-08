@@ -212,7 +212,14 @@ public class PDFProcessor {
             Student student = pages.getKey();
             if (student != null) {
                 Collection<QRCodeMapping> pagesToAdd = pages.getValue();
-                assignments.add(new Assignment(assignmentName, pagesToAdd, student, course, LocalDateTime.now()));
+                assignments.add(
+                        Assignment.builder()
+                                .withQRCodeMappings(pagesToAdd)
+                                .withStudent(student)
+                                .withCourse(course)
+                                .withCreatedDateTime(LocalDateTime.now())
+                                .createUnique(assignmentName)
+                );
             }
         }
         mergeAssignmentPages(assignments);
