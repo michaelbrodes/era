@@ -25,6 +25,8 @@ public class ServerWebModule implements ServerModule {
     private static ServerWebModule INSTANCE;
 
     private final HealthController healthController;
+    private final IndexController indexController;
+    private final AssignmentViewController assignmentViewController;
 
     /**
      * Creates the controllers contained in this module
@@ -34,11 +36,16 @@ public class ServerWebModule implements ServerModule {
             CourseDAO courseDAO,
             AssignmentDAO assignmentDAO) {
         this.healthController = new HealthController();
+        this.indexController = new IndexController();
+        this.assignmentViewController = new AssignmentViewController();
     }
 
     @Override
     public void setupRoutes() {
+
         Spark.get("/hello", healthController::checkHealth);
+        Spark.get("/", indexController::checkIndex);
+        Spark.get("/student/:userName", assignmentViewController::showAssignments);
     }
 
     /**
