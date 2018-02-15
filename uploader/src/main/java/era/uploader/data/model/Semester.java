@@ -30,6 +30,12 @@ public class Semester implements Comparable<Semester> {
         this.year = year;
     }
 
+    public Semester(String uuid, Term term, @Nullable Year year) {
+        this.uuid = uuid;
+        this.term = term;
+        this.year = year;
+    }
+
     public Semester(int uniqueId, String term, @Nullable Integer year, @Nonnull String uuid) {
         Preconditions.checkArgument(uniqueId > 0, "A database id cannot be less than 1!");
         Preconditions.checkNotNull(term, "Term cannot be null!");
@@ -118,6 +124,10 @@ public class Semester implements Comparable<Semester> {
                 .compare(this.year, that.year)
                 .compare(this.term.ordinal(), that.term.ordinal())
                 .result();
+    }
+
+    public String apiToString() {
+        return term.name() + "-" + year.toString();
     }
 
     @Override

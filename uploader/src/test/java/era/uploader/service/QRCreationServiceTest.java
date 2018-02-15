@@ -22,12 +22,12 @@
 //import static org.junit.Assert.assertNotNull;
 //
 //public class QRCreationServiceTest {
-//    private QRCreationService qrService;
+//    private AssignmentCreationService qrService;
 //
 //    @Before
 //    public void setUp() {
 //        MockQRCodeMappingDAOImpl pageDAO = new MockQRCodeMappingDAOImpl();
-//        qrService = new QRCreationService(pageDAO);
+//        qrService = new AssignmentCreationService(pageDAO);
 //    }
 //
 //    @Test

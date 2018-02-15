@@ -9,7 +9,6 @@ import era.server.data.Model;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNullableByDefault;
-import java.time.Year;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,15 +35,13 @@ public class Course implements Model {
     private Course(
             @Nonnull String name,
             @Nonnull Semester semester,
-            @Nonnull String uuid,
             @Nonnull Builder builder) {
         Preconditions.checkNotNull(name, "Cannot create a course with a null name");
         Preconditions.checkNotNull(semester, "Cannot create a course with a null semester");
-        Preconditions.checkNotNull(uuid, "Cannot create a course with a null uuid");
 
         this.name = name;
         this.semester = semester;
-        this.uuid = uuid;
+        this.uuid = builder.uuid;
         this.studentsEnrolled = builder.studentsEnrolled == null ?
                 Sets.newHashSet() :
                 builder.studentsEnrolled;
@@ -169,6 +166,8 @@ public class Course implements Model {
             return this;
         }
 
+        // Suppresed warnings because intellij doesn't know how to deal with lambdas
+        @SuppressWarnings("UnusedReturnValue")
         public Builder withAssignments(Set<Assignment> assignments) {
             this.assignments = assignments;
             return this;
@@ -195,21 +194,19 @@ public class Course implements Model {
 
         public Course create(
                 @Nonnull String name,
-                @Nonnull String uuid,
                 @Nonnull Semester semester
         ) {
             Preconditions.checkNotNull(name, "Cannot create a course with a null name");
-            Preconditions.checkNotNull(uuid, "Cannot create a course with a null uuid");
             Preconditions.checkNotNull(semester, "Cannot create a course with a null semester");
 
-            return new Course(name, semester, uuid, this);
+            return new Course(name, semester, this);
         }
 
         public Course create() {
             Preconditions.checkNotNull(name, "Cannot create a course with a null name");
             Preconditions.checkNotNull(semester, "Cannot create a course with a null semester");
 
-            return create(name, uuid, semester);
+            return create(name, semester);
         }
     }
 }

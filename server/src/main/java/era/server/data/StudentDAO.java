@@ -3,6 +3,7 @@ package era.server.data;
 import era.server.data.model.Student;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 public interface StudentDAO {
@@ -14,6 +15,8 @@ public interface StudentDAO {
      */
     void insert(Student student);
 
+    Student resolveStudent(Student student);
+
     /**
      * Get a student from the database with the corresponding id
      *
@@ -21,4 +24,6 @@ public interface StudentDAO {
      * @return a student from the database.
      */
     Student read(String id);
+
+    Optional<Student> readByUsername(String username);
 }

@@ -9,7 +9,7 @@ import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.QRCodeMappingDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.viewmodel.AssignmentPrintoutMetaData;
-import era.uploader.service.QRCreationService;
+import era.uploader.service.AssignmentCreationService;
 import era.uploader.service.assignment.AveryTemplate;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -87,7 +87,7 @@ public class AssignmentCreationController {
         ObservableList<String> descriptions = FXCollections.observableArrayList(templateDescriptions.keySet());
         averyTemplateComboBox.setItems(descriptions);
 
-        QRCreationService qrs = new QRCreationService(QR_CODE_MAPPING_DAO);
+        AssignmentCreationService qrs = new AssignmentCreationService(QR_CODE_MAPPING_DAO);
 
 
         // When the user clicks 'create assignment'
@@ -134,7 +134,7 @@ public class AssignmentCreationController {
 //            Course currentCourse = nameToCourse.get(currentCourseName);
 //            AveryTemplate template = templateDescriptions.get(averyTemplateComboBox.getValue());
 //
-//            QRCreationService qrs = new QRCreationService(QR_CODE_MAPPING_DAO);
+//            AssignmentCreationService qrs = new AssignmentCreationService(QR_CODE_MAPPING_DAO);
 //            Collection<QRCodeMapping> qrCodesForStudents = qrs.createQRs(
 //                    currentCourse,
 //                    assignmentName.getText(),
