@@ -5,7 +5,7 @@
 //import era.uploader.data.model.Assignment;
 //import era.uploader.data.model.Course;
 //import era.uploader.data.model.Student;
-//import era.uploader.service.QRCreationService;
+//import era.uploader.service.AssignmentCreationService;
 //import era.uploader.service.assignment.AveryConstants;
 //import era.uploader.service.assignment.QRCode;
 //import era.uploader.service.assignment.QRCodePDF;
@@ -36,7 +36,7 @@
 //                .create("bdude");
 //        Assignment assignment = Assignment.builder()
 //                .create("how to be cool");
-//        String qrFileName = QRCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
+//        String qrFileName = AssignmentCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
 //        System.out.println("one image pdf: " + qrFileName);
 //        QRCodePDF shippingLabelPDF = new QRCodePDF(AveryConstants.Shipping.CELLS_PER_PAGE);
 //        ShippingLabelSaver qrSaver = new ShippingLabelSaver(shippingLabelPDF);
@@ -75,7 +75,7 @@
 //
 //        Assignment assignment = Assignment.builder()
 //                .create("how to be cool");
-//        String qrFileName = QRCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
+//        String qrFileName = AssignmentCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
 //        System.out.println("two image pdf: " + qrFileName);
 //        QRCodePDF shippingLabelPDF = new QRCodePDF(AveryConstants.Shipping.CELLS_PER_PAGE);
 //        ShippingLabelSaver qrSaver = new ShippingLabelSaver(shippingLabelPDF);
@@ -119,7 +119,7 @@
 //
 //        Assignment assignment = Assignment.builder()
 //                .create("how to be cool");
-//        String qrFileName = QRCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
+//        String qrFileName = AssignmentCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
 //        System.out.println("three image pdf: " + qrFileName);
 //        QRCodePDF shippingLabelPDF = new QRCodePDF(AveryConstants.Shipping.CELLS_PER_PAGE);
 //        ShippingLabelSaver qrSaver = new ShippingLabelSaver(shippingLabelPDF);
@@ -198,7 +198,7 @@
 //
 //        Assignment assignment = Assignment.builder()
 //                .create("how to be cool");
-//        String qrFileName = QRCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
+//        String qrFileName = AssignmentCreationService.ASSIGNMENTS_DIR + File.separator + assignment.getName() + " " + UUID.randomUUID().toString() + ".pdf";
 //        System.out.println("page + 1 image pdf: " + qrFileName);
 //        QRCodePDF shippingLabelPDF = new QRCodePDF(AveryConstants.Shipping.CELLS_PER_PAGE);
 //        ShippingLabelSaver qrSaver = new ShippingLabelSaver(shippingLabelPDF);

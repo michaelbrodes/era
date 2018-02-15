@@ -1,34 +1,46 @@
-package era.uploader.communication;
+package era.server.communication;
 
 import com.google.common.collect.Sets;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import era.uploader.data.model.Course;
-import era.uploader.data.model.Semester;
-import era.uploader.data.model.Student;
-import era.uploader.data.model.Term;
+import era.server.data.model.Course;
+import era.server.data.model.Semester;
+import era.server.data.model.Student;
+import era.server.data.model.Term;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Year;
 import java.util.Set;
 
-public class Course_JsonTypeAdapter extends TypeAdapter <Course>{
+public class CourseJSONTypeAdapter extends TypeAdapter<Course>{
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CourseJSONTypeAdapter.class);
     @Override
     public void write(JsonWriter out, Course value) throws IOException {
+        if (value == null) {
+            out.nullValue();
+            return;
+        }
+
         out.beginObject();
+            out.name("uuid").value(value.getUuid());
             out.name("name").value(value.getName());
             out.name("studentsEnrolled").beginArray();
-                for (Student student : value.getStudentsEnrolled()){
-                    out.beginObject();
-                    out.name("userName").value(student.getUserName());
-                    out.name("email").value(student.getEmail());
-                    out.endObject();
-                }
+            for (Student student : value.getStudentsEnrolled()){
+                out.beginObject();
+                out.name("userName").value(student.getUserName());
+                out.name("email").value(student.getEmail());
+                out.name("uuid").value(student.getUuid());
+                out.endObject();
+            }
             out.endArray();
             out.name("semester").beginObject();
+                out.name("uuid").value(value.getSemester().getUuid());
                 out.name("term").value(value.getSemester().getTerm().name());
                 out.name("year").beginObject();
                     out.name("year").value(value.getSemester().getYear().getValue());
@@ -46,54 +58,57 @@ public class Course_JsonTypeAdapter extends TypeAdapter <Course>{
 
         Course.Builder courseBuilder = Course.builder();
         // a uuid is required to make a course
-        String uuid = null, name = null;
+        String name = null;
         Semester semester = null;
         in.beginObject();
         while (in.hasNext()) {
             String nextName = in.nextName();
             switch(nextName) {
                 case "uuid":
-                    uuid = in.nextString();
+                    // they might send it over, ignore it
+                    in.nextString();
+                    LOGGER.warn("course.uuid sent over as part of Uploader JSON payload. Ignoring...");
                     break;
                 case "name":
                     name = in.nextString();
+                    courseBuilder.withName(name);
                     break;
                 case "studentsEnrolled":
                     courseBuilder.withStudents(parseStudentsEnrolled(in));
                     break;
                 case "semester":
                     semester = parseSemester(in);
+                    courseBuilder.withSemester(semester);
                     break;
                 default:
-                    throw JSONParseException.unexpectedField(Course.class, nextName);
+                    throw new JsonSyntaxException("Unexpected " + nextName + " field in course");
             }
         }
         in.endObject();
 
-        if (uuid == null) {
-            throw JSONParseException.fieldNotSupplied(Course.class, "uuid");
-        }
-
         if (name == null) {
-            throw JSONParseException.fieldNotSupplied(Course.class, "name");
+            throw new JsonSyntaxException("A name wasn't supplied as part of the Course entity");
         }
 
         if (semester == null) {
-            throw JSONParseException.fieldNotSupplied(Course.class, "semester");
+            throw new JsonSyntaxException("A name wasn't supplied as part of the Semester entity");
         }
 
-        return courseBuilder.create(name, uuid, semester);
+        return courseBuilder.create();
     }
 
     private Semester parseSemester(JsonReader in) throws IOException {
         in.beginObject();
-        String uuid = null, term = null;
+        String term = null;
         Integer year = null;
+
         while (in.hasNext()) {
             String nextName = in.nextName();
             switch(nextName) {
                 case "uuid":
-                    uuid = in.nextString();
+                    // they might send it in
+                    in.nextString();
+                    LOGGER.warn("semester.uuid sent over as part of Uploader JSON payload. Ignoring...");
                     break;
                 case "term" :
                     term = in.nextString();
@@ -106,20 +121,16 @@ public class Course_JsonTypeAdapter extends TypeAdapter <Course>{
                     in.endObject();
                     break;
                 default:
-                    throw JSONParseException.unexpectedField(Semester.class, nextName);
+                    throw new JsonSyntaxException("Unexpected " + nextName + " field in semester");
             }
         }
         in.endObject();
 
-        if (uuid == null) {
-            throw JSONParseException.fieldNotSupplied(Semester.class, "uuid");
-        }
-
         if (term == null) {
-            throw JSONParseException.fieldNotSupplied(Semester.class, "term");
+            throw new JsonSyntaxException("A term wasn't supplied as part of the Semester entity.");
         }
 
-        return new Semester(uuid, Term.valueOf(term), year != null ? Year.of(year) : null);
+        return new Semester(Term.valueOf(term), year != null ? Year.of(year) : null);
     }
 
     private Set<Student> parseStudentsEnrolled(JsonReader in) throws IOException {
@@ -128,7 +139,7 @@ public class Course_JsonTypeAdapter extends TypeAdapter <Course>{
         while (in.hasNext()) {
             in.beginObject();
             Student.Builder studentBuilder = Student.builder();
-            String username = null, uuid = null;
+            String username = null;
             while(in.hasNext()) {
                 String nextField = in.nextName();
                 switch(nextField) {
@@ -139,26 +150,26 @@ public class Course_JsonTypeAdapter extends TypeAdapter <Course>{
                         studentBuilder.withEmail(in.nextString());
                         break;
                     case "uuid":
-                        uuid = in.nextString();
+                        // they might send it over.
+                        in.nextString();
+                        LOGGER.warn("student.uuid sent over as part of Uploader JSON payload. Ignoring...");
                         break;
                     default:
-                        throw JSONParseException.unexpectedField(Student.class, nextField);
+                        throw new JsonSyntaxException("Unexpected " + nextField + " field in student");
                 }
             }
             in.endObject();
 
-            if (uuid == null) {
-                throw JSONParseException.fieldNotSupplied(Student.class, "uuid");
-            }
 
             if (username == null) {
-                throw JSONParseException.fieldNotSupplied(Student.class, "username");
+                throw new JsonSyntaxException("A username wasn't supplied as part of the Student entity.");
             }
 
-            studentsEnrolled.add(studentBuilder.create(username, uuid));
+            studentsEnrolled.add(studentBuilder.create(username));
         }
         in.endArray();
 
         return studentsEnrolled;
     }
+
 }

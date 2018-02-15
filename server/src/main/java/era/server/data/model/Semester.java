@@ -24,8 +24,15 @@ public class Semester implements Comparable<Semester>, Model {
     private final Term term;
     private final Year year;
 
-    public Semester(String uuid, Term term, @Nullable Year year) {
-        Preconditions.checkNotNull(uuid, "A database id cannot be null!");
+    public Semester(Term term, @Nullable Year year) {
+        Preconditions.checkNotNull(term, "Term cannot be null!");
+        this.uuid = null;
+        this.term = term;
+        // now is the only sensible default.
+        this.year = year == null ? Year.now() : year;
+    }
+
+    public Semester(@Nullable String uuid, Term term, @Nullable Year year) {
         Preconditions.checkNotNull(term, "Term cannot be null!");
         this.uuid = uuid;
         this.term = term;
@@ -42,6 +49,7 @@ public class Semester implements Comparable<Semester>, Model {
         );
     }
 
+    @Nullable
     public String getUuid() {
         return uuid;
     }
@@ -64,6 +72,14 @@ public class Semester implements Comparable<Semester>, Model {
 
     public int getYearInt() {
         return year.getValue();
+    }
+
+    public Semester withDifferentUUID(String uuid) {
+        if (!uuid.equals(this.uuid)) {
+            return new Semester(uuid, this.term, this.year);
+        } else {
+            return this;
+        }
     }
 
     @Override

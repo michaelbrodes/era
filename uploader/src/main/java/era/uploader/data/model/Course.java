@@ -212,6 +212,24 @@ public class Course {
         }
 
         public Course create(
+                @Nonnull String name,
+                @Nonnull String uuid,
+                @Nonnull Semester semester
+        ) {
+            this.semester = semester;
+            String[] nameArray = name.split("-");
+            String department = nameArray[0];
+            String courseNumber = nameArray[1];
+            String sectionNumber = nameArray[2];
+            return create(
+                    department,
+                    courseNumber,
+                    sectionNumber,
+                    uuid
+            );
+        }
+
+        public Course create(
                 @Nonnull String department,
                 @Nonnull String courseNumber,
                 @Nonnull String sectionNumber,

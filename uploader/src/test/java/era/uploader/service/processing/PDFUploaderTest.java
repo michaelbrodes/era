@@ -21,7 +21,6 @@ public class PDFUploaderTest {
     @Test
     public void uploadOneAssignment() throws Exception {
         Course course = Course.builder()
-                .withName("Intro to Chemistry")
                 .withSemester(Semester.of(Term.FALL, Year.now()))
                 .createUnique("CHEM", "111", "001");
         Student student = Student.builder()
@@ -38,7 +37,7 @@ public class PDFUploaderTest {
                 .withUniqueId(1)
                 .createUnique("TestAssignment");
 
-        AssignmentUploader.uploadAssignments(Collections.singletonList(assignment),"http://127.0.0.1:3000");
+        AssignmentUploader.uploadAssignments(Collections.singletonList(assignment),"http://127.0.0.1:3001");
 
         Assert.assertTrue(true);
     }

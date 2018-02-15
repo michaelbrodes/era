@@ -8,7 +8,9 @@ import com.google.common.collect.Sets;
 import era.server.data.Model;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNullableByDefault;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,22 +29,27 @@ public class Student implements Model {
     private String email;
     // every course that the student belongs to
     private final Set<Course> courses;
+    private final Set<Assignment> assignments;
     private final String uuid;
 
     /* Constructors */
-    private Student(@Nonnull String userName, @Nonnull String uuid, Builder builder) {
+    private Student(@Nonnull String userName, Builder builder) {
         Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
-        Preconditions.checkNotNull(uuid, "UUID cannot be null for a student");
         this.userName = userName;
-        this.uuid = uuid;
+        this.uuid = builder.uuid;
         this.email = builder.email;
         this.courses = builder.courses == null ? Sets.newHashSet() : builder.courses;
+        this.assignments = builder.assignments == null ? Sets.newHashSet() : builder.assignments;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * This getter will return null if we haven't stored this student into the database.
+     */
+    @Nullable
     public String getUuid() {
         return uuid;
     }
@@ -97,6 +104,11 @@ public class Student implements Model {
         return Objects.hashCode(getUserName(), getEmail(), getUuid());
     }
 
+    @Nonnull
+    public Set<Assignment> getAssignments() {
+        return assignments;
+    }
+
     /**
      * A Builder is a <em>design pattern</em> that allows you to specify constructor
      * arguments with just plain setters. We use a builder here because the
@@ -111,9 +123,11 @@ public class Student implements Model {
      * {@link #create}.
      */
     public static class Builder {
-        private String email;
+        private String email = null;
+        private String uuid = null;
         // every course that the student belongs to
         private Set<Course> courses = Sets.newHashSet();
+        private Set<Assignment> assignments = Sets.newHashSet();
 
         public Builder() {
 
@@ -136,8 +150,20 @@ public class Student implements Model {
             return this;
         }
 
-        public Student create(@Nonnull String userName, @Nonnull String uuid) {
-            return new Student(userName, uuid, this);
+        public Builder withAssignments(@Nonnull Collection<Assignment> assignments) {
+            Preconditions.checkNotNull(assignments);
+
+            this.assignments.addAll(assignments);
+            return this;
+        }
+
+        public Builder withUUID(String uuid) {
+            this.uuid = uuid;
+            return this;
+        }
+
+        public Student create(@Nonnull String userName) {
+            return new Student(userName, this);
         }
     }
 }

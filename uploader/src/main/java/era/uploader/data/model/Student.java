@@ -187,9 +187,11 @@ public class Student {
 
         public Student create(@Nonnull String userName, @Nonnull String uuid) {
             Preconditions.checkNotNull(userName);
-            this.email = userName
-                    + "@"
-                    + UploaderProperties.instance().getEmailSuffix();
+            if (this.email == null) {
+                this.email = userName
+                        + "@"
+                        + UploaderProperties.instance().getEmailSuffix();
+            }
             return new Student(userName, uuid, this);
         }
 

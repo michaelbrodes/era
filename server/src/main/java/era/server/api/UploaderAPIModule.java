@@ -41,6 +41,7 @@ public class UploaderAPIModule implements ServerModule {
     public void setupRoutes() {
         Spark.post(API_PREFIX + Course.ENDPOINT, upc::uploadCourses);
         Spark.post(API_PREFIX + Course.ENDPOINT + "/:courseId/assignment", upc::uploadAssignment);
+        Spark.post(API_PREFIX + Course.ENDPOINT + "/:courseName/semester/:semesterName/assignment", upc::uploadAssignmentPDF);
     }
 
     /**

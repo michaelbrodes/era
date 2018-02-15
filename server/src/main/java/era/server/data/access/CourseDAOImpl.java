@@ -1,7 +1,11 @@
 package era.server.data.access;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
+import era.server.api.UUIDGenerator;
 import era.server.data.CourseDAO;
+import era.server.data.StudentDAO;
+import era.server.data.database.tables.records.CourseRecord;
 import era.server.data.database.tables.records.SemesterRecord;
 import era.server.data.model.Assignment;
 import era.server.data.model.Course;
@@ -10,11 +14,10 @@ import era.server.data.model.Student;
 import era.server.data.model.Term;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Year;
 import java.util.Optional;
@@ -34,6 +37,7 @@ import static era.server.data.database.Tables.STUDENT;
 @ParametersAreNonnullByDefault
 public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
     private static CourseDAO INSTANCE;
+    private static final StudentDAO STUDENT_DAO = StudentDAOImpl.instance();
 
     /**
      * private No-op constructor so we can't construct instances without using
@@ -47,79 +51,67 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
      * Create and Insert a new Course object into the access
      */
     @Override
-    public void insert(Course course) throws SQLException {
+    public Course insert(Course course) {
         Preconditions.checkNotNull(course);
-        try (DSLContext create = connect()) {
-            Semester dbSemester = resolveOrInsertSemester(course.getSemester());
-            int affected = create.insertInto(
-                           COURSE,
-                           COURSE.UUID,
-                           COURSE.SEMESTER_ID,
-                           COURSE.NAME
-                    )
-                    .values(
-                            course.getUuid(),
-                            dbSemester.getUuid(),
-                            course.getName()
-                    )
-                    .execute();
-            if (affected == 0) {
-                throw new SQLException("Insert of " + course.toString() + " failed");
-            }
+        course.setSemester(resolveSemester(course.getSemester()));
+        Course dbCourse = resolveCourse(course);
+        Set<Student> resolvedStudents = Sets.newHashSet();
 
-            for (Student student: course.getStudentsEnrolled()) {
-                create.insertInto(
-                        STUDENT,
-                        STUDENT.EMAIL,
-                        STUDENT.UUID,
-                        STUDENT.USERNAME
-                        )
-                        .values(student.getEmail(), student.getUuid(), student.getUserName())
-                        .execute();
+        for (Student student: course.getStudentsEnrolled()) {
+            Student dbStudent = STUDENT_DAO.resolveStudent(student);
+            insertCourseStudent(dbCourse, dbStudent);
+            resolvedStudents.add(dbStudent);
+        }
 
-                create.insertInto(
-                        COURSE_STUDENT,
-                        COURSE_STUDENT.COURSE_ID,
-                        COURSE_STUDENT.STUDENT_ID
-                        )
-                        .values(course.getUuid(), student.getUuid())
-                        .execute();
-            }
+        dbCourse.getStudentsEnrolled().clear();
+        dbCourse.getStudentsEnrolled().addAll(resolvedStudents);
 
-            for (Assignment assignment: course.getAssignments()) {
-                create.insertInto(
-                                ASSIGNMENT,
-                                ASSIGNMENT.NAME,
-                                ASSIGNMENT.IMAGE_FILE_PATH,
-                                ASSIGNMENT.CREATED_DATE_TIME,
-                                ASSIGNMENT.UUID,
-                                ASSIGNMENT.STUDENT_ID,
-                                ASSIGNMENT.COURSE_ID
-                        )
+        return dbCourse;
+    }
+
+    @Override
+    @Nonnull
+    public Course resolveCourse (Course course) {
+        try (DSLContext ctx = connect()) {
+            Condition sameNameAndSemester = COURSE.NAME.eq(course.getName())
+                    .and(COURSE.SEMESTER_ID.eq(course.getSemester().getUuid()));
+            Optional<CourseRecord> maybeCourse = ctx.selectFrom(COURSE)
+                    .where(sameNameAndSemester)
+                    .fetchOptional();
+
+            String uuid = UUIDGenerator.uuid();
+
+            if (!maybeCourse.isPresent()) {
+                ctx.insertInto(
+                        COURSE,
+                        COURSE.UUID,
+                        COURSE.NAME,
+                        COURSE.SEMESTER_ID)
                         .values(
-                                assignment.getName(),
-                                assignment.getImageFilePath(),
-                                assignment.getCreatedDateTimeStamp(),
-                                assignment.getUuid(),
-                                assignment.getStudent_id(),
-                                assignment.getCourse_id()
-                        )
+                                uuid,
+                                course.getName(),
+                                course.getSemester().getUuid())
                         .execute();
+            } else {
+                uuid = maybeCourse.get().getUuid();
             }
+
+            return Course.builder()
+                    .withName(course.getName())
+                    .withStudents(course.getStudentsEnrolled())
+                    .withSemester(course.getSemester())
+                    .withUuid(uuid)
+                    .create();
         }
     }
 
-
-    /* Access data from existing Course object from access */
-    @Override
-    @Nullable
-    public Course read(String id) {
+    private Optional<Course> findCourse(Condition filterer) {
         try (DSLContext create = connect()) {
             Optional<Course.Builder> builder = create.select()
                     .from(COURSE)
                     .join(SEMESTER)
                     .on(SEMESTER.UUID.eq(COURSE.SEMESTER_ID))
-                    .where(COURSE.UUID.eq(id))
+                    .where(filterer)
                     .fetchOptional()
                     .map(record -> {
                         Term term = Term.valueOf(record.get(SEMESTER.TERM));
@@ -145,7 +137,8 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                             String username = record.get(STUDENT.USERNAME);
                             return Student.builder()
                                     .withEmail(email)
-                                    .create(username, studentId);
+                                    .withUUID(studentId)
+                                    .create(username);
                         })
                         .collect(Collectors.toSet());
                 courseBuilder.withStudents(studentSet);
@@ -158,7 +151,7 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                         ASSIGNMENT.CREATED_DATE_TIME,
                         ASSIGNMENT.IMAGE_FILE_PATH,
                         ASSIGNMENT.COURSE_ID
-                        )
+                )
                         .from(ASSIGNMENT)
                         .where(ASSIGNMENT.COURSE_ID.eq(courseBuilder.getDatabaseId()))
                         .fetchLazy()
@@ -179,48 +172,87 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                 courseBuilder.withAssignments(assignmentSet);
             });
 
-            return builder.map(Course.Builder::create).orElse(null);
+            return builder.map(Course.Builder::create);
         }
     }
 
-    private Semester resolveOrInsertSemester(Semester apiSemester) {
-        try (DSLContext ctx = connect()) {
-            final Semester semesterToResolve = apiSemester;
-            Condition filterer = DSL.and(
-                    SEMESTER.TERM.eq(semesterToResolve.getTermString()),
-                    SEMESTER.YEAR.eq(semesterToResolve.getYearInt())
-            );
-
-            // try to find the semester if it exists, otherwise insert it
-            return ctx.selectFrom(SEMESTER)
+    private Optional<Semester> findSemester(Condition filterer) {
+        try (DSLContext create = connect()) {
+            return create.selectFrom(SEMESTER)
                     .where(filterer)
                     .fetchOptional()
-                    .orElseGet(() -> {
-                        ctx.insertInto(
+                    .map(semesterRecord -> new Semester(
+                            semesterRecord.getUuid(),
+                            Term.valueOf(semesterRecord.getTerm()),
+                            Year.of(semesterRecord.getYear())));
+        }
+    }
+
+
+    /* Access data from existing Course object from access */
+    @Override
+    @Nullable
+    public Course read(String id) {
+        return findCourse(COURSE.UUID.eq(id)).orElse(null);
+    }
+
+    @Override
+    public Optional<Course> readByCourseNameAndSemester(String name, Semester semester) {
+        Optional<Semester> dbSemester = findSemester(SEMESTER.TERM.eq(semester.getTermString())
+                                                .and(SEMESTER.YEAR.eq(semester.getYearInt())));
+        if (dbSemester.isPresent()) {
+            return findCourse(COURSE.NAME.eq(name)
+                         .and(COURSE.SEMESTER_ID.eq(dbSemester.get().getUuid())));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private void insertCourseStudent(Course course, Student student) {
+        try (DSLContext ctx = connect()) {
+            ctx.insertInto(
+                COURSE_STUDENT,
+                COURSE_STUDENT.STUDENT_ID,
+                COURSE_STUDENT.COURSE_ID
+            )
+            .values(
+                student.getUuid(),
+                course.getUuid()
+            )
+            .onDuplicateKeyIgnore()
+            .execute();
+        }
+    }
+
+    @Nonnull
+    private Semester resolveSemester(@Nonnull Semester apiSemester) {
+        try (DSLContext ctx = connect()) {
+            Condition filter = SEMESTER.TERM.eq(apiSemester.getTermString())
+                    .and(SEMESTER.YEAR.eq(apiSemester.getYearInt()));
+
+            Optional<SemesterRecord> maybeSemester = ctx.selectFrom(SEMESTER)
+                    .where(filter)
+                    .fetchOptional();
+            String uuid;
+
+            if (!maybeSemester.isPresent()) {
+                uuid = UUIDGenerator.uuid();
+                ctx.insertInto(
                                 SEMESTER,
                                 SEMESTER.UUID,
                                 SEMESTER.TERM,
                                 SEMESTER.YEAR
-                        ).values(
-                                // uniqueId is sent over the API
-                                semesterToResolve.getUuid(),
-                                semesterToResolve.getTermString(),
-                                semesterToResolve.getYearInt()
+                        )
+                        .values(
+                                uuid,
+                                apiSemester.getTerm().name(),
+                                apiSemester.getYearInt()
                         ).execute();
-                        SemesterRecord semesterRecord = new SemesterRecord();
-                        semesterRecord.setUuid(semesterToResolve.getUuid());
-                        semesterRecord.setTerm(semesterToResolve.getTermString());
-                        semesterRecord.setYear(semesterToResolve.getYearInt());
-                        return semesterRecord;
-                    })
-                    .map((record) -> {
-                        SemesterRecord semesterRecord = record.into(SEMESTER);
-                        return new Semester(
-                                semesterRecord.getUuid(),
-                                Term.valueOf(semesterRecord.getTerm()),
-                                Year.of(semesterRecord.getYear())
-                        );
-                    });
+            } else {
+                uuid = maybeSemester.get().getUuid();
+            }
+
+            return new Semester(uuid, apiSemester.getTerm(), apiSemester.getYear());
         }
     }
 

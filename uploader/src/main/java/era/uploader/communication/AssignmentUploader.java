@@ -13,6 +13,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Collection;
 
 public class AssignmentUploader {
@@ -24,20 +25,19 @@ public class AssignmentUploader {
 
             CloseableHttpClient client = HttpClientBuilder.create().build();
 
-            String courseServerId = current.getCourse().getUuid();
+            String courseName = URLEncoder.encode(current.getCourse().getName(), "UTF-8");
+            String semesterName = URLEncoder.encode(current.getCourse().getSemester().apiToString(), "UTF-8");
 
-            host += "/api/course/" + courseServerId + "/assignment";
+            host += "/api/course/" + courseName + "/semester/" + semesterName + "/assignment";
 
             HttpPost post = new HttpPost(host);
 
             File file = new File(current.getImageFilePath());
             String assignmentName = current.getName();
-            String assignmentServerId = current.getUuid();
-            String studentServerId = current.getStudent().getUuid();
+            String studentName = current.getStudent().getUserName();
 
-            post.addHeader("X-Assignment-Id", assignmentServerId);
             post.addHeader("X-Assignment-Name", assignmentName);
-            post.addHeader("X-Student-Id", studentServerId);
+            post.addHeader("X-Student-Name", studentName);
             post.addHeader("X-Assignment-File-Name", current.getImageFilePath());
 
 
