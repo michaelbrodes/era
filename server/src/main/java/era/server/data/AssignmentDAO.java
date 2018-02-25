@@ -3,6 +3,7 @@ package era.server.data;
 import era.server.data.model.Assignment;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 
 /**
  * Provides CRUD functionality for {@link Assignment} objects. We made an interface
@@ -16,4 +17,6 @@ public interface AssignmentDAO {
      * @param assignment the assignment to insert.
      */
     void storeAssignment(Assignment assignment);
+
+    Optional<Assignment> fetch(String uuid);
 }

@@ -2,6 +2,7 @@ package era.server.web;
 
 
 import era.server.ServerModule;
+import era.server.common.UnauthorizedException;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.StudentDAO;
@@ -27,6 +28,7 @@ public class ServerWebModule implements ServerModule {
     private final HealthController healthController;
     private final IndexController indexController;
     private final AssignmentViewController assignmentViewController;
+    private final ErrorController errorController;
 
     /**
      * Creates the controllers contained in this module
@@ -37,15 +39,17 @@ public class ServerWebModule implements ServerModule {
             AssignmentDAO assignmentDAO) {
         this.healthController = new HealthController();
         this.indexController = new IndexController();
-        this.assignmentViewController = new AssignmentViewController();
+        this.assignmentViewController = new AssignmentViewController(assignmentDAO, courseDAO);
+        this.errorController = new ErrorController();
     }
 
     @Override
     public void setupRoutes() {
-
         Spark.get("/hello", healthController::checkHealth);
         Spark.get("/", indexController::checkIndex);
-        Spark.get("/student/:userName", assignmentViewController::showAssignments);
+        Spark.get("/student/:userName", assignmentViewController::assignmentList);
+        Spark.get("/student/:userName/assignment/:assignmentId", assignmentViewController::assignment);
+        Spark.exception(UnauthorizedException.class, errorController::unauthorized);
     }
 
     /**

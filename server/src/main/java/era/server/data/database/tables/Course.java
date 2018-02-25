@@ -39,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Course extends TableImpl<CourseRecord> {
 
-    private static final long serialVersionUID = -925966460;
+    private static final long serialVersionUID = 2046974378;
 
     /**
      * The reference instance of <code>era.course</code>
@@ -111,7 +111,7 @@ public class Course extends TableImpl<CourseRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.COURSE_COURSE_SEMESTER_FK, Indexes.COURSE_PRIMARY);
+        return Arrays.<Index>asList(Indexes.COURSE_COURSE_SEMESTER_FK, Indexes.COURSE_COURSE_SEMESTER_NAME_UK, Indexes.COURSE_PRIMARY);
     }
 
     /**
@@ -127,7 +127,7 @@ public class Course extends TableImpl<CourseRecord> {
      */
     @Override
     public List<UniqueKey<CourseRecord>> getKeys() {
-        return Arrays.<UniqueKey<CourseRecord>>asList(Keys.KEY_COURSE_PRIMARY);
+        return Arrays.<UniqueKey<CourseRecord>>asList(Keys.KEY_COURSE_PRIMARY, Keys.KEY_COURSE_COURSE_SEMESTER_NAME_UK);
     }
 
     /**

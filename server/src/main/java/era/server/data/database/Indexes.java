@@ -39,6 +39,7 @@ public class Indexes {
     public static final Index ASSIGNMENT_ASSIGNMENT_STUDENT_IDX = Indexes0.ASSIGNMENT_ASSIGNMENT_STUDENT_IDX;
     public static final Index ASSIGNMENT_PRIMARY = Indexes0.ASSIGNMENT_PRIMARY;
     public static final Index COURSE_COURSE_SEMESTER_FK = Indexes0.COURSE_COURSE_SEMESTER_FK;
+    public static final Index COURSE_COURSE_SEMESTER_NAME_UK = Indexes0.COURSE_COURSE_SEMESTER_NAME_UK;
     public static final Index COURSE_PRIMARY = Indexes0.COURSE_PRIMARY;
     public static final Index COURSE_STUDENT_COURSE_STUDENT_STUDENT_FK = Indexes0.COURSE_STUDENT_COURSE_STUDENT_STUDENT_FK;
     public static final Index COURSE_STUDENT_PRIMARY = Indexes0.COURSE_STUDENT_PRIMARY;
@@ -47,7 +48,6 @@ public class Indexes {
     public static final Index SEMESTER_PRIMARY = Indexes0.SEMESTER_PRIMARY;
     public static final Index SEMESTER_SEMESTER_TERM_YEAR = Indexes0.SEMESTER_SEMESTER_TERM_YEAR;
     public static final Index STUDENT_PRIMARY = Indexes0.STUDENT_PRIMARY;
-    public static final Index STUDENT_STUDENT_EMAIL_UK = Indexes0.STUDENT_STUDENT_EMAIL_UK;
     public static final Index STUDENT_STUDENT_USERNAME_UK = Indexes0.STUDENT_STUDENT_USERNAME_UK;
 
     // -------------------------------------------------------------------------
@@ -59,6 +59,7 @@ public class Indexes {
         public static Index ASSIGNMENT_ASSIGNMENT_STUDENT_IDX = createIndex("assignment_student_idx", Assignment.ASSIGNMENT, new OrderField[] { Assignment.ASSIGNMENT.STUDENT_ID }, false);
         public static Index ASSIGNMENT_PRIMARY = createIndex("PRIMARY", Assignment.ASSIGNMENT, new OrderField[] { Assignment.ASSIGNMENT.UUID }, true);
         public static Index COURSE_COURSE_SEMESTER_FK = createIndex("course_semester_fk", Course.COURSE, new OrderField[] { Course.COURSE.SEMESTER_ID }, false);
+        public static Index COURSE_COURSE_SEMESTER_NAME_UK = createIndex("course_semester_name_uk", Course.COURSE, new OrderField[] { Course.COURSE.NAME, Course.COURSE.SEMESTER_ID }, true);
         public static Index COURSE_PRIMARY = createIndex("PRIMARY", Course.COURSE, new OrderField[] { Course.COURSE.UUID }, true);
         public static Index COURSE_STUDENT_COURSE_STUDENT_STUDENT_FK = createIndex("course_student_student_fk", CourseStudent.COURSE_STUDENT, new OrderField[] { CourseStudent.COURSE_STUDENT.STUDENT_ID }, false);
         public static Index COURSE_STUDENT_PRIMARY = createIndex("PRIMARY", CourseStudent.COURSE_STUDENT, new OrderField[] { CourseStudent.COURSE_STUDENT.COURSE_ID, CourseStudent.COURSE_STUDENT.STUDENT_ID }, true);
@@ -67,7 +68,6 @@ public class Indexes {
         public static Index SEMESTER_PRIMARY = createIndex("PRIMARY", Semester.SEMESTER, new OrderField[] { Semester.SEMESTER.UUID }, true);
         public static Index SEMESTER_SEMESTER_TERM_YEAR = createIndex("semester_term_year", Semester.SEMESTER, new OrderField[] { Semester.SEMESTER.TERM, Semester.SEMESTER.YEAR }, true);
         public static Index STUDENT_PRIMARY = createIndex("PRIMARY", Student.STUDENT, new OrderField[] { Student.STUDENT.UUID }, true);
-        public static Index STUDENT_STUDENT_EMAIL_UK = createIndex("student_email_uk", Student.STUDENT, new OrderField[] { Student.STUDENT.EMAIL }, true);
         public static Index STUDENT_STUDENT_USERNAME_UK = createIndex("student_username_uk", Student.STUDENT, new OrderField[] { Student.STUDENT.USERNAME }, true);
     }
 }

@@ -32,6 +32,7 @@ public class Course implements Model {
     private Set<Assignment> assignments = Sets.newHashSet();
 
     /* Constructor */
+    @Deprecated
     private Course(
             @Nonnull String name,
             @Nonnull Semester semester,
@@ -41,6 +42,20 @@ public class Course implements Model {
 
         this.name = name;
         this.semester = semester;
+        this.uuid = builder.uuid;
+        this.studentsEnrolled = builder.studentsEnrolled == null ?
+                Sets.newHashSet() :
+                builder.studentsEnrolled;
+        this.assignments = builder.assignments == null ?
+                Sets.newHashSet() :
+                builder.assignments;
+    }
+
+    private Course (
+            @Nonnull String name,
+            Builder builder) {
+        this.name = name;
+        this.semester = builder.semester;
         this.uuid = builder.uuid;
         this.studentsEnrolled = builder.studentsEnrolled == null ?
                 Sets.newHashSet() :
@@ -192,6 +207,7 @@ public class Course implements Model {
             return this.uuid;
         }
 
+        @Deprecated
         public Course create(
                 @Nonnull String name,
                 @Nonnull Semester semester
@@ -204,9 +220,8 @@ public class Course implements Model {
 
         public Course create() {
             Preconditions.checkNotNull(name, "Cannot create a course with a null name");
-            Preconditions.checkNotNull(semester, "Cannot create a course with a null semester");
 
-            return create(name, semester);
+            return new Course(name, this);
         }
     }
 }

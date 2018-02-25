@@ -7,6 +7,8 @@ import org.jooq.DSLContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import java.util.Optional;
+
 import static era.server.data.database.Tables.ASSIGNMENT;
 
 /**
@@ -49,6 +51,21 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO{
                     studentId,
                     assignment.getCreatedDateTimeStamp()
             ).execute();
+        }
+    }
+
+    @Override
+    public Optional<Assignment> fetch(String uuid) {
+        try (DSLContext create = connect()) {
+            return create.selectFrom(ASSIGNMENT)
+                    .where(ASSIGNMENT.UUID.eq(uuid))
+                    .fetchOptional()
+                    .map(dbAssignment -> Assignment.builder()
+                            .withImageFilePath(dbAssignment.getImageFilePath())
+                            .withCreatedDateTime(dbAssignment.getCreatedDateTime().toLocalDateTime())
+                            .withStudent_id(dbAssignment.getStudentId())
+                            .withCourse_id(dbAssignment.getCourseId())
+                            .create(dbAssignment.getName(), dbAssignment.getUuid()));
         }
     }
 
