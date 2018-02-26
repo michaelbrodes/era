@@ -41,7 +41,7 @@ public class ServerWebModule implements ServerModule {
         this.healthController = new HealthController();
         this.indexController = new IndexController(RENDERER);
         this.assignmentViewController = new AssignmentViewController(RENDERER, assignmentDAO, courseDAO);
-        this.errorController = new ErrorController();
+        this.errorController = new ErrorController(RENDERER);
     }
 
     @Override

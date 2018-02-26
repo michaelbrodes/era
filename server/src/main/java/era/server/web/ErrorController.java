@@ -9,6 +9,11 @@ import java.util.Map;
 
 // TODO move this to CASAuth when it is merged in
 public class ErrorController {
+    private final PageRenderer renderer;
+
+    public ErrorController(PageRenderer renderer) {
+        this.renderer = renderer;
+    }
     public String unauthorized(Exception exception, Request request, Response response) {
         request.session(true);
         response.status(403);
@@ -21,6 +26,6 @@ public class ErrorController {
         }
         message.put("reason", "You are not authorized to view this page.");
 
-        return PageRenderer.render(message, "unauthorized.hbs");
+        return renderer.render(message, "unauthorized.hbs");
     }
 }

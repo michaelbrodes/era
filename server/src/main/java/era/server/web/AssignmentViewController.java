@@ -49,14 +49,6 @@ public class AssignmentViewController {
         return renderer.render(viewModel, "assignment-view.hbs");
     }
 
-//    public String courseList(Request request, Response response) {
-//        AssignmentViewContext context = AssignmentViewContext.initialize(request);
-//        Optional<String> studentUsername = context.getStudentUsername();
-//        Set<Course> courses = studentUsername.map(courseDAO::readAllCoursesEnrolledIn)
-//                .orElse(Sets.newHashSet());
-//        return "";
-//    }
-
 
     /**
      * Given a URL param {@code :assignmentId} read that assignment's filename
@@ -67,9 +59,10 @@ public class AssignmentViewController {
      * response is already set when we copy the PDF to {@link Response#raw()}
      */
     public Object assignment(Request request, Response response) {
-        AssignmentViewContext.initialize(request);
-        Optional<String> assignmentUUID = Optional.ofNullable(request.params(":assignmentId"));
-        Optional<Assignment> assignment = assignmentUUID.flatMap(assignmentDAO::fetch);
+        AssignmentViewContext context = AssignmentViewContext.initialize(request);
+        Optional<Assignment> assignment = context
+                .getAssignmentId()
+                .flatMap(assignmentDAO::fetch);
 
         if (assignment.isPresent()) {
             try (OutputStream out = response.raw().getOutputStream()) {

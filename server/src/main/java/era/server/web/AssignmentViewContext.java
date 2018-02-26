@@ -11,9 +11,11 @@ import java.util.Optional;
  */
 public class AssignmentViewContext {
     private final String studentUsername;
+    private final String assignmentId;
 
-    AssignmentViewContext(@Nullable String studentUsername) {
+    private AssignmentViewContext(@Nullable String studentUsername, @Nullable String assignmentId) {
         this.studentUsername = studentUsername;
+        this.assignmentId = assignmentId;
     }
 
     public static AssignmentViewContext initialize(Request request) {
@@ -25,10 +27,16 @@ public class AssignmentViewContext {
             student = request.params(":userName");
         }
 
-        return new AssignmentViewContext(student);
+        String assignmentId = request.params(":assignmentId");
+
+        return new AssignmentViewContext(student, assignmentId);
     }
 
     public Optional<String> getStudentUsername() {
         return Optional.ofNullable(studentUsername);
+    }
+
+    public Optional<String> getAssignmentId() {
+        return Optional.ofNullable(assignmentId);
     }
 }

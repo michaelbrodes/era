@@ -219,42 +219,23 @@ public class UploadController {
         try {
              courses = jsonParser.fromJson(request.body(), courseList);
         } catch(JsonSyntaxException e) {
-            LOGGER.error("Exception when parsing course JSON \n{}", jsonParser);
+            LOGGER.error("Exception when parsing course JSON \n{}", request.body());
             LOGGER.error("Detailed exception: ", e);
             return APIMessage.error(request, response, 400, e.getMessage());
-        }
-
-        if (courses == null) {
-            return APIMessage.error(
-                    request,
-                    response,
-                    400,
-                    "We cannot insert a null collection of courses"
-            );
         }
 
         // we cannot insert a null course or a course that has either a null
         // name, uniqueId, or semester.
         for (Course course : courses) {
-            if (course != null
-                    && course.getName() != null
-                    && course.getSemester() != null) {
-                try {
-                    courseDAO.insert(course);
-                } catch (SQLException e) {
-                    String errorMessage = "Error inserting course "
-                            + course.toString() +
-                            " into the database "
-                            + e.getMessage();
-                    LOGGER.error(errorMessage);
-                    return APIMessage.error(request, response, 500, errorMessage);
-                }
-            } else if (course == null) {
-                return APIMessage.error(request, response, 400, "Cannot create null course");
-            } else {
-                return APIMessage.error(request, response, 400, "Course "
-                        + course.toString()
-                        + " has null information that cannot be inserted");
+            try {
+                courseDAO.insert(course);
+            } catch (SQLException e) {
+                String errorMessage = "Error inserting course "
+                        + course.toString() +
+                        " into the database "
+                        + e.getMessage();
+                LOGGER.error(errorMessage);
+                return APIMessage.error(request, response, 500, errorMessage);
             }
         }
 

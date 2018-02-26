@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run JAR" type="JarApplication" factoryName="JAR Application">
+    <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+    <option name="JAR_PATH" value="$PROJECT_DIR$/build/libs/server-1.0-SNAPSHOT.jar" />
+    <option name="PROGRAM_PARAMETERS" value="--app-port 3001 --db-host localhost --db-port 3306 --db-user root --db-password w8SvS%fyB^^E47m --db-name era" />
+    <option name="WORKING_DIRECTORY" value="C:\Dev\era\server" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
+    <envs />
+    <method>
+      <option name="Gradle.BeforeRunTask" enabled="true" tasks="jar" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
+    </method>
+  </configuration>
+</component>
