@@ -8,8 +8,8 @@ import era.uploader.data.database.AssignmentDAOImpl;
 import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.QRCodeMappingDAOImpl;
 import era.uploader.data.model.Course;
-import era.uploader.processing.PDFProcessor;
-import era.uploader.processing.ScanningProgress;
+import era.uploader.service.processing.PDFProcessor;
+import era.uploader.service.processing.ScanningProgress;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.Optional;
  * This service is responsible for taking in PDFs, extracting the UUID
  * embedded in them, and mapping those UUIDs to placeholder pages in the
  * database. This controller will rely heavily on the
- * {@link era.uploader.processing} package.
+ * {@link era.uploader.service.processing} package.
  */
 public class PDFScanningService {
     private final QRCodeMappingDAO qrCodeMappingDAO = QRCodeMappingDAOImpl.instance();
@@ -38,12 +38,6 @@ public class PDFScanningService {
             String assignment,
             String host
     ) {
-        Optional<Boolean> uploadingEnabled = UploaderProperties
-                .instance()
-                .isUploadingEnabled();
-        if (!uploadingEnabled.orElse(Boolean.FALSE)) {
-            host = null;
-        }
 
         return PDFProcessor.process(qrCodeMappingDAO, assignmentDAO, pdf, course, assignment, host);
     }

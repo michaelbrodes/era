@@ -49,14 +49,16 @@ public class StudentDAOImpl extends DatabaseDAO<StudentRecord, Student> implemen
                     STUDENT.LAST_NAME,
                     STUDENT.USERNAME,
                     STUDENT.SCHOOL_ID,
-                    STUDENT.EMAIL
+                    STUDENT.EMAIL,
+                    STUDENT.UUID
                     )
                     .values(
                             student.getFirstName(),
                             student.getLastName(),
                             student.getUserName(),
                             student.getSchoolId(),
-                           student.getEmail()
+                            student.getEmail(),
+                            student.getUuid()
                     )
                     .returning(
                             STUDENT.UNIQUE_ID

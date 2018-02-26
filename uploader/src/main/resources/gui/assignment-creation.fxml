@@ -3,37 +3,71 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 <AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.AssignmentCreationController">
-    <Button fx:id="homeButton" layoutX="873.0" layoutY="53.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="107.0" text="Home" onAction="#home" />
+
+    <Button layoutX="873.0" layoutY="53.0" mnemonicParsing="false" onAction="#home" prefHeight="27.0" prefWidth="107.0" text="Home" />
+    <ComboBox fx:id="averyTemplateComboBox" layoutX="650.0" layoutY="430.0" prefHeight="25.0" prefWidth="275.0" promptText="Avery Label Template" />
+   <Label layoutX="530.0" layoutY="434.0" text="Avery Label Template" />
+   <TableView fx:id="assignmentList" layoutX="650.0" layoutY="165.0" prefHeight="250.0" prefWidth="340.0">
+     <columns>
+       <TableColumn prefWidth="175.0" text="Assignment Name">
+           <cellValueFactory>
+               <PropertyValueFactory property="assignmentName" />
+           </cellValueFactory>
+       </TableColumn>
+
+       <TableColumn prefWidth="75.0" text="Pages" >
+           <cellValueFactory>
+               <PropertyValueFactory property="numPages" />
+           </cellValueFactory>
+       </TableColumn>
+
+         <TableColumn prefWidth="90.0" text="Course" >
+             <cellValueFactory>
+                 <PropertyValueFactory property="courseName" />
+             </cellValueFactory>
+         </TableColumn>
+
+     </columns>
+   </TableView>
+    <Button fx:id="createQRCodePageButton" layoutX="650.0" layoutY="516.0" mnemonicParsing="false" text="Create QR Codes">
+        <font>
+            <Font size="14.0" />
+        </font>
+    </Button>
     <fx:define>
         <ToggleGroup fx:id="databaseLocation" />
     </fx:define>
     <children>
-        <Label fx:id="label1" layoutX="62.0" layoutY="346.0" prefHeight="37.0" prefWidth="416.0" text="Assignment Length (pages)">
-         <tooltip>
-            <Tooltip text="This is the number of pages that each assignment will have per student" />
-         </tooltip></Label>
-        <Label fx:id="label2" layoutX="66.0" layoutY="250.0" prefHeight="37.0" prefWidth="138.0" text="Course Name" />
-        <Label fx:id="label3" layoutX="66.0" layoutY="165.0" prefHeight="37.0" prefWidth="138.0" text="Assignment Name" />
+        <Label layoutX="62.0" layoutY="346.0" prefHeight="37.0" prefWidth="416.0" text="Assignment Length (pages)">
+            <tooltip>
+                <Tooltip text="This is the number of pages that each assignment will have per student" />
+            </tooltip>
+        </Label>
+        <Label layoutX="66.0" layoutY="250.0" prefHeight="37.0" prefWidth="138.0" text="Course Name" />
+        <Label layoutX="66.0" layoutY="165.0" prefHeight="37.0" prefWidth="138.0" text="Assignment Name" />
 
         <ComboBox fx:id="numPagesComboBox" layoutX="324.0" layoutY="351.0" prefHeight="27.0" prefWidth="161.0" promptText="Number of Pages" />
-        <Label fx:id="assignmentCreationLabel" layoutX="326.0" layoutY="42.0" prefHeight="37.0" prefWidth="416.0" text="Assignment Creation">
+        <Label layoutX="326.0" layoutY="42.0" prefHeight="37.0" prefWidth="416.0" text="Assignment Creation">
             <font>
                 <Font name="Courier New" size="32.0" />
             </font>
         </Label>
         <TextField fx:id="assignmentName" alignment="CENTER" layoutX="206.0" layoutY="171.0" prefHeight="27.0" prefWidth="283.0" promptText="Assignment Name" />
         <ComboBox fx:id="courseNamesComboBox" layoutX="206.0" layoutY="256.0" prefHeight="27.0" prefWidth="283.0" promptText="Course" />
-        <Button fx:id="createAssignmentButton" layoutX="801.0" layoutY="518.0" mnemonicParsing="false" text="Create Assignment">
+        <Button fx:id="createAssignmentButton" layoutX="348.0" layoutY="518.0" mnemonicParsing="false" text="Create Assignment">
             <font>
                 <Font size="14.0" />
             </font>
@@ -42,13 +76,14 @@
             <menus>
                 <Menu mnemonicParsing="false" text="Navigation Menu">
                     <items>
-                        <MenuItem fx:id="home"  onAction="#home" mnemonicParsing="false" text="Home" />
-                        <MenuItem fx:id="createCourse" onAction="#course" mnemonicParsing="false"  text="Create Course" />
-                        <MenuItem fx:id="scanPDF" onAction="#scanPDF" mnemonicParsing="false"  text="Process PDF" />
+                        <MenuItem fx:id="home" mnemonicParsing="false" onAction="#home" text="Home" />
+                        <MenuItem fx:id="createCourse" mnemonicParsing="false" onAction="#course" text="Create Course" />
+                        <MenuItem fx:id="scanPDF" mnemonicParsing="false" onAction="#scanPDF" text="Process PDF" />
                     </items>
                 </Menu>
             </menus>
         </MenuBar>
-        
+        <Label layoutX="852.0" layoutY="6.0" text="Current Mode:" />
+        <Label fx:id="modeLabel" layoutX="950.0" layoutY="6.0" text="null" />
     </children>
 </AnchorPane>

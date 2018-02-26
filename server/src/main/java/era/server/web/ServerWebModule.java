@@ -2,6 +2,8 @@ package era.server.web;
 
 
 import era.server.ServerModule;
+import era.server.common.PageRenderer;
+import era.server.common.UnauthorizedException;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.StudentDAO;
@@ -16,16 +18,18 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * The Server Web <em>module</em> is a module of the "Server" application
  * that handles requests coming from students to view their assignments. It is
- * responsible for generating the UI that allows students to see their
- * assignments
+ * responsible for both generating the UI that allows students to see their
+ * assignments and authenticating those students.
  *
  * This particular package will have Controllers to handle these requests.
+ *
+ * @see ServerModule
  */
 @ThreadSafe
 public class ServerWebModule implements ServerModule {
 
+    private static final PageRenderer RENDERER = new PageRenderer();
     private static ServerWebModule INSTANCE;
-
     private final HealthController healthController;
     private final IndexController indexController;
     private final AssignmentViewController assignmentViewController;
@@ -45,6 +49,8 @@ public class ServerWebModule implements ServerModule {
         this.assignmentViewController = new AssignmentViewController();
         this.casAuth = new CASAuth(studentDAO);
         this.casEnabled = casEnabled;
+        this.indexController = new IndexController(RENDERER);
+        this.assignmentViewController = new AssignmentViewController(RENDERER, assignmentDAO, courseDAO);
     }
 
     @Override
@@ -52,9 +58,15 @@ public class ServerWebModule implements ServerModule {
         if (casEnabled) {
             Spark.get("/student/login", casAuth::login);
         }
-    Spark.get("/hello", healthController::checkHealth);
-    Spark.get("/", indexController::checkIndex);
-    Spark.get("/student/:userName", assignmentViewController::showAssignments);
+        Spark.get("/hello", healthController::checkHealth);
+        Spark.get("/", indexController::checkIndex);
+        Spark.get("/student/logout", (request, response)->{
+            request.session().attributes().clear();
+            response.redirect("/");
+            return null;
+        });
+        Spark.get("/student/:userName", assignmentViewController::assignmentList);
+        Spark.get("/student/:userName/assignment/:assignmentId", assignmentViewController::assignment);
 
     }
 

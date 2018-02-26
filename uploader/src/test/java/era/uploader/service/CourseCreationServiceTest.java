@@ -7,6 +7,7 @@ import era.uploader.data.database.MockCourseDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
+import era.uploader.data.model.Term;
 import org.junit.Test;
 
 import java.nio.file.Paths;
@@ -41,12 +42,17 @@ public class CourseCreationServiceTest {
                 "822222222",
                 "833333333"
         );
-        Semester currentSemester = new Semester(Semester.Term.FALL, Year.now());
-        Course eighteen = new Course("CHEM", "131", "018", currentSemester);
-        Course two = new Course("CHEM", "131", "002", currentSemester);
-        Course notExist = new Course("Spooky spooky ghosts", "101", "001", currentSemester);
-
-        Multimap<Course, Student> coursesToStudents = service.createCourses(Paths.get(roster), currentSemester);
+        Semester currentSemester = Semester.of(Term.FALL, Year.now());
+        Course eighteen = Course.builder()
+                .withSemester(currentSemester)
+                .createUnique("CHEM", "131", "018");
+        Course two = Course.builder()
+                .withSemester(currentSemester)
+                .createUnique("CHEM", "131", "002");
+        Course notExist = Course.builder()
+                .withSemester(currentSemester)
+                .createUnique("Spooky spooky ghosts", "101", "001");
+        Multimap<Course, Student> coursesToStudents = service.createCourses(Paths.get(roster), currentSemester, false);
 
         Map<Course, Collection<Student>> coursesToStudentsMap = coursesToStudents.asMap();
         // 002 and 018 each have one member while 018 has two

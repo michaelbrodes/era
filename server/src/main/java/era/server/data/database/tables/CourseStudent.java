@@ -39,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CourseStudent extends TableImpl<CourseStudentRecord> {
 
-    private static final long serialVersionUID = -1389362464;
+    private static final long serialVersionUID = 1035736600;
 
     /**
      * The reference instance of <code>era.course_student</code>
@@ -55,14 +55,14 @@ public class CourseStudent extends TableImpl<CourseStudentRecord> {
     }
 
     /**
-     * The column <code>era.course_student.course_id</code>.
-     */
-    public final TableField<CourseStudentRecord, Long> COURSE_ID = createField("course_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
-
-    /**
      * The column <code>era.course_student.student_id</code>.
      */
-    public final TableField<CourseStudentRecord, Long> STUDENT_ID = createField("student_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<CourseStudentRecord, String> STUDENT_ID = createField("student_id", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false), this, "");
+
+    /**
+     * The column <code>era.course_student.course_id</code>.
+     */
+    public final TableField<CourseStudentRecord, String> COURSE_ID = createField("course_id", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false), this, "");
 
     /**
      * Create a <code>era.course_student</code> table reference
@@ -130,7 +130,7 @@ public class CourseStudent extends TableImpl<CourseStudentRecord> {
      */
     @Override
     public List<ForeignKey<CourseStudentRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<CourseStudentRecord, ?>>asList(Keys.COURSE_STUDENT_COURSE_FK, Keys.COURSE_STUDENT_STUDENT_FK);
+        return Arrays.<ForeignKey<CourseStudentRecord, ?>>asList(Keys.COURSE_STUDENT_STUDENT_FK, Keys.COURSE_STUDENT_COURSE_FK);
     }
 
     /**

@@ -1,11 +1,11 @@
 package era.uploader.data.model;
 
 import com.google.common.base.Preconditions;
-import com.google.zxing.common.BitMatrix;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNullableByDefault;
+import java.awt.image.BufferedImage;
 
 /**
  * An individual page for an assignment. A page has a QR code that encodes a
@@ -17,9 +17,11 @@ public class QRCodeMapping {
     private int sequenceNumber;
     // transient means that the BitMatrix should not be serialized over rest
     // calls and it should not be stored in the database
-    private transient BitMatrix qrCode;
+    @Deprecated
+    private transient BufferedImage qrCode;
     private String uuid;
     private String tempDocumentName;
+    @Deprecated
     private transient PDDocument document;
     private Integer studentId;
 
@@ -69,27 +71,12 @@ public class QRCodeMapping {
     }
 
 
-    public BitMatrix getQrCode() {
+    public BufferedImage getQrCode() {
         return qrCode;
     }
 
-    public void setQrCode( BitMatrix qrCode) {
+    public void setQrCode( BufferedImage qrCode) {
         this.qrCode = qrCode;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof QRCodeMapping)) return false;
-
-        QRCodeMapping QRCodeMapping = (QRCodeMapping) o;
-
-        return uuid.equals(QRCodeMapping.uuid);
-    }
-
-    @Override
-    public int hashCode() {
-        return uuid.hashCode();
     }
 
     public PDDocument getDocument() {
@@ -116,6 +103,21 @@ public class QRCodeMapping {
         return studentId;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof QRCodeMapping)) return false;
+
+        QRCodeMapping QRCodeMapping = (QRCodeMapping) o;
+
+        return uuid.equals(QRCodeMapping.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid.hashCode();
+    }
+
 
     /**
      * A Builder is a <em>design pattern</em> that allows you to specify constructor
@@ -134,7 +136,7 @@ public class QRCodeMapping {
         private Student student;
         private Integer studentId;
         private int sequenceNumber;
-        private BitMatrix qrCode;
+        private BufferedImage qrCode;
         private PDDocument document;
         private String tempDocumentName;
 
@@ -158,11 +160,10 @@ public class QRCodeMapping {
             return this;
         }
 
-        public Builder withQRCode(BitMatrix qrCode) {
+        public Builder withQRCodeImage(BufferedImage qrCode) {
             this.qrCode = qrCode;
             return this;
         }
-
         public Builder withTempDocumentName(String name) {
             this.tempDocumentName = name;
             return this;

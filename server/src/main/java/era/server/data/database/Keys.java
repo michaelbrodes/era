@@ -49,43 +49,45 @@ public class Keys {
 
     public static final UniqueKey<AssignmentRecord> KEY_ASSIGNMENT_PRIMARY = UniqueKeys0.KEY_ASSIGNMENT_PRIMARY;
     public static final UniqueKey<CourseRecord> KEY_COURSE_PRIMARY = UniqueKeys0.KEY_COURSE_PRIMARY;
+    public static final UniqueKey<CourseRecord> KEY_COURSE_COURSE_SEMESTER_NAME_UK = UniqueKeys0.KEY_COURSE_COURSE_SEMESTER_NAME_UK;
     public static final UniqueKey<CourseStudentRecord> KEY_COURSE_STUDENT_PRIMARY = UniqueKeys0.KEY_COURSE_STUDENT_PRIMARY;
     public static final UniqueKey<SchemaVersionRecord> KEY_SCHEMA_VERSION_PRIMARY = UniqueKeys0.KEY_SCHEMA_VERSION_PRIMARY;
     public static final UniqueKey<SemesterRecord> KEY_SEMESTER_PRIMARY = UniqueKeys0.KEY_SEMESTER_PRIMARY;
     public static final UniqueKey<SemesterRecord> KEY_SEMESTER_SEMESTER_TERM_YEAR = UniqueKeys0.KEY_SEMESTER_SEMESTER_TERM_YEAR;
     public static final UniqueKey<StudentRecord> KEY_STUDENT_PRIMARY = UniqueKeys0.KEY_STUDENT_PRIMARY;
     public static final UniqueKey<StudentRecord> KEY_STUDENT_STUDENT_USERNAME_UK = UniqueKeys0.KEY_STUDENT_STUDENT_USERNAME_UK;
-    public static final UniqueKey<StudentRecord> KEY_STUDENT_STUDENT_EMAIL_UK = UniqueKeys0.KEY_STUDENT_STUDENT_EMAIL_UK;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final ForeignKey<AssignmentRecord, CourseRecord> ASSIGNMENT_COURSE_FK = ForeignKeys0.ASSIGNMENT_COURSE_FK;
     public static final ForeignKey<AssignmentRecord, StudentRecord> ASSIGNMENT_STUDENT_FK = ForeignKeys0.ASSIGNMENT_STUDENT_FK;
-    public static final ForeignKey<CourseStudentRecord, CourseRecord> COURSE_STUDENT_COURSE_FK = ForeignKeys0.COURSE_STUDENT_COURSE_FK;
+    public static final ForeignKey<AssignmentRecord, CourseRecord> ASSIGNMENT_COURSE_FK = ForeignKeys0.ASSIGNMENT_COURSE_FK;
+    public static final ForeignKey<CourseRecord, SemesterRecord> COURSE_SEMESTER_FK = ForeignKeys0.COURSE_SEMESTER_FK;
     public static final ForeignKey<CourseStudentRecord, StudentRecord> COURSE_STUDENT_STUDENT_FK = ForeignKeys0.COURSE_STUDENT_STUDENT_FK;
+    public static final ForeignKey<CourseStudentRecord, CourseRecord> COURSE_STUDENT_COURSE_FK = ForeignKeys0.COURSE_STUDENT_COURSE_FK;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
 
     private static class UniqueKeys0 extends AbstractKeys {
-        public static final UniqueKey<AssignmentRecord> KEY_ASSIGNMENT_PRIMARY = createUniqueKey(Assignment.ASSIGNMENT, "KEY_assignment_PRIMARY", Assignment.ASSIGNMENT.UNIQUE_ID);
-        public static final UniqueKey<CourseRecord> KEY_COURSE_PRIMARY = createUniqueKey(Course.COURSE, "KEY_course_PRIMARY", Course.COURSE.UNIQUE_ID);
+        public static final UniqueKey<AssignmentRecord> KEY_ASSIGNMENT_PRIMARY = createUniqueKey(Assignment.ASSIGNMENT, "KEY_assignment_PRIMARY", Assignment.ASSIGNMENT.UUID);
+        public static final UniqueKey<CourseRecord> KEY_COURSE_PRIMARY = createUniqueKey(Course.COURSE, "KEY_course_PRIMARY", Course.COURSE.UUID);
+        public static final UniqueKey<CourseRecord> KEY_COURSE_COURSE_SEMESTER_NAME_UK = createUniqueKey(Course.COURSE, "KEY_course_course_semester_name_uk", Course.COURSE.NAME, Course.COURSE.SEMESTER_ID);
         public static final UniqueKey<CourseStudentRecord> KEY_COURSE_STUDENT_PRIMARY = createUniqueKey(CourseStudent.COURSE_STUDENT, "KEY_course_student_PRIMARY", CourseStudent.COURSE_STUDENT.COURSE_ID, CourseStudent.COURSE_STUDENT.STUDENT_ID);
         public static final UniqueKey<SchemaVersionRecord> KEY_SCHEMA_VERSION_PRIMARY = createUniqueKey(SchemaVersion.SCHEMA_VERSION, "KEY_schema_version_PRIMARY", SchemaVersion.SCHEMA_VERSION.INSTALLED_RANK);
-        public static final UniqueKey<SemesterRecord> KEY_SEMESTER_PRIMARY = createUniqueKey(Semester.SEMESTER, "KEY_semester_PRIMARY", Semester.SEMESTER.UNIQUE_ID);
+        public static final UniqueKey<SemesterRecord> KEY_SEMESTER_PRIMARY = createUniqueKey(Semester.SEMESTER, "KEY_semester_PRIMARY", Semester.SEMESTER.UUID);
         public static final UniqueKey<SemesterRecord> KEY_SEMESTER_SEMESTER_TERM_YEAR = createUniqueKey(Semester.SEMESTER, "KEY_semester_semester_term_year", Semester.SEMESTER.TERM, Semester.SEMESTER.YEAR);
-        public static final UniqueKey<StudentRecord> KEY_STUDENT_PRIMARY = createUniqueKey(Student.STUDENT, "KEY_student_PRIMARY", Student.STUDENT.UNIQUE_ID);
+        public static final UniqueKey<StudentRecord> KEY_STUDENT_PRIMARY = createUniqueKey(Student.STUDENT, "KEY_student_PRIMARY", Student.STUDENT.UUID);
         public static final UniqueKey<StudentRecord> KEY_STUDENT_STUDENT_USERNAME_UK = createUniqueKey(Student.STUDENT, "KEY_student_student_username_uk", Student.STUDENT.USERNAME);
-        public static final UniqueKey<StudentRecord> KEY_STUDENT_STUDENT_EMAIL_UK = createUniqueKey(Student.STUDENT, "KEY_student_student_email_uk", Student.STUDENT.EMAIL);
     }
 
     private static class ForeignKeys0 extends AbstractKeys {
-        public static final ForeignKey<AssignmentRecord, CourseRecord> ASSIGNMENT_COURSE_FK = createForeignKey(era.server.data.database.Keys.KEY_COURSE_PRIMARY, Assignment.ASSIGNMENT, "assignment_course_fk", Assignment.ASSIGNMENT.COURSE_ID);
         public static final ForeignKey<AssignmentRecord, StudentRecord> ASSIGNMENT_STUDENT_FK = createForeignKey(era.server.data.database.Keys.KEY_STUDENT_PRIMARY, Assignment.ASSIGNMENT, "assignment_student_fk", Assignment.ASSIGNMENT.STUDENT_ID);
-        public static final ForeignKey<CourseStudentRecord, CourseRecord> COURSE_STUDENT_COURSE_FK = createForeignKey(era.server.data.database.Keys.KEY_COURSE_PRIMARY, CourseStudent.COURSE_STUDENT, "course_student_course_fk", CourseStudent.COURSE_STUDENT.COURSE_ID);
+        public static final ForeignKey<AssignmentRecord, CourseRecord> ASSIGNMENT_COURSE_FK = createForeignKey(era.server.data.database.Keys.KEY_COURSE_PRIMARY, Assignment.ASSIGNMENT, "assignment_course_fk", Assignment.ASSIGNMENT.COURSE_ID);
+        public static final ForeignKey<CourseRecord, SemesterRecord> COURSE_SEMESTER_FK = createForeignKey(era.server.data.database.Keys.KEY_SEMESTER_PRIMARY, Course.COURSE, "course_semester_fk", Course.COURSE.SEMESTER_ID);
         public static final ForeignKey<CourseStudentRecord, StudentRecord> COURSE_STUDENT_STUDENT_FK = createForeignKey(era.server.data.database.Keys.KEY_STUDENT_PRIMARY, CourseStudent.COURSE_STUDENT, "course_student_student_fk", CourseStudent.COURSE_STUDENT.STUDENT_ID);
+        public static final ForeignKey<CourseStudentRecord, CourseRecord> COURSE_STUDENT_COURSE_FK = createForeignKey(era.server.data.database.Keys.KEY_COURSE_PRIMARY, CourseStudent.COURSE_STUDENT, "course_student_course_fk", CourseStudent.COURSE_STUDENT.COURSE_ID);
     }
 }

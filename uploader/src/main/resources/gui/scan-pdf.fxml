@@ -11,7 +11,6 @@
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-
 <AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.PDFScanningController">
     <Button fx:id="homeButton" layoutX="873.0" layoutY="53.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="107.0" text="Home" onAction="#home" />
     <fx:define>
@@ -47,10 +46,7 @@
                 </Menu>
             </menus>
         </MenuBar>
-        <RadioButton fx:id="online" layoutX="56.0" layoutY="291.0" mnemonicParsing="false" text="Online">
-         <toggleGroup>
-            <ToggleGroup fx:id="databaseLocation" />
-         </toggleGroup></RadioButton>
-        <RadioButton fx:id="offline" layoutX="56.0" layoutY="326.0" mnemonicParsing="false" text="Offline" toggleGroup="$databaseLocation" />
+        <Label layoutX="852.0" layoutY="6.0" text="Current Mode:" />
+        <Label fx:id="modeLabel" layoutX="950.0" layoutY="6.0" text="null" />
     </children>
 </AnchorPane>

@@ -2,8 +2,9 @@ package era.uploader.controller;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import era.uploader.common.UploaderProperties;
 import era.uploader.data.model.Course;
-import era.uploader.processing.ScanningProgress;
+import era.uploader.service.processing.ScanningProgress;
 import era.uploader.service.PDFScanningService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -46,17 +48,17 @@ public class PDFScanningController {
     private Button browseButton;
     @FXML
     private TextField assignmentName;
+    @FXML
+    private Label modeLabel;
 
-
-    //TODO update this to something not hardcoded you schlum
-    private static final String HOST_NAME = "http://localhost:3000";
+    private static final String NULL_HOST = null;
 
     private final PDFScanningService pdfServ = new PDFScanningService();
 
     private Path fullPath;
     private String fullFileName;
+    //private Course currentCourse;
     //private String currentAssignment;
-   //private Course currentCourse;
 
 
     @FXML
@@ -121,19 +123,39 @@ public class PDFScanningController {
 
             else if (fullFileName != null)
                 try {
-
+                boolean uploading = false;
                 if(currentCourse != null && currentAssignment != null) {
-                    final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, HOST_NAME);
-                    URL url = getClass().getResource("/gui/pdf-progress.fxml");
+                    if (UploaderProperties.instance().isUploadingEnabled() != null) {
+                        uploading = UploaderProperties.instance().isUploadingEnabled();
+                    }
+                    if(uploading) {
 
-                    FXMLLoader fxmlloader = new FXMLLoader();
-                    fxmlloader.setLocation(url);
-                    //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
-                    Parent root = fxmlloader.load();
-                    Scene mainScene = scanButton.getScene();
-                    // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
-                    ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
-                    mainScene.setRoot(root);
+                        String serverURL = UploaderProperties.instance().getServerURL().orElse(null);
+                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, serverURL);
+                        URL url = getClass().getResource("/gui/pdf-progress.fxml");
+
+                        FXMLLoader fxmlloader = new FXMLLoader();
+                        fxmlloader.setLocation(url);
+                        //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+                        Parent root = fxmlloader.load();
+                        Scene mainScene = scanButton.getScene();
+                        // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
+                        ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
+                        mainScene.setRoot(root);
+                    }
+                    else {
+                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, NULL_HOST);
+                        URL url = getClass().getResource("/gui/pdf-progress.fxml");
+
+                        FXMLLoader fxmlloader = new FXMLLoader();
+                        fxmlloader.setLocation(url);
+                        //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+                        Parent root = fxmlloader.load();
+                        Scene mainScene = scanButton.getScene();
+                        // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
+                        ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
+                        mainScene.setRoot(root);
+                    }
 
                 }
 
@@ -144,6 +166,15 @@ public class PDFScanningController {
                     errorAlert.showAndWait();
                 }
         });
+
+        if (UploaderProperties.instance().isUploadingEnabled()){
+            modeLabel.setText("Online");
+            modeLabel.setTextFill(Color.web("#228b22"));
+        }
+        else {
+            modeLabel.setText("Offline");
+            modeLabel.setTextFill(Color.web("#ff0000"));
+        }
     }
 
     public void home() throws IOException {

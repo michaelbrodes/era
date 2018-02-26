@@ -15,8 +15,10 @@ import javax.annotation.concurrent.ThreadSafe;
  * Therefore, it allows for one way communication from the uploader to the
  * server.
  *
- * This particular package will have REST Controllers for this communication
- * such as the {@link UploadController} for assignment uploads
+ * This particular package will have REST Controllers that facilitate this
+ * communication, such as the {@link UploadController} for assignment uploads.
+ *
+ * @see ServerModule
  */
 @ThreadSafe
 public class UploaderAPIModule implements ServerModule {
@@ -39,6 +41,7 @@ public class UploaderAPIModule implements ServerModule {
     public void setupRoutes() {
         Spark.post(API_PREFIX + Course.ENDPOINT, upc::uploadCourses);
         Spark.post(API_PREFIX + Course.ENDPOINT + "/:courseId/assignment", upc::uploadAssignment);
+        Spark.post(API_PREFIX + Course.ENDPOINT + "/:courseName/semester/:semesterName/assignment", upc::uploadAssignmentPDF);
     }
 
     /**

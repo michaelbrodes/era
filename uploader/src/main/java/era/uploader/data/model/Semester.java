@@ -1,7 +1,9 @@
 package era.uploader.data.model;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ComparisonChain;
+import era.uploader.common.UUIDGenerator;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -16,40 +18,32 @@ import java.time.Year;
 @ParametersAreNonnullByDefault
 public class Semester implements Comparable<Semester> {
 
-    public enum Term {
-        FALL,
-        SPRING,
-        SUMMER,
-        WINTER;
-
-        public final String humanReadable() {
-            return this.name().substring(0, 1)
-                    + this.name().substring(1).toLowerCase();
-        }
-
-        public static Term humanValueOf(String humanReadable) {
-            return Term.valueOf(humanReadable.toUpperCase());
-        }
-    }
-
     private int uniqueId;
     private Term term;
     private Year year;
+    private String uuid;
 
-    public Semester(Term term, Year year) {
+    private Semester(Term term, Year year) {
         Preconditions.checkNotNull(term, "Term cannot be null!");
         Preconditions.checkNotNull(year, "Year cannot be null!");
         this.term = term;
         this.year = year;
     }
 
-    public Semester(int uniqueId, String term, @Nullable Integer year) {
+    public Semester(String uuid, Term term, @Nullable Year year) {
+        this.uuid = uuid;
+        this.term = term;
+        this.year = year;
+    }
+
+    public Semester(int uniqueId, String term, @Nullable Integer year, @Nonnull String uuid) {
         Preconditions.checkArgument(uniqueId > 0, "A database id cannot be less than 1!");
         Preconditions.checkNotNull(term, "Term cannot be null!");
         this.uniqueId = uniqueId;
         this.term = Term.valueOf(term);
         // now is the only sensible default.
         this.year = year == null ? Year.now() : Year.of(year);
+        this.uuid = uuid;
     }
 
     public static Semester of(Term term, Year year) {
@@ -78,14 +72,14 @@ public class Semester implements Comparable<Semester> {
         return term;
     }
 
-    @Nonnull
-    public String getTermString() {
-        return term.name();
-    }
-
     public void setTerm(Term term) {
         Preconditions.checkNotNull(term);
         this.term = term;
+    }
+
+    @Nonnull
+    public String getTermString() {
+        return term.name();
     }
 
     @Nonnull
@@ -93,30 +87,35 @@ public class Semester implements Comparable<Semester> {
         return year;
     }
 
+    public void setYear(Year year) {
+        Preconditions.checkNotNull(year);
+        this.year = year;
+    }
+
     public int getYearInt() {
         return year.getValue();
     }
 
-    public void setYear(Year year) {
-        Preconditions.checkNotNull(year);
-        this.year = year;
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void makeUnique() {
+        this.uuid = UUIDGenerator.uuid();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Semester semester = (Semester) o;
-
-        return uniqueId == semester.uniqueId && term == semester.term && year.equals(semester.year);
+        return getTerm() == semester.getTerm() &&
+                Objects.equal(getYear(), semester.getYear());
     }
 
     @Override
     public int hashCode() {
-        int result = term.hashCode();
-        result = 31 * result + year.hashCode();
-        return result;
+        return Objects.hashCode(getTerm(), getYear());
     }
 
     @Override
@@ -127,8 +126,13 @@ public class Semester implements Comparable<Semester> {
                 .result();
     }
 
+    public String apiToString() {
+        return term.name() + "-" + year.toString();
+    }
+
     @Override
     public String toString() {
         return term.humanReadable() + " " + year.toString();
     }
+
 }

@@ -23,7 +23,7 @@ public class StudentConverter
                 .withFirstName(studentRecord.getFirstName())
                 .withLastName(studentRecord.getLastName())
                 .withUniqueId(studentRecord.getUniqueId())
-                .create(studentRecord.getUsername());
+                .create(studentRecord.getUsername(), studentRecord.getUuid());
     }
 
     @Override
@@ -34,6 +34,7 @@ public class StudentConverter
         record.setLastName(student.getLastName());
         record.setUsername(student.getUserName());
         record.setUniqueId(student.getUniqueId() < 1 ? null : student.getUniqueId());
+        record.setUuid(student.getUuid());
         return record;
     }
 

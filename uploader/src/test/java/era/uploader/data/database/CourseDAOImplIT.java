@@ -7,6 +7,7 @@ import era.uploader.data.DAO;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
+import era.uploader.data.model.Term;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.After;
@@ -18,11 +19,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.time.Year;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import static era.uploader.data.database.jooq.Tables.COURSE;
 import static era.uploader.data.database.jooq.Tables.COURSE_STUDENT;
@@ -38,8 +37,6 @@ import static era.uploader.data.database.jooq.tables.Semester.SEMESTER;
  * <strong>NEVER</strong> run this test on a production database. That means
  * <strong>DR JONES DON'T RUN THIS TEST</strong> unless the database you are
  * using doesn't have useful information
- *
- * TODO: make sure to let Dr. Jones know not to run this test or just don't ship this test at all
  *
  * This class is ignored because we shouldn't run it each time we compile,
  * instead it should be ran <strong>only</strong> when we are testing the
@@ -86,21 +83,21 @@ public class CourseDAOImplIT {
 
         Course testCourse = Course.builder()
                 .withName(courseName)
-                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
+                .withSemester(Semester.of(Term.FALL, Year.now()))
                 .withStudents(ImmutableSet.of(
                         Student.builder()
                             .withFirstName(archerName)
                             .withLastName("Archer")
                             .withSchoolId("800999999")
-                            .create("sarcher"),
+                            .createUnique("sarcher"),
                         Student.builder()
                             .withFirstName(lanaName)
                             .withLastName("Kane")
                             .withSchoolId("800888888")
-                            .create("lkane")
+                            .createUnique("lkane")
                 ))
                 .withAssignments(ImmutableSet.of())
-                .create("CHEM", "111", sectionNumber);
+                .createUnique("CHEM", "111", sectionNumber);
 
         courseDAO.insert(testCourse);
 
@@ -134,21 +131,21 @@ public class CourseDAOImplIT {
 
         Course testCourse = Course.builder()
                 .withName(courseName)
-                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
+                .withSemester(Semester.of(Term.FALL, Year.now()))
                 .withStudents(ImmutableSet.of(
                         Student.builder()
                                 .withFirstName(archerName)
                                 .withLastName("Archer")
                                 .withSchoolId("800999990")
-                                .create("student1"),
+                                .createUnique("student1"),
                         Student.builder()
                                 .withFirstName(lanaName)
                                 .withLastName("Kane")
                                 .withSchoolId("800888880")
-                                .create("student2")
+                                .createUnique("student2")
                 ))
                 .withAssignments(ImmutableSet.of())
-                .create("CHEM", "120", sectionNumber);
+                .createUnique("CHEM", "120", sectionNumber);
 
         courseDAO.insert(testCourse);
     }
@@ -158,33 +155,33 @@ public class CourseDAOImplIT {
         CourseDAO courseDAO = CourseDAOImpl.instance();
         Course testCourse = Course.builder()
                 .withName("Intro to Chemistry")
-                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
+                .withSemester(Semester.of(Term.FALL, Year.now()))
                 .withAssignments(ImmutableSet.of())
-                .create("CHEM", "120", "001");
+                .createUnique("CHEM", "120", "001");
 
         Course testCourse2 = Course.builder()
                 .withName("Second Intro to Chemistry")
-                .withSemester(Semester.of(Semester.Term.FALL, Year.now()))
+                .withSemester(Semester.of(Term.FALL, Year.now()))
                 .withAssignments(ImmutableSet.of())
-                .create("CHEM", "150", "002");
+                .createUnique("CHEM", "150", "002");
 
         Student s1 = Student.builder()
                 .withFirstName("Sterling")
                 .withLastName("Archer")
                 .withSchoolId("800999999")
-                .create("sarcher");
+                .createUnique("sarcher");
         Student s2 = Student.builder()
                 .withFirstName("Lana")
                 .withLastName("Kane")
                 .withSchoolId("800888888")
-                .create("lkane");
+                .createUnique("lkane");
 
         ImmutableMultimap<Course, Student> mmap = ImmutableMultimap.of(
                 testCourse, s1,
                 testCourse, s2,
                 testCourse2, s1
         );
-        courseDAO.insertCourseAndStudents(mmap, Semester.of(Semester.Term.FALL, Year.now()));
+        courseDAO.insertCourseAndStudents(mmap, Semester.of(Term.FALL, Year.now()));
 
         List<Course> courses = courseDAO.getAllCourses();
         Assert.assertEquals(2, courses.size());

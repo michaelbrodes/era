@@ -1,16 +1,17 @@
 package era.uploader.data.model;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import era.uploader.common.IOUtil;
+import era.uploader.common.UUIDGenerator;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * An assignment is a pdf scan of the student's actual assignment. One Course
@@ -18,103 +19,24 @@ import java.util.Set;
  * assignments.
  */
 public class Assignment {
+    private final String name;                        /* Name of the Assignment */
+    private final String uuid;
+    private int course_id;
+    private int student_id;
+    // UNIVERSALLY UNIQUE ID used to allow the server to handle mainly Uploader clients
     /* Class Fields */
     private String imageFilePath;               /* Path to the PDF file with the images associated with the assignment */
-    private String name;                        /* Name of the Assignment */
-    private transient Collection<QRCodeMapping> QRCodeMappings = new HashSet<>();  /* Set of QRCodeMapping objects for each Assignment */
+    private transient Collection<QRCodeMapping> qrCodeMappings; /* Set of QRCodeMapping objects for each Assignment */
     private transient PDDocument image;
     private LocalDateTime createdDateTime;
     private Student student;
     private Course course;
-    private int course_id;
-    private int student_id;
     private int uniqueId;
-
-    /* Constructors */
-    public Assignment() {
-
-    }
-    /**
-     * Creates a new Assignment object. All Nonnull arguments are required
-     * arguments and match "NOT NULL" columns in the database.
-     *
-     * @param imageFilePath the path to the pdf storing this assignment
-     * @param name the name of the assignment
-     * @param course the course that this assignment belongs to
-     * @param QRCodeMappings the QRCodeMappings that make up this assignment
-     * @param student the student who turned this assignment in
-     */
-    public Assignment(
-            @Nonnull String imageFilePath,
-            @Nonnull String name,
-            @Nonnull Course course,
-            Collection<QRCodeMapping> QRCodeMappings,
-            @Nonnull Student student,
-            @Nonnull LocalDateTime createdDateTime
-    ) {
-        Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
-        Preconditions.checkNotNull(imageFilePath, "Cannot create an Assignment with a null imageFilePath");
-        Preconditions.checkNotNull(student, "Cannot create an Assignment with a null student");
-        Preconditions.checkNotNull(course, "Cannot create an Assignment with a null course");
-        Preconditions.checkNotNull(createdDateTime, "Created date time cannot be null");
-
-        this.createdDateTime = createdDateTime;
-        this.imageFilePath = imageFilePath;
-        this.name = name;
-        this.QRCodeMappings = QRCodeMappings == null ? Sets.newHashSet() : QRCodeMappings;
-        this.student = student;
-        this.course = course;
-    }
-
-    /**
-     * Creates a new Assignment object. All Nonnull arguments are required
-     * arguments and match "NOT NULL" columns in the database.
-     *
-     * @param name the name of the assignment
-     * @param course the course that this assignment belongs to
-     * @param QRCodeMappings the QRCodeMappings that make up this assignment
-     * @param student the student who turned this assignment in
-     * @param createdDateTime the date and time that the assignment has been
-     *                        created
-     */
-    public Assignment(
-            @Nonnull String name,
-            Collection<QRCodeMapping> QRCodeMappings,
-            @Nonnull Student student,
-            @Nonnull Course course,
-            @Nonnull LocalDateTime createdDateTime
-    ) {
-        Preconditions.checkNotNull(name, "Cannot create an Assignment with a null student");
-        Preconditions.checkNotNull(student, "Cannot create an Assignment with a null student");
-        Preconditions.checkNotNull(course, "Cannot create an Assignment with a null course");
-        Preconditions.checkNotNull(createdDateTime, "Cannot create an Assignment with a null create date");
-
-        this.name = name;
-        this.QRCodeMappings = QRCodeMappings == null ? Sets.newHashSet() : QRCodeMappings;
-        this.student = student;
-        this.course = course;
-        this.imageFilePath = generateFileLocation();
-    }
-
-    public Assignment(
-            @Nonnull String imageFilePath,
-            @Nonnull String name,
-            int course_id,
-            int student_id,
-            int uniqueId
-    ) {
-        Preconditions.checkNotNull(imageFilePath, "Assignment cannot have a null imageFilePath!");
-        Preconditions.checkNotNull(name, "Assignment cannot have a null name!");
-        this.imageFilePath = imageFilePath;
-        this.name = name;
-        this.course_id = course_id;
-        this.student_id = student_id;
-        this.uniqueId = uniqueId;
-    }
 
     private Assignment(
             String name,
             LocalDateTime createdDateTime,
+            String uuid,
             Builder builder
     ) {
         this.name = name;
@@ -129,8 +51,13 @@ public class Assignment {
         this.course_id = builder.course_id;
         this.student_id = builder.student_id;
         this.image = builder.image;
-        this.QRCodeMappings = builder.QRCodeMappings;
+        this.qrCodeMappings = builder.qrCodeMappings;
         this.uniqueId = builder.uniqueId;
+        this.uuid = uuid;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
@@ -148,50 +75,10 @@ public class Assignment {
                 + ".pdf";
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Assignment that = (Assignment) o;
-
-        return uniqueId == that.uniqueId && name.equals(that.name) && student.equals(that.student) && course.equals(that.course);
-    }
-
-    @Override
-    public int hashCode() {
-        int studentHashCode;
-        int courseHashCode;
-
-        if( student == null){
-            studentHashCode = 0;
-        }
-        else{
-            studentHashCode = student.hashCode();
-        }
-
-        if( course == null){
-            courseHashCode = 0;
-        }
-        else{
-            courseHashCode = course.hashCode();
-        }
-        int result = name.hashCode();
-        result = 31 * result + studentHashCode;
-        result = 31 * result + courseHashCode;
-        result = 31 * result + uniqueId;
-        return result;
-    }
-
     /* Getters and Setters */
     @Nonnull
     public String getImageFilePath() {
         return imageFilePath;
-    }
-
-    public void setImageFilePath(@Nonnull String imageFilePath) {
-        Preconditions.checkNotNull(imageFilePath, "a null imageFilePath cannot be stored in the database");
-        this.imageFilePath = imageFilePath;
     }
 
     @Nonnull
@@ -199,42 +86,25 @@ public class Assignment {
         return name;
     }
 
-    public void setName(@Nonnull String name) {
-        Preconditions.checkNotNull(name, "a null name cannot be stored in the database.");
-        this.name = name;
-    }
-
     public int getCourse_id() {
-        return course_id;
-    }
-
-    public void setCourse_id(int course_id) {
-        this.course_id = course_id;
+        if (course_id == 0) {
+            return course.getUniqueId();
+        } else {
+            return course_id;
+        }
     }
 
     public int getStudent_id() {
-        return student_id;
-    }
-
-    public void setStudent_id(int student_id) {
-        this.student_id = student_id;
+        if (student_id == 0) {
+            return student.getUniqueId();
+        } else {
+            return student_id;
+        }
     }
 
     @Nonnull
     public Collection<QRCodeMapping> getQRCodeMappings() {
-        return QRCodeMappings;
-    }
-
-    /**
-     * Convenience method for if you want a set of QRCodeMappings.
-     */
-    @Nonnull
-    public Set<QRCodeMapping> getPagesSet() {
-        return Sets.newHashSet(QRCodeMappings);
-    }
-
-    public void setQRCodeMappings(Set<QRCodeMapping> QRCodeMappings) {
-        this.QRCodeMappings = QRCodeMappings == null ? Sets.newHashSet() : QRCodeMappings;
+        return qrCodeMappings;
     }
 
     public Course getCourse() {
@@ -244,31 +114,36 @@ public class Assignment {
     public void setCourse(@Nonnull Course course) {
         Preconditions.checkNotNull(course, "a null course cannot be stored in the database");
         this.course = course;
+        this.course_id = course.getUniqueId();
     }
 
     public Student getStudent() {
         return student;
     }
 
-    public void setStudent(Student student) {
-        this.student = student;
-    }
+    public void setStudent(@Nonnull Student student) {
+        Preconditions.checkNotNull(student);
 
-    public void setUniqueId(int uniqueId) {
-        this.uniqueId = uniqueId;
+        this.student = student;
+        this.student_id = student.getUniqueId();
     }
 
     public int getUniqueId() {
         return this.uniqueId;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public void setUniqueId(int uniqueId) {
+        this.uniqueId = uniqueId;
     }
 
-    @Nonnull
+    @Nullable
     public LocalDateTime getCreatedDateTime() {
         return createdDateTime;
+    }
+
+    public void setCreatedDateTime(@Nonnull LocalDateTime createdDateTime) {
+        Preconditions.checkNotNull(createdDateTime, "Created date time cannot be null");
+        this.createdDateTime = createdDateTime;
     }
 
     @Nonnull
@@ -276,9 +151,36 @@ public class Assignment {
         return createdDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
-    public void setCreatedDateTime(@Nonnull LocalDateTime createdDateTime) {
-        Preconditions.checkNotNull(createdDateTime, "Created date time cannot be null");
-        this.createdDateTime = createdDateTime;
+    public String getUuid() {
+        return uuid;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Assignment that = (Assignment) o;
+        return (getCourse_id() == that.getCourse_id() || Objects.equal(getCourse(), that.getCourse())) &&
+                (getStudent_id() == that.getStudent_id() || Objects.equal(getStudent(), that.getStudent())) &&
+                getUniqueId() == that.getUniqueId() &&
+                Objects.equal(getName(), that.getName()) &&
+                Objects.equal(getUuid(), that.getUuid());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getName(), getUuid(), getCourse_id(), getStudent_id(), getStudent(), getCourse(), getUniqueId());
+    }
+
+    @Override
+    public String toString() {
+        return "Assignment{" +
+                "name='" + name + '\'' +
+                ", uuid='" + uuid + '\'' +
+                ", student=" + student +
+                ", course=" + course +
+                ", uniqueId=" + uniqueId +
+                '}';
     }
 
     /**
@@ -288,7 +190,7 @@ public class Assignment {
      * fields. For each nullable field an exponential amount of constructor
      * overloads could be required. If you would like to do those constructor
      * overloads then more power to you, but I am too lazy for that.
-     *
+     * <p>
      * Our convention is that each field that can be null will have a Builder
      * setter prefixed by the word <code>with</code> and suffixed by the field
      * name in camel case. All nonnull fields will be specified in
@@ -296,7 +198,7 @@ public class Assignment {
      */
     public static class Builder {
         private String imageFilePath;               /* Path to the PDF file with the images associated with the assignment */
-        private Collection<QRCodeMapping> QRCodeMappings = new HashSet<>();  /* Set of QRCodeMapping objects for each Assignment */
+        private Collection<QRCodeMapping> qrCodeMappings = new HashSet<>();  /* Set of QRCodeMapping objects for each Assignment */
         private transient PDDocument image;
         private int course_id;
         private int student_id;
@@ -310,8 +212,8 @@ public class Assignment {
             return this;
         }
 
-        public Builder withQRCodeMappings(Collection<QRCodeMapping> QRCodeMappings) {
-            this.QRCodeMappings = QRCodeMappings;
+        public Builder withQRCodeMappings(Collection<QRCodeMapping> qrCodeMappings) {
+            this.qrCodeMappings = qrCodeMappings;
             return this;
         }
 
@@ -350,12 +252,18 @@ public class Assignment {
             return this;
         }
 
-        public Assignment create(@Nonnull String name) {
+        public Assignment create(@Nonnull String name, @Nonnull String uuid) {
             Preconditions.checkNotNull(name);
+            Preconditions.checkNotNull(uuid, "we need a UUID to store the Assignment Server Side");
             if (createDateTime == null) {
                 createDateTime = LocalDateTime.now();
             }
-            return new Assignment(name, createDateTime, this);
+
+            return new Assignment(name, createDateTime, uuid, this);
+        }
+
+        public Assignment createUnique(@Nonnull String name) {
+            return create(name, UUIDGenerator.uuid());
         }
 
     }

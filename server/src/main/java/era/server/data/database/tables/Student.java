@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Student extends TableImpl<StudentRecord> {
 
-    private static final long serialVersionUID = -1727213102;
+    private static final long serialVersionUID = -1581670907;
 
     /**
      * The reference instance of <code>era.student</code>
@@ -52,11 +52,6 @@ public class Student extends TableImpl<StudentRecord> {
     public Class<StudentRecord> getRecordType() {
         return StudentRecord.class;
     }
-
-    /**
-     * The column <code>era.student.unique_id</code>.
-     */
-    public final TableField<StudentRecord, Long> UNIQUE_ID = createField("unique_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>era.student.uuid</code>.
@@ -115,7 +110,7 @@ public class Student extends TableImpl<StudentRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.STUDENT_PRIMARY, Indexes.STUDENT_STUDENT_EMAIL_UK, Indexes.STUDENT_STUDENT_USERNAME_UK);
+        return Arrays.<Index>asList(Indexes.STUDENT_PRIMARY, Indexes.STUDENT_STUDENT_USERNAME_UK);
     }
 
     /**
@@ -131,7 +126,7 @@ public class Student extends TableImpl<StudentRecord> {
      */
     @Override
     public List<UniqueKey<StudentRecord>> getKeys() {
-        return Arrays.<UniqueKey<StudentRecord>>asList(Keys.KEY_STUDENT_PRIMARY, Keys.KEY_STUDENT_STUDENT_USERNAME_UK, Keys.KEY_STUDENT_STUDENT_EMAIL_UK);
+        return Arrays.<UniqueKey<StudentRecord>>asList(Keys.KEY_STUDENT_PRIMARY, Keys.KEY_STUDENT_STUDENT_USERNAME_UK);
     }
 
     /**

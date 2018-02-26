@@ -3,18 +3,23 @@ package era.server.data.access;
 import com.google.common.base.Preconditions;
 import era.server.data.AssignmentDAO;
 import era.server.data.model.Assignment;
-import era.server.data.model.Course;
 import org.jooq.DSLContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static era.server.data.database.Tables.ASSIGNMENT;
+import static era.server.data.database.Tables.COURSE;
+import static era.server.data.database.Tables.STUDENT;
 
 /**
  * Provides CRUD functionality for Assignments inside a access.
  */
 @ParametersAreNonnullByDefault
-public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO{
+public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
     private static AssignmentDAO INSTANCE;
 
     /**
@@ -28,28 +33,64 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO{
     public void storeAssignment(Assignment assignment) {
         Preconditions.checkNotNull(assignment);
         try (DSLContext ctx = connect()) {
-            long courseId = assignment.getCourse() == null ?
+            String courseId = assignment.getCourse() == null ?
                     assignment.getCourse_id() :
-                    assignment.getCourse().getUniqueId();
-            long studentId = assignment.getStudent() == null ?
+                    assignment.getCourse().getUuid();
+            String studentId = assignment.getStudent() == null ?
                     assignment.getStudent_id() :
-                    assignment.getStudent().getUniqueId();
+                    assignment.getStudent().getUuid();
             ctx.insertInto(
                     ASSIGNMENT,
-                    ASSIGNMENT.UNIQUE_ID,
+                    ASSIGNMENT.UUID,
                     ASSIGNMENT.NAME,
                     ASSIGNMENT.IMAGE_FILE_PATH,
                     ASSIGNMENT.COURSE_ID,
                     ASSIGNMENT.STUDENT_ID,
                     ASSIGNMENT.CREATED_DATE_TIME
             ).values(
-                    assignment.getUniqueId(),
+                    assignment.getUuid(),
                     assignment.getName(),
                     assignment.getImageFilePath(),
                     courseId,
                     studentId,
                     assignment.getCreatedDateTimeStamp()
-            );
+            ).execute();
+        }
+    }
+
+    @Override
+    public Set<Assignment> fetchAllByStudent(String username) {
+        try (DSLContext create = connect()) {
+            return create.select(ASSIGNMENT.UUID, ASSIGNMENT.NAME, ASSIGNMENT.CREATED_DATE_TIME, COURSE.NAME, STUDENT.USERNAME)
+                    .from(ASSIGNMENT)
+                    .join(STUDENT)
+                        .on(ASSIGNMENT.STUDENT_ID.eq(STUDENT.UUID))
+                    .join(COURSE)
+                        .on(ASSIGNMENT.COURSE_ID.eq(COURSE.UUID))
+                    .where(STUDENT.USERNAME.eq(username))
+                    .orderBy(ASSIGNMENT.CREATED_DATE_TIME.desc())
+                    .fetchStream()
+                    .map((record) -> Assignment.builder()
+                            .withCourseName(record.get(COURSE.NAME))
+                            .withStudentUname(record.get(STUDENT.USERNAME))
+                            .withCreatedDateTime(record.get(ASSIGNMENT.CREATED_DATE_TIME).toLocalDateTime())
+                            .create(record.get(ASSIGNMENT.NAME), record.get(ASSIGNMENT.UUID)))
+                    .collect(Collectors.toSet());
+        }
+    }
+
+    @Override
+    public Optional<Assignment> fetch(String uuid) {
+        try (DSLContext create = connect()) {
+            return create.selectFrom(ASSIGNMENT)
+                    .where(ASSIGNMENT.UUID.eq(uuid))
+                    .fetchOptional()
+                    .map(dbAssignment -> Assignment.builder()
+                            .withImageFilePath(dbAssignment.getImageFilePath())
+                            .withCreatedDateTime(dbAssignment.getCreatedDateTime().toLocalDateTime())
+                            .withStudent_id(dbAssignment.getStudentId())
+                            .withCourse_id(dbAssignment.getCourseId())
+                            .create(dbAssignment.getName(), dbAssignment.getUuid()));
         }
     }
 

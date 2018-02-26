@@ -1,10 +1,12 @@
 package era.uploader.controller;
 
 import com.google.common.collect.Multimap;
+import era.uploader.common.UploaderProperties;
 import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
+import era.uploader.data.model.Term;
 import era.uploader.data.viewmodel.StudentMetaData;
 import era.uploader.service.CourseCreationService;
 import javafx.collections.FXCollections;
@@ -17,6 +19,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -30,7 +33,6 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 /**
- * TODO implement this class over break
  * This class needs to have a GUI that will take in a CSV file. Generate a
  * bunch of students from that CSV file using
  * {@link era.uploader.service.CourseCreationService}, and then output the
@@ -51,6 +53,8 @@ public class CourseCreationController {
     private ComboBox<String> termDropdown;
     @FXML
     private ComboBox<Integer> yearDropdown;
+    @FXML
+    private Label modeLabel;
 
 
     private final FileChooser chooser = new FileChooser();
@@ -68,9 +72,9 @@ public class CourseCreationController {
         );
 
         ObservableList<String> availableTerms = FXCollections.observableArrayList();
-        EnumSet.allOf(Semester.Term.class)
+        EnumSet.allOf(Term.class)
                 .stream()
-                .map(Semester.Term::humanReadable)
+                .map(Term::humanReadable)
                 .forEach(availableTerms::add);
         termDropdown.setPromptText("Term...");
         termDropdown.setItems(availableTerms);
@@ -81,6 +85,15 @@ public class CourseCreationController {
                 .forEach(availableYears::add);
         yearDropdown.setPromptText("Year...");
         yearDropdown.setItems(availableYears);
+
+        if (UploaderProperties.instance().isUploadingEnabled()){
+            modeLabel.setText("Online");
+            modeLabel.setTextFill(Color.web("#228b22"));
+        }
+        else {
+            modeLabel.setText("Offline");
+            modeLabel.setTextFill(Color.web("#ff0000"));
+        }
     }
 
     /**
@@ -147,8 +160,12 @@ public class CourseCreationController {
             return;
         }
         Multimap<Course, Student> coursesToStudents = null;
+        boolean uploading = false;
         try {
-            coursesToStudents = service.createCourses(inputPath, semester.get());
+            if (UploaderProperties.instance().isUploadingEnabled() != null) {
+                uploading = UploaderProperties.instance().isUploadingEnabled();
+            }
+            coursesToStudents = service.createCourses(inputPath, semester.get(), uploading);
         } catch (IOException e) {
             // technically shouldn't be possible but we need to be defensive
             Alert fileOperationError = new Alert(Alert.AlertType.ERROR);
@@ -160,6 +177,16 @@ public class CourseCreationController {
             return;
         }
 
+        try {
+            service.uploadIfEnabled(coursesToStudents.keySet());
+        } catch (IOException e) {
+            Alert fileOperationError = new Alert(Alert.AlertType.ERROR);
+            fileOperationError.setHeaderText("Cannot connect to Server.");
+            fileOperationError.setContentText("There was an error connecting " +
+                    "to the remote server. Please make sure that server is up " +
+                    "and that the right URL is shown in uploader.properties");
+            fileOperationError.showAndWait();
+        }
         ObservableList<StudentMetaData> students = StudentMetaData.fromMultimap(coursesToStudents);
         output.setItems(students);
     }
@@ -175,7 +202,7 @@ public class CourseCreationController {
         Optional<Semester> chosenSemester = Optional.empty();
 
         if (chosenTerm != null && chosenYear != null) {
-            Semester.Term term = Semester.Term.humanValueOf(chosenTerm);
+            Term term = Term.humanValueOf(chosenTerm);
             Year year = Year.of(chosenYear);
             chosenSemester = Optional.of(Semester.of(term, year));
         }
