@@ -61,7 +61,7 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
     @Override
     public Set<Assignment> fetchAllByStudent(String username) {
         try (DSLContext create = connect()) {
-            return create.select(ASSIGNMENT.UUID, ASSIGNMENT.NAME, ASSIGNMENT.CREATED_DATE_TIME, COURSE.NAME)
+            return create.select(ASSIGNMENT.UUID, ASSIGNMENT.NAME, ASSIGNMENT.CREATED_DATE_TIME, COURSE.NAME, STUDENT.USERNAME)
                     .from(ASSIGNMENT)
                     .join(STUDENT)
                         .on(ASSIGNMENT.STUDENT_ID.eq(STUDENT.UUID))
@@ -72,6 +72,7 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
                     .fetchStream()
                     .map((record) -> Assignment.builder()
                             .withCourseName(record.get(COURSE.NAME))
+                            .withStudentUname(record.get(STUDENT.USERNAME))
                             .withCreatedDateTime(record.get(ASSIGNMENT.CREATED_DATE_TIME).toLocalDateTime())
                             .create(record.get(ASSIGNMENT.NAME), record.get(ASSIGNMENT.UUID)))
                     .collect(Collectors.toSet());

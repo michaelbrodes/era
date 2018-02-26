@@ -29,6 +29,7 @@ public class Assignment implements Model {
     private String course_id;
     private String student_id;
     private String courseName;
+    private String studentUname;
     private final String uuid;
 
     /**
@@ -81,6 +82,7 @@ public class Assignment implements Model {
         this.courseName = builder.course == null
                 ? builder.courseName
                 : builder.course.getName();
+        this.studentUname = builder.studentUname;
     }
 
     @Override
@@ -154,7 +156,8 @@ public class Assignment implements Model {
                 "name", name,
                 "createdDateTime", assignmentDate,
                 "course", courseName,
-                "uuid", uuid
+                "uuid", uuid,
+                "username", studentUname
         );
     }
 
@@ -183,6 +186,7 @@ public class Assignment implements Model {
         private Course course;
         private LocalDateTime createDateTime;
         private String courseName;
+        private String studentUname;
 
         public Builder withImageFilePath(String imageFilePath) {
             this.imageFilePath = imageFilePath;
@@ -216,6 +220,11 @@ public class Assignment implements Model {
 
         public Builder withCourseName(String courseName) {
             this.courseName = courseName;
+            return this;
+        }
+
+        public Builder withStudentUname(String studentUname) {
+            this.studentUname = studentUname;
             return this;
         }
 

@@ -29,7 +29,6 @@ public class ServerWebModule implements ServerModule {
     private final HealthController healthController;
     private final IndexController indexController;
     private final AssignmentViewController assignmentViewController;
-    private final ErrorController errorController;
 
     /**
      * Creates the controllers contained in this module
@@ -41,16 +40,19 @@ public class ServerWebModule implements ServerModule {
         this.healthController = new HealthController();
         this.indexController = new IndexController(RENDERER);
         this.assignmentViewController = new AssignmentViewController(RENDERER, assignmentDAO, courseDAO);
-        this.errorController = new ErrorController(RENDERER);
     }
 
     @Override
     public void setupRoutes() {
         Spark.get("/hello", healthController::checkHealth);
         Spark.get("/", indexController::checkIndex);
+        Spark.get("/student/logout", (request, response)->{
+            request.session().attributes().clear();
+            response.redirect("/");
+            return null;
+        });
         Spark.get("/student/:userName", assignmentViewController::assignmentList);
         Spark.get("/student/:userName/assignment/:assignmentId", assignmentViewController::assignment);
-        Spark.exception(UnauthorizedException.class, errorController::unauthorized);
     }
 
     /**
