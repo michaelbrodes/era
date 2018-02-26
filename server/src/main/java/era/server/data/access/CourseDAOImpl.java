@@ -208,6 +208,24 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
         }
     }
 
+    @Override
+    public Set<Course> readAllCoursesEnrolledIn(String byStudent) {
+        try (DSLContext ctx = connect()) {
+            return ctx.select(COURSE.UUID, COURSE.NAME)
+                    .from(COURSE)
+                    .join(COURSE_STUDENT)
+                        .on(COURSE.UUID.eq(COURSE_STUDENT.COURSE_ID))
+                    .join(STUDENT)
+                        .on(COURSE_STUDENT.STUDENT_ID.eq(STUDENT.UUID))
+                    .where(STUDENT.USERNAME.eq(byStudent))
+                    .fetchStream()
+                    .map(record -> Course.builder()
+                            .withName(record.get(COURSE.NAME))
+                            .create())
+                    .collect(Collectors.toSet());
+        }
+    }
+
     private void insertCourseStudent(Course course, Student student) {
         try (DSLContext ctx = connect()) {
             ctx.insertInto(

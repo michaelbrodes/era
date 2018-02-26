@@ -7,13 +7,19 @@ import org.jooq.DSLContext;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static era.server.data.database.Tables.ASSIGNMENT;
+import static era.server.data.database.Tables.COURSE;
+import static era.server.data.database.Tables.STUDENT;
 
 /**
  * Provides CRUD functionality for Assignments inside a access.
  */
 @ParametersAreNonnullByDefault
-public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO{
+public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
     private static AssignmentDAO INSTANCE;
 
     /**
@@ -49,6 +55,41 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO{
                     studentId,
                     assignment.getCreatedDateTimeStamp()
             ).execute();
+        }
+    }
+
+    @Override
+    public Set<Assignment> fetchAllByStudent(String username) {
+        try (DSLContext create = connect()) {
+            return create.select(ASSIGNMENT.UUID, ASSIGNMENT.NAME, ASSIGNMENT.CREATED_DATE_TIME, COURSE.NAME)
+                    .from(ASSIGNMENT)
+                    .join(STUDENT)
+                        .on(ASSIGNMENT.STUDENT_ID.eq(STUDENT.UUID))
+                    .join(COURSE)
+                        .on(ASSIGNMENT.COURSE_ID.eq(COURSE.UUID))
+                    .where(STUDENT.USERNAME.eq(username))
+                    .orderBy(ASSIGNMENT.CREATED_DATE_TIME.desc())
+                    .fetchStream()
+                    .map((record) -> Assignment.builder()
+                            .withCourseName(record.get(COURSE.NAME))
+                            .withCreatedDateTime(record.get(ASSIGNMENT.CREATED_DATE_TIME).toLocalDateTime())
+                            .create(record.get(ASSIGNMENT.NAME), record.get(ASSIGNMENT.UUID)))
+                    .collect(Collectors.toSet());
+        }
+    }
+
+    @Override
+    public Optional<Assignment> fetch(String uuid) {
+        try (DSLContext create = connect()) {
+            return create.selectFrom(ASSIGNMENT)
+                    .where(ASSIGNMENT.UUID.eq(uuid))
+                    .fetchOptional()
+                    .map(dbAssignment -> Assignment.builder()
+                            .withImageFilePath(dbAssignment.getImageFilePath())
+                            .withCreatedDateTime(dbAssignment.getCreatedDateTime().toLocalDateTime())
+                            .withStudent_id(dbAssignment.getStudentId())
+                            .withCourse_id(dbAssignment.getCourseId())
+                            .create(dbAssignment.getName(), dbAssignment.getUuid()));
         }
     }
 

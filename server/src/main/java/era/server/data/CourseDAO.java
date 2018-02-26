@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Provides CRUD access functionality for {@link Course} objects. Abstracted
@@ -34,4 +35,6 @@ public interface CourseDAO {
      * identify a course.
      */
     Optional<Course> readByCourseNameAndSemester(String name, Semester semester);
+
+    Set<Course> readAllCoursesEnrolledIn(String byStudent);
 }

@@ -11,7 +11,12 @@ import java.util.Map;
 
 public class IndexController {
 
-    public static final int SESSION_TIMEOUT_SECONDS = 600;
+    private static final int SESSION_TIMEOUT_SECONDS = 600;
+    private final PageRenderer renderer;
+
+    public IndexController(PageRenderer renderer) {
+        this.renderer = renderer;
+    }
 
     public String checkIndex(Request request, Response response) {
 
@@ -28,7 +33,7 @@ public class IndexController {
 
         Map<String, Object> model = new HashMap<>();
 
-        return PageRenderer.render(model, "index.hbs");
+        return renderer.render(model, "index.hbs");
 
     }
 

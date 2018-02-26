@@ -2,6 +2,8 @@ package era.server.web;
 
 
 import era.server.ServerModule;
+import era.server.common.PageRenderer;
+import era.server.common.UnauthorizedException;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.StudentDAO;
@@ -22,11 +24,12 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class ServerWebModule implements ServerModule {
 
+    private static final PageRenderer RENDERER = new PageRenderer();
     private static ServerWebModule INSTANCE;
-
     private final HealthController healthController;
     private final IndexController indexController;
     private final AssignmentViewController assignmentViewController;
+    private final ErrorController errorController;
 
     /**
      * Creates the controllers contained in this module
@@ -36,16 +39,18 @@ public class ServerWebModule implements ServerModule {
             CourseDAO courseDAO,
             AssignmentDAO assignmentDAO) {
         this.healthController = new HealthController();
-        this.indexController = new IndexController();
-        this.assignmentViewController = new AssignmentViewController();
+        this.indexController = new IndexController(RENDERER);
+        this.assignmentViewController = new AssignmentViewController(RENDERER, assignmentDAO, courseDAO);
+        this.errorController = new ErrorController();
     }
 
     @Override
     public void setupRoutes() {
-
         Spark.get("/hello", healthController::checkHealth);
         Spark.get("/", indexController::checkIndex);
-        Spark.get("/student/:userName", assignmentViewController::showAssignments);
+        Spark.get("/student/:userName", assignmentViewController::assignmentList);
+        Spark.get("/student/:userName/assignment/:assignmentId", assignmentViewController::assignment);
+        Spark.exception(UnauthorizedException.class, errorController::unauthorized);
     }
 
     /**
