@@ -4,7 +4,7 @@
 package era.server.data.database.tables;
 
 
-import era.server.data.database.Era;
+import era.server.data.database.Dev;
 import era.server.data.database.Indexes;
 import era.server.data.database.Keys;
 import era.server.data.database.tables.records.SchemaVersionRecord;
@@ -39,10 +39,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class SchemaVersion extends TableImpl<SchemaVersionRecord> {
 
-    private static final long serialVersionUID = 1893633769;
+    private static final long serialVersionUID = -629851772;
 
     /**
-     * The reference instance of <code>era.schema_version</code>
+     * The reference instance of <code>dev.schema_version</code>
      */
     public static final SchemaVersion SCHEMA_VERSION = new SchemaVersion();
 
@@ -55,71 +55,71 @@ public class SchemaVersion extends TableImpl<SchemaVersionRecord> {
     }
 
     /**
-     * The column <code>era.schema_version.installed_rank</code>.
+     * The column <code>dev.schema_version.installed_rank</code>.
      */
     public final TableField<SchemaVersionRecord, Integer> INSTALLED_RANK = createField("installed_rank", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>era.schema_version.version</code>.
+     * The column <code>dev.schema_version.version</code>.
      */
     public final TableField<SchemaVersionRecord, String> VERSION = createField("version", org.jooq.impl.SQLDataType.VARCHAR(50).defaultValue(org.jooq.impl.DSL.field("NULL", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
-     * The column <code>era.schema_version.description</code>.
+     * The column <code>dev.schema_version.description</code>.
      */
     public final TableField<SchemaVersionRecord, String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.VARCHAR(200).nullable(false), this, "");
 
     /**
-     * The column <code>era.schema_version.type</code>.
+     * The column <code>dev.schema_version.type</code>.
      */
     public final TableField<SchemaVersionRecord, String> TYPE = createField("type", org.jooq.impl.SQLDataType.VARCHAR(20).nullable(false), this, "");
 
     /**
-     * The column <code>era.schema_version.script</code>.
+     * The column <code>dev.schema_version.script</code>.
      */
     public final TableField<SchemaVersionRecord, String> SCRIPT = createField("script", org.jooq.impl.SQLDataType.VARCHAR(1000).nullable(false), this, "");
 
     /**
-     * The column <code>era.schema_version.checksum</code>.
+     * The column <code>dev.schema_version.checksum</code>.
      */
     public final TableField<SchemaVersionRecord, Integer> CHECKSUM = createField("checksum", org.jooq.impl.SQLDataType.INTEGER.defaultValue(org.jooq.impl.DSL.field("NULL", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
-     * The column <code>era.schema_version.installed_by</code>.
+     * The column <code>dev.schema_version.installed_by</code>.
      */
     public final TableField<SchemaVersionRecord, String> INSTALLED_BY = createField("installed_by", org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "");
 
     /**
-     * The column <code>era.schema_version.installed_on</code>.
+     * The column <code>dev.schema_version.installed_on</code>.
      */
     public final TableField<SchemaVersionRecord, Timestamp> INSTALLED_ON = createField("installed_on", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaultValue(org.jooq.impl.DSL.field("current_timestamp()", org.jooq.impl.SQLDataType.TIMESTAMP)), this, "");
 
     /**
-     * The column <code>era.schema_version.execution_time</code>.
+     * The column <code>dev.schema_version.execution_time</code>.
      */
     public final TableField<SchemaVersionRecord, Integer> EXECUTION_TIME = createField("execution_time", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>era.schema_version.success</code>.
+     * The column <code>dev.schema_version.success</code>.
      */
     public final TableField<SchemaVersionRecord, Byte> SUCCESS = createField("success", org.jooq.impl.SQLDataType.TINYINT.nullable(false), this, "");
 
     /**
-     * Create a <code>era.schema_version</code> table reference
+     * Create a <code>dev.schema_version</code> table reference
      */
     public SchemaVersion() {
         this(DSL.name("schema_version"), null);
     }
 
     /**
-     * Create an aliased <code>era.schema_version</code> table reference
+     * Create an aliased <code>dev.schema_version</code> table reference
      */
     public SchemaVersion(String alias) {
         this(DSL.name(alias), SCHEMA_VERSION);
     }
 
     /**
-     * Create an aliased <code>era.schema_version</code> table reference
+     * Create an aliased <code>dev.schema_version</code> table reference
      */
     public SchemaVersion(Name alias) {
         this(alias, SCHEMA_VERSION);
@@ -138,7 +138,7 @@ public class SchemaVersion extends TableImpl<SchemaVersionRecord> {
      */
     @Override
     public Schema getSchema() {
-        return Era.ERA;
+        return Dev.DEV;
     }
 
     /**

@@ -26,7 +26,7 @@ import org.jooq.impl.AbstractKeys;
 
 /**
  * A class modelling foreign key relationships and constraints of tables of 
- * the <code>era</code> schema.
+ * the <code>dev</code> schema.
  */
 @Generated(
     value = {

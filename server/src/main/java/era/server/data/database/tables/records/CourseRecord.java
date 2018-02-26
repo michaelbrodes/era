@@ -28,10 +28,10 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CourseRecord extends UpdatableRecordImpl<CourseRecord> implements Record3<String, String, String> {
 
-    private static final long serialVersionUID = 2093655468;
+    private static final long serialVersionUID = 1522190958;
 
     /**
-     * Setter for <code>era.course.uuid</code>.
+     * Setter for <code>dev.course.uuid</code>.
      */
     public CourseRecord setUuid(String value) {
         set(0, value);
@@ -39,14 +39,14 @@ public class CourseRecord extends UpdatableRecordImpl<CourseRecord> implements R
     }
 
     /**
-     * Getter for <code>era.course.uuid</code>.
+     * Getter for <code>dev.course.uuid</code>.
      */
     public String getUuid() {
         return (String) get(0);
     }
 
     /**
-     * Setter for <code>era.course.name</code>.
+     * Setter for <code>dev.course.name</code>.
      */
     public CourseRecord setName(String value) {
         set(1, value);
@@ -54,14 +54,14 @@ public class CourseRecord extends UpdatableRecordImpl<CourseRecord> implements R
     }
 
     /**
-     * Getter for <code>era.course.name</code>.
+     * Getter for <code>dev.course.name</code>.
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>era.course.semester_id</code>.
+     * Setter for <code>dev.course.semester_id</code>.
      */
     public CourseRecord setSemesterId(String value) {
         set(2, value);
@@ -69,7 +69,7 @@ public class CourseRecord extends UpdatableRecordImpl<CourseRecord> implements R
     }
 
     /**
-     * Getter for <code>era.course.semester_id</code>.
+     * Getter for <code>dev.course.semester_id</code>.
      */
     public String getSemesterId() {
         return (String) get(2);

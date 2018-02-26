@@ -4,7 +4,7 @@
 package era.server.data.database.tables;
 
 
-import era.server.data.database.Era;
+import era.server.data.database.Dev;
 import era.server.data.database.Indexes;
 import era.server.data.database.Keys;
 import era.server.data.database.tables.records.SemesterRecord;
@@ -38,10 +38,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Semester extends TableImpl<SemesterRecord> {
 
-    private static final long serialVersionUID = -833569387;
+    private static final long serialVersionUID = -845803325;
 
     /**
-     * The reference instance of <code>era.semester</code>
+     * The reference instance of <code>dev.semester</code>
      */
     public static final Semester SEMESTER = new Semester();
 
@@ -54,36 +54,36 @@ public class Semester extends TableImpl<SemesterRecord> {
     }
 
     /**
-     * The column <code>era.semester.uuid</code>.
+     * The column <code>dev.semester.uuid</code>.
      */
-    public final TableField<SemesterRecord, String> UUID = createField("uuid", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid()", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+    public final TableField<SemesterRecord, String> UUID = createField("uuid", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false), this, "");
 
     /**
-     * The column <code>era.semester.term</code>.
+     * The column <code>dev.semester.term</code>.
      */
     public final TableField<SemesterRecord, String> TERM = createField("term", org.jooq.impl.SQLDataType.VARCHAR(6).nullable(false), this, "");
 
     /**
-     * The column <code>era.semester.year</code>.
+     * The column <code>dev.semester.year</code>.
      */
     public final TableField<SemesterRecord, Integer> YEAR = createField("year", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * Create a <code>era.semester</code> table reference
+     * Create a <code>dev.semester</code> table reference
      */
     public Semester() {
         this(DSL.name("semester"), null);
     }
 
     /**
-     * Create an aliased <code>era.semester</code> table reference
+     * Create an aliased <code>dev.semester</code> table reference
      */
     public Semester(String alias) {
         this(DSL.name(alias), SEMESTER);
     }
 
     /**
-     * Create an aliased <code>era.semester</code> table reference
+     * Create an aliased <code>dev.semester</code> table reference
      */
     public Semester(Name alias) {
         this(alias, SEMESTER);
@@ -102,7 +102,7 @@ public class Semester extends TableImpl<SemesterRecord> {
      */
     @Override
     public Schema getSchema() {
-        return Era.ERA;
+        return Dev.DEV;
     }
 
     /**

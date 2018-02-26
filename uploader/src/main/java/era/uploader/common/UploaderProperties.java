@@ -87,7 +87,7 @@ public class UploaderProperties {
             Optional<String> hostname = configProperties
                     .map(props -> props.getProperty(SERVER_HOSTNAME, "localhost"));
             Optional<String> port = configProperties
-                    .map(properties -> properties.getProperty(SERVER_PORT, "3001"));
+                    .map(properties -> properties.getProperty(SERVER_PORT));
             Optional<String> protocol = configProperties
                     .map(properties -> properties.getProperty(SERVER_PROTOCOL, "http"));
             if (hostname.isPresent()
@@ -98,6 +98,10 @@ public class UploaderProperties {
                         + hostname.get()
                         + ":"
                         + port.get());
+            } else if (hostname.isPresent() && protocol.isPresent()) {
+                ret = Optional.of(protocol.get()
+                        + "://"
+                        + hostname.get());
             }
         }
 

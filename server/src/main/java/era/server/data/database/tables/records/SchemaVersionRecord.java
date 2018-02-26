@@ -30,10 +30,10 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class SchemaVersionRecord extends UpdatableRecordImpl<SchemaVersionRecord> implements Record10<Integer, String, String, String, String, Integer, String, Timestamp, Integer, Byte> {
 
-    private static final long serialVersionUID = 521979968;
+    private static final long serialVersionUID = 1311158076;
 
     /**
-     * Setter for <code>era.schema_version.installed_rank</code>.
+     * Setter for <code>dev.schema_version.installed_rank</code>.
      */
     public SchemaVersionRecord setInstalledRank(Integer value) {
         set(0, value);
@@ -41,14 +41,14 @@ public class SchemaVersionRecord extends UpdatableRecordImpl<SchemaVersionRecord
     }
 
     /**
-     * Getter for <code>era.schema_version.installed_rank</code>.
+     * Getter for <code>dev.schema_version.installed_rank</code>.
      */
     public Integer getInstalledRank() {
         return (Integer) get(0);
     }
 
     /**
-     * Setter for <code>era.schema_version.version</code>.
+     * Setter for <code>dev.schema_version.version</code>.
      */
     public SchemaVersionRecord setVersion(String value) {
         set(1, value);
@@ -56,14 +56,14 @@ public class SchemaVersionRecord extends UpdatableRecordImpl<SchemaVersionRecord
     }
 
     /**
-     * Getter for <code>era.schema_version.version</code>.
+     * Getter for <code>dev.schema_version.version</code>.
      */
     public String getVersion() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>era.schema_version.description</code>.
+     * Setter for <code>dev.schema_version.description</code>.
      */
     public SchemaVersionRecord setDescription(String value) {
         set(2, value);
@@ -71,14 +71,14 @@ public class SchemaVersionRecord extends UpdatableRecordImpl<SchemaVersionRecord
     }
 
     /**
-     * Getter for <code>era.schema_version.description</code>.
+     * Getter for <code>dev.schema_version.description</code>.
      */
     public String getDescription() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>era.schema_version.type</code>.
+     * Setter for <code>dev.schema_version.type</code>.
      */
     public SchemaVersionRecord setType(String value) {
         set(3, value);
@@ -86,14 +86,14 @@ public class SchemaVersionRecord extends UpdatableRecordImpl<SchemaVersionRecord
     }
 
     /**
-     * Getter for <code>era.schema_version.type</code>.
+     * Getter for <code>dev.schema_version.type</code>.
      */
     public String getType() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>era.schema_version.script</code>.
+     * Setter for <code>dev.schema_version.script</code>.
      */
     public SchemaVersionRecord setScript(String value) {
         set(4, value);
@@ -101,14 +101,14 @@ public class SchemaVersionRecord extends UpdatableRecordImpl<SchemaVersionRecord
     }
 
     /**
-     * Getter for <code>era.schema_version.script</code>.
+     * Getter for <code>dev.schema_version.script</code>.
      */
     public String getScript() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>era.schema_version.checksum</code>.
+     * Setter for <code>dev.schema_version.checksum</code>.
      */
     public SchemaVersionRecord setChecksum(Integer value) {
         set(5, value);
@@ -116,14 +116,14 @@ public class SchemaVersionRecord extends UpdatableRecordImpl<SchemaVersionRecord
     }
 
     /**
-     * Getter for <code>era.schema_version.checksum</code>.
+     * Getter for <code>dev.schema_version.checksum</code>.
      */
     public Integer getChecksum() {
         return (Integer) get(5);
     }
 
     /**
-     * Setter for <code>era.schema_version.installed_by</code>.
+     * Setter for <code>dev.schema_version.installed_by</code>.
      */
     public SchemaVersionRecord setInstalledBy(String value) {
         set(6, value);
@@ -131,14 +131,14 @@ public class SchemaVersionRecord extends UpdatableRecordImpl<SchemaVersionRecord
     }
 
     /**
-     * Getter for <code>era.schema_version.installed_by</code>.
+     * Getter for <code>dev.schema_version.installed_by</code>.
      */
     public String getInstalledBy() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>era.schema_version.installed_on</code>.
+     * Setter for <code>dev.schema_version.installed_on</code>.
      */
     public SchemaVersionRecord setInstalledOn(Timestamp value) {
         set(7, value);
@@ -146,14 +146,14 @@ public class SchemaVersionRecord extends UpdatableRecordImpl<SchemaVersionRecord
     }
 
     /**
-     * Getter for <code>era.schema_version.installed_on</code>.
+     * Getter for <code>dev.schema_version.installed_on</code>.
      */
     public Timestamp getInstalledOn() {
         return (Timestamp) get(7);
     }
 
     /**
-     * Setter for <code>era.schema_version.execution_time</code>.
+     * Setter for <code>dev.schema_version.execution_time</code>.
      */
     public SchemaVersionRecord setExecutionTime(Integer value) {
         set(8, value);
@@ -161,14 +161,14 @@ public class SchemaVersionRecord extends UpdatableRecordImpl<SchemaVersionRecord
     }
 
     /**
-     * Getter for <code>era.schema_version.execution_time</code>.
+     * Getter for <code>dev.schema_version.execution_time</code>.
      */
     public Integer getExecutionTime() {
         return (Integer) get(8);
     }
 
     /**
-     * Setter for <code>era.schema_version.success</code>.
+     * Setter for <code>dev.schema_version.success</code>.
      */
     public SchemaVersionRecord setSuccess(Byte value) {
         set(9, value);
@@ -176,7 +176,7 @@ public class SchemaVersionRecord extends UpdatableRecordImpl<SchemaVersionRecord
     }
 
     /**
-     * Getter for <code>era.schema_version.success</code>.
+     * Getter for <code>dev.schema_version.success</code>.
      */
     public Byte getSuccess() {
         return (Byte) get(9);
