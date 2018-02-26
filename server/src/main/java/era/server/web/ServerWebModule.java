@@ -29,6 +29,7 @@ public class ServerWebModule implements ServerModule {
     private final HealthController healthController;
     private final IndexController indexController;
     private final AssignmentViewController assignmentViewController;
+    private final CASAuth casAuth;
     private final Boolean casEnabled;
 
     /**
@@ -42,14 +43,14 @@ public class ServerWebModule implements ServerModule {
         this.healthController = new HealthController();
         this.indexController = new IndexController();
         this.assignmentViewController = new AssignmentViewController();
+        this.casAuth = new CASAuth(studentDAO);
         this.casEnabled = casEnabled;
     }
 
     @Override
     public void setupRoutes() {
         if (casEnabled) {
-            Config pac4jConfig = CASAuth.initializeConfig();
-            setUpCASRoutes(pac4jConfig);
+            Spark.get("/student/login", casAuth::login);
         }
     Spark.get("/hello", healthController::checkHealth);
     Spark.get("/", indexController::checkIndex);
@@ -81,15 +82,5 @@ public class ServerWebModule implements ServerModule {
         }
 
         return INSTANCE;
-    }
-
-    public void setUpCASRoutes(Config config) {
-        Spark.before("/student/login", new SecurityFilter(config, "CasClient"));
-
-        final CallbackRoute cr = new CallbackRoute(config);
-        Spark.get("/student/login", cr);
-        Spark.post("/student/login", cr);
-
-        Spark.get("/logout", new LogoutRoute(config, "/"));
     }
 }

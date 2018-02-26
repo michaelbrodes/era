@@ -21,4 +21,6 @@ public interface StudentDAO {
      * @return a student from the database.
      */
     Student read(long id);
+
+    Student getOrCreateStudent(String username);
 }

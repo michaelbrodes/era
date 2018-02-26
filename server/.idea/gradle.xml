@@ -5,7 +5,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="C:/ProgramData/chocolatey/lib/gradle/tools/gradle-3.4.1" />
+        <option name="gradleHome" value="/usr/local/Cellar/gradle/4.2/libexec" />
         <option name="gradleJvm" value="1.8" />
         <option name="modules">
           <set>

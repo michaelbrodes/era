@@ -2,6 +2,7 @@ package era.server.data.access;
 
 
 import era.server.data.StudentDAO;
+import era.server.data.database.tables.records.StudentRecord;
 import era.server.data.model.Course;
 import era.server.data.model.Student;
 import org.jooq.DSLContext;
@@ -66,6 +67,22 @@ public class StudentDAOImpl extends DatabaseDAO implements StudentDAO {
                     )
                     .orElse(null);
         }
+    }
+    @Override
+    public Student getOrCreateStudent(String username) {
+        Student newStudent = new Student(username, username + "@siue.edu");
+        try (DSLContext create = connect()) {
+            StudentRecord studentRecord = create.selectFrom(STUDENT)
+                    .where(STUDENT.USERNAME.eq(username))
+                    .fetchOne();
+            if (studentRecord == null) {
+                insert(newStudent);
+            }
+            else {
+                newStudent.setUuid(studentRecord.getUuid());
+            }
+        }
+        return newStudent;
     }
 
     public static StudentDAO instance() {

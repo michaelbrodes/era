@@ -24,7 +24,7 @@ public class IndexController {
 
         }
 
-
+        request.session().attribute("user","testUsername");
 
         Map<String, Object> model = new HashMap<>();
 

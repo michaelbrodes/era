@@ -24,6 +24,7 @@ public class Student implements Model {
     private String email;
     private long uniqueId;    /* Identifier that we generate to uniquely identify each student inside the QR code */
     // every course that the student belongs to
+    private String uuid;
     private Set<Course> courses = Sets.newHashSet();
 
     /* Constructors */
@@ -36,6 +37,12 @@ public class Student implements Model {
     public Student(@Nonnull String userName) {
         Preconditions.checkNotNull(userName);
         this.userName = userName;
+    }
+
+    public Student(@Nonnull String userName, @Nonnull String email) {
+        Preconditions.checkNotNull(userName);
+        this.userName = userName;
+        this.email = email;
     }
 
     public Student(
@@ -127,6 +134,14 @@ public class Student implements Model {
 
     public void setCourses(Set<Course> courses) {
         this.courses = courses == null ? Sets.newHashSet() : courses;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     @Override
