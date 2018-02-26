@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class PageRenderer {
 
-    public static String render(Map<String, Object> model, String templatePath) {
+    public String render(Map<String, Object> model, String templatePath) {
         return new HandlebarsTemplateEngine().render(new ModelAndView(model, templatePath));
     }
 }

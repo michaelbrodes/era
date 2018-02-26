@@ -4,6 +4,7 @@ import era.server.data.model.Assignment;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Provides CRUD functionality for {@link Assignment} objects. We made an interface
@@ -19,4 +20,6 @@ public interface AssignmentDAO {
     void storeAssignment(Assignment assignment);
 
     Optional<Assignment> fetch(String uuid);
+
+    Set<Assignment> fetchAllByStudent(String username);
 }

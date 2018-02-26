@@ -28,6 +28,7 @@ public class Assignment implements Model {
     private Course course;
     private String course_id;
     private String student_id;
+    private String courseName;
     private final String uuid;
 
     /**
@@ -77,6 +78,9 @@ public class Assignment implements Model {
         this.course_id = builder.course_id;
         this.student_id = builder.student_id;
         this.uuid = uuid;
+        this.courseName = builder.course == null
+                ? builder.courseName
+                : builder.course.getName();
     }
 
     @Override
@@ -144,13 +148,12 @@ public class Assignment implements Model {
 
     @Override
     public Map<String, Object> toViewModel() {
-        // Format: Month/Day/Year Era e.g. July/13/2014 AD
-        String assignmentDate = createdDateTime.format(DateTimeFormatter.ofPattern("L/d/y G"));
+        // Format: Month/Day/Year e.g. July/13/2014
+        String assignmentDate = createdDateTime.format(DateTimeFormatter.ofPattern("L/d/y"));
         return ImmutableMap.of(
                 "name", name,
                 "createdDateTime", assignmentDate,
-                "student", student.getUserName(),
-                "course", course.getName(),
+                "course", courseName,
                 "uuid", uuid
         );
     }
@@ -179,6 +182,7 @@ public class Assignment implements Model {
         private Student student;
         private Course course;
         private LocalDateTime createDateTime;
+        private String courseName;
 
         public Builder withImageFilePath(String imageFilePath) {
             this.imageFilePath = imageFilePath;
@@ -207,6 +211,11 @@ public class Assignment implements Model {
 
         public Builder withCreatedDateTime(LocalDateTime createDateTime) {
             this.createDateTime = createDateTime;
+            return this;
+        }
+
+        public Builder withCourseName(String courseName) {
+            this.courseName = courseName;
             return this;
         }
 
