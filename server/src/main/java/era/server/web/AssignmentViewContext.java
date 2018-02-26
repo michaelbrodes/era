@@ -20,6 +20,10 @@ public class AssignmentViewContext {
         // TODO wrap CASAuth#assertAuthed in this method
         request.session(true);
         String student = request.session().attribute("user");
+        // TODO remove this once authentication is in
+        if (student == null) {
+            student = request.params(":userName");
+        }
 
         return new AssignmentViewContext(student);
     }

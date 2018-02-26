@@ -2,6 +2,7 @@ package era.server.web;
 
 
 import era.server.ServerModule;
+import era.server.common.PageRenderer;
 import era.server.common.UnauthorizedException;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
@@ -23,8 +24,8 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class ServerWebModule implements ServerModule {
 
+    private static final PageRenderer RENDERER = new PageRenderer();
     private static ServerWebModule INSTANCE;
-
     private final HealthController healthController;
     private final IndexController indexController;
     private final AssignmentViewController assignmentViewController;
@@ -38,8 +39,8 @@ public class ServerWebModule implements ServerModule {
             CourseDAO courseDAO,
             AssignmentDAO assignmentDAO) {
         this.healthController = new HealthController();
-        this.indexController = new IndexController();
-        this.assignmentViewController = new AssignmentViewController(assignmentDAO, courseDAO);
+        this.indexController = new IndexController(RENDERER);
+        this.assignmentViewController = new AssignmentViewController(RENDERER, assignmentDAO, courseDAO);
         this.errorController = new ErrorController();
     }
 
