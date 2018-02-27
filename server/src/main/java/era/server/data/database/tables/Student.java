@@ -4,7 +4,7 @@
 package era.server.data.database.tables;
 
 
-import era.server.data.database.Era;
+import era.server.data.database.Dev;
 import era.server.data.database.Indexes;
 import era.server.data.database.Keys;
 import era.server.data.database.tables.records.StudentRecord;
@@ -38,10 +38,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Student extends TableImpl<StudentRecord> {
 
-    private static final long serialVersionUID = -1581670907;
+    private static final long serialVersionUID = -1724051577;
 
     /**
-     * The reference instance of <code>era.student</code>
+     * The reference instance of <code>dev.student</code>
      */
     public static final Student STUDENT = new Student();
 
@@ -54,36 +54,36 @@ public class Student extends TableImpl<StudentRecord> {
     }
 
     /**
-     * The column <code>era.student.uuid</code>.
+     * The column <code>dev.student.uuid</code>.
      */
     public final TableField<StudentRecord, String> UUID = createField("uuid", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid()", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
-     * The column <code>era.student.username</code>.
+     * The column <code>dev.student.username</code>.
      */
     public final TableField<StudentRecord, String> USERNAME = createField("username", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * The column <code>era.student.email</code>.
+     * The column <code>dev.student.email</code>.
      */
     public final TableField<StudentRecord, String> EMAIL = createField("email", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * Create a <code>era.student</code> table reference
+     * Create a <code>dev.student</code> table reference
      */
     public Student() {
         this(DSL.name("student"), null);
     }
 
     /**
-     * Create an aliased <code>era.student</code> table reference
+     * Create an aliased <code>dev.student</code> table reference
      */
     public Student(String alias) {
         this(DSL.name(alias), STUDENT);
     }
 
     /**
-     * Create an aliased <code>era.student</code> table reference
+     * Create an aliased <code>dev.student</code> table reference
      */
     public Student(Name alias) {
         this(alias, STUDENT);
@@ -102,7 +102,7 @@ public class Student extends TableImpl<StudentRecord> {
      */
     @Override
     public Schema getSchema() {
-        return Era.ERA;
+        return Dev.DEV;
     }
 
     /**

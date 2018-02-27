@@ -30,10 +30,10 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AssignmentRecord extends UpdatableRecordImpl<AssignmentRecord> implements Record6<String, String, String, Timestamp, String, String> {
 
-    private static final long serialVersionUID = -900427512;
+    private static final long serialVersionUID = 867123178;
 
     /**
-     * Setter for <code>era.assignment.uuid</code>.
+     * Setter for <code>dev.assignment.uuid</code>.
      */
     public AssignmentRecord setUuid(String value) {
         set(0, value);
@@ -41,14 +41,14 @@ public class AssignmentRecord extends UpdatableRecordImpl<AssignmentRecord> impl
     }
 
     /**
-     * Getter for <code>era.assignment.uuid</code>.
+     * Getter for <code>dev.assignment.uuid</code>.
      */
     public String getUuid() {
         return (String) get(0);
     }
 
     /**
-     * Setter for <code>era.assignment.name</code>.
+     * Setter for <code>dev.assignment.name</code>.
      */
     public AssignmentRecord setName(String value) {
         set(1, value);
@@ -56,14 +56,14 @@ public class AssignmentRecord extends UpdatableRecordImpl<AssignmentRecord> impl
     }
 
     /**
-     * Getter for <code>era.assignment.name</code>.
+     * Getter for <code>dev.assignment.name</code>.
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>era.assignment.image_file_path</code>.
+     * Setter for <code>dev.assignment.image_file_path</code>.
      */
     public AssignmentRecord setImageFilePath(String value) {
         set(2, value);
@@ -71,14 +71,14 @@ public class AssignmentRecord extends UpdatableRecordImpl<AssignmentRecord> impl
     }
 
     /**
-     * Getter for <code>era.assignment.image_file_path</code>.
+     * Getter for <code>dev.assignment.image_file_path</code>.
      */
     public String getImageFilePath() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>era.assignment.created_date_time</code>.
+     * Setter for <code>dev.assignment.created_date_time</code>.
      */
     public AssignmentRecord setCreatedDateTime(Timestamp value) {
         set(3, value);
@@ -86,14 +86,14 @@ public class AssignmentRecord extends UpdatableRecordImpl<AssignmentRecord> impl
     }
 
     /**
-     * Getter for <code>era.assignment.created_date_time</code>.
+     * Getter for <code>dev.assignment.created_date_time</code>.
      */
     public Timestamp getCreatedDateTime() {
         return (Timestamp) get(3);
     }
 
     /**
-     * Setter for <code>era.assignment.student_id</code>.
+     * Setter for <code>dev.assignment.student_id</code>.
      */
     public AssignmentRecord setStudentId(String value) {
         set(4, value);
@@ -101,14 +101,14 @@ public class AssignmentRecord extends UpdatableRecordImpl<AssignmentRecord> impl
     }
 
     /**
-     * Getter for <code>era.assignment.student_id</code>.
+     * Getter for <code>dev.assignment.student_id</code>.
      */
     public String getStudentId() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>era.assignment.course_id</code>.
+     * Setter for <code>dev.assignment.course_id</code>.
      */
     public AssignmentRecord setCourseId(String value) {
         set(5, value);
@@ -116,7 +116,7 @@ public class AssignmentRecord extends UpdatableRecordImpl<AssignmentRecord> impl
     }
 
     /**
-     * Getter for <code>era.assignment.course_id</code>.
+     * Getter for <code>dev.assignment.course_id</code>.
      */
     public String getCourseId() {
         return (String) get(5);

@@ -93,7 +93,7 @@ public class UploadController {
         if (courseName == null || semesterName == null) {
             response.status(400);
             return "";
-        }// if :coursId is null malformed request, return 400
+        }// if :courseId is null malformed request, return 400
 
         if (!contentType.contains("multipart/form-data")) {
             response.status(415);

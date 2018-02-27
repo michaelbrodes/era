@@ -28,10 +28,10 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class StudentRecord extends UpdatableRecordImpl<StudentRecord> implements Record3<String, String, String> {
 
-    private static final long serialVersionUID = -1268602351;
+    private static final long serialVersionUID = -1034933711;
 
     /**
-     * Setter for <code>era.student.uuid</code>.
+     * Setter for <code>dev.student.uuid</code>.
      */
     public StudentRecord setUuid(String value) {
         set(0, value);
@@ -39,14 +39,14 @@ public class StudentRecord extends UpdatableRecordImpl<StudentRecord> implements
     }
 
     /**
-     * Getter for <code>era.student.uuid</code>.
+     * Getter for <code>dev.student.uuid</code>.
      */
     public String getUuid() {
         return (String) get(0);
     }
 
     /**
-     * Setter for <code>era.student.username</code>.
+     * Setter for <code>dev.student.username</code>.
      */
     public StudentRecord setUsername(String value) {
         set(1, value);
@@ -54,14 +54,14 @@ public class StudentRecord extends UpdatableRecordImpl<StudentRecord> implements
     }
 
     /**
-     * Getter for <code>era.student.username</code>.
+     * Getter for <code>dev.student.username</code>.
      */
     public String getUsername() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>era.student.email</code>.
+     * Setter for <code>dev.student.email</code>.
      */
     public StudentRecord setEmail(String value) {
         set(2, value);
@@ -69,7 +69,7 @@ public class StudentRecord extends UpdatableRecordImpl<StudentRecord> implements
     }
 
     /**
-     * Getter for <code>era.student.email</code>.
+     * Getter for <code>dev.student.email</code>.
      */
     public String getEmail() {
         return (String) get(2);

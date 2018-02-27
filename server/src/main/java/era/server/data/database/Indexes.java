@@ -19,7 +19,7 @@ import org.jooq.impl.AbstractKeys;
 
 
 /**
- * A class modelling indexes of tables of the <code>era</code> schema.
+ * A class modelling indexes of tables of the <code>dev</code> schema.
  */
 @Generated(
     value = {

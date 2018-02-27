@@ -24,3 +24,4 @@ Once you have the JAR built you can run it using various command line arguments:
  * `--db-name`: the name of the database containing the my-assignments schema
  (usually era to match with the gradle build)
  * `--db-password`: the password for that user. 
+ * `--cas-enabled`: `true` if you want to use the CAS authentication, `false` otherwise

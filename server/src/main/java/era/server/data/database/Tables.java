@@ -15,7 +15,7 @@ import javax.annotation.Generated;
 
 
 /**
- * Convenience access to all tables in era
+ * Convenience access to all tables in dev
  */
 @Generated(
     value = {
@@ -28,32 +28,32 @@ import javax.annotation.Generated;
 public class Tables {
 
     /**
-     * The table <code>era.assignment</code>.
+     * The table <code>dev.assignment</code>.
      */
     public static final Assignment ASSIGNMENT = era.server.data.database.tables.Assignment.ASSIGNMENT;
 
     /**
-     * The table <code>era.course</code>.
+     * The table <code>dev.course</code>.
      */
     public static final Course COURSE = era.server.data.database.tables.Course.COURSE;
 
     /**
-     * The table <code>era.course_student</code>.
+     * The table <code>dev.course_student</code>.
      */
     public static final CourseStudent COURSE_STUDENT = era.server.data.database.tables.CourseStudent.COURSE_STUDENT;
 
     /**
-     * The table <code>era.schema_version</code>.
+     * The table <code>dev.schema_version</code>.
      */
     public static final SchemaVersion SCHEMA_VERSION = era.server.data.database.tables.SchemaVersion.SCHEMA_VERSION;
 
     /**
-     * The table <code>era.semester</code>.
+     * The table <code>dev.semester</code>.
      */
     public static final Semester SEMESTER = era.server.data.database.tables.Semester.SEMESTER;
 
     /**
-     * The table <code>era.student</code>.
+     * The table <code>dev.student</code>.
      */
     public static final Student STUDENT = era.server.data.database.tables.Student.STUDENT;
 }

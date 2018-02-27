@@ -49,15 +49,6 @@ public class AssignmentViewController {
         return renderer.render(viewModel, "assignment-view.hbs");
     }
 
-//    public String courseList(Request request, Response response) {
-//        AssignmentViewContext context = AssignmentViewContext.initialize(request);
-//        Optional<String> studentUsername = context.getStudentUsername();
-//        Set<Course> courses = studentUsername.map(courseDAO::readAllCoursesEnrolledIn)
-//                .orElse(Sets.newHashSet());
-//        return "";
-//    }
-
-
     /**
      * Given a URL param {@code :assignmentId} read that assignment's filename
      * from the database, then read the file from the filesystem and display it

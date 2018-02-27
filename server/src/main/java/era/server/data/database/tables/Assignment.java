@@ -4,7 +4,7 @@
 package era.server.data.database.tables;
 
 
-import era.server.data.database.Era;
+import era.server.data.database.Dev;
 import era.server.data.database.Indexes;
 import era.server.data.database.Keys;
 import era.server.data.database.tables.records.AssignmentRecord;
@@ -40,10 +40,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Assignment extends TableImpl<AssignmentRecord> {
 
-    private static final long serialVersionUID = 929339353;
+    private static final long serialVersionUID = 684426078;
 
     /**
-     * The reference instance of <code>era.assignment</code>
+     * The reference instance of <code>dev.assignment</code>
      */
     public static final Assignment ASSIGNMENT = new Assignment();
 
@@ -56,51 +56,51 @@ public class Assignment extends TableImpl<AssignmentRecord> {
     }
 
     /**
-     * The column <code>era.assignment.uuid</code>.
+     * The column <code>dev.assignment.uuid</code>.
      */
     public final TableField<AssignmentRecord, String> UUID = createField("uuid", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid()", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
-     * The column <code>era.assignment.name</code>.
+     * The column <code>dev.assignment.name</code>.
      */
     public final TableField<AssignmentRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * The column <code>era.assignment.image_file_path</code>.
+     * The column <code>dev.assignment.image_file_path</code>.
      */
     public final TableField<AssignmentRecord, String> IMAGE_FILE_PATH = createField("image_file_path", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * The column <code>era.assignment.created_date_time</code>.
+     * The column <code>dev.assignment.created_date_time</code>.
      */
     public final TableField<AssignmentRecord, Timestamp> CREATED_DATE_TIME = createField("created_date_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaultValue(org.jooq.impl.DSL.field("current_timestamp()", org.jooq.impl.SQLDataType.TIMESTAMP)), this, "");
 
     /**
-     * The column <code>era.assignment.student_id</code>.
+     * The column <code>dev.assignment.student_id</code>.
      */
     public final TableField<AssignmentRecord, String> STUDENT_ID = createField("student_id", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false), this, "");
 
     /**
-     * The column <code>era.assignment.course_id</code>.
+     * The column <code>dev.assignment.course_id</code>.
      */
     public final TableField<AssignmentRecord, String> COURSE_ID = createField("course_id", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false), this, "");
 
     /**
-     * Create a <code>era.assignment</code> table reference
+     * Create a <code>dev.assignment</code> table reference
      */
     public Assignment() {
         this(DSL.name("assignment"), null);
     }
 
     /**
-     * Create an aliased <code>era.assignment</code> table reference
+     * Create an aliased <code>dev.assignment</code> table reference
      */
     public Assignment(String alias) {
         this(DSL.name(alias), ASSIGNMENT);
     }
 
     /**
-     * Create an aliased <code>era.assignment</code> table reference
+     * Create an aliased <code>dev.assignment</code> table reference
      */
     public Assignment(Name alias) {
         this(alias, ASSIGNMENT);
@@ -119,7 +119,7 @@ public class Assignment extends TableImpl<AssignmentRecord> {
      */
     @Override
     public Schema getSchema() {
-        return Era.ERA;
+        return Dev.DEV;
     }
 
     /**

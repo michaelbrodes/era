@@ -28,10 +28,10 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class SemesterRecord extends UpdatableRecordImpl<SemesterRecord> implements Record3<String, String, Integer> {
 
-    private static final long serialVersionUID = 112427653;
+    private static final long serialVersionUID = -128383033;
 
     /**
-     * Setter for <code>era.semester.uuid</code>.
+     * Setter for <code>dev.semester.uuid</code>.
      */
     public SemesterRecord setUuid(String value) {
         set(0, value);
@@ -39,14 +39,14 @@ public class SemesterRecord extends UpdatableRecordImpl<SemesterRecord> implemen
     }
 
     /**
-     * Getter for <code>era.semester.uuid</code>.
+     * Getter for <code>dev.semester.uuid</code>.
      */
     public String getUuid() {
         return (String) get(0);
     }
 
     /**
-     * Setter for <code>era.semester.term</code>.
+     * Setter for <code>dev.semester.term</code>.
      */
     public SemesterRecord setTerm(String value) {
         set(1, value);
@@ -54,14 +54,14 @@ public class SemesterRecord extends UpdatableRecordImpl<SemesterRecord> implemen
     }
 
     /**
-     * Getter for <code>era.semester.term</code>.
+     * Getter for <code>dev.semester.term</code>.
      */
     public String getTerm() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>era.semester.year</code>.
+     * Setter for <code>dev.semester.year</code>.
      */
     public SemesterRecord setYear(Integer value) {
         set(2, value);
@@ -69,7 +69,7 @@ public class SemesterRecord extends UpdatableRecordImpl<SemesterRecord> implemen
     }
 
     /**
-     * Getter for <code>era.semester.year</code>.
+     * Getter for <code>dev.semester.year</code>.
      */
     public Integer getYear() {
         return (Integer) get(2);

@@ -45,8 +45,6 @@ public class ServerWebModule implements ServerModule {
             AssignmentDAO assignmentDAO,
             Boolean casEnabled) {
         this.healthController = new HealthController();
-        this.indexController = new IndexController();
-        this.assignmentViewController = new AssignmentViewController();
         this.casAuth = new CASAuth(studentDAO);
         this.casEnabled = casEnabled;
         this.indexController = new IndexController(RENDERER);

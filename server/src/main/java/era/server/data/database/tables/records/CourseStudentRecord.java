@@ -27,10 +27,10 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CourseStudentRecord extends UpdatableRecordImpl<CourseStudentRecord> implements Record2<String, String> {
 
-    private static final long serialVersionUID = -1081266006;
+    private static final long serialVersionUID = -615841558;
 
     /**
-     * Setter for <code>era.course_student.student_id</code>.
+     * Setter for <code>dev.course_student.student_id</code>.
      */
     public CourseStudentRecord setStudentId(String value) {
         set(0, value);
@@ -38,14 +38,14 @@ public class CourseStudentRecord extends UpdatableRecordImpl<CourseStudentRecord
     }
 
     /**
-     * Getter for <code>era.course_student.student_id</code>.
+     * Getter for <code>dev.course_student.student_id</code>.
      */
     public String getStudentId() {
         return (String) get(0);
     }
 
     /**
-     * Setter for <code>era.course_student.course_id</code>.
+     * Setter for <code>dev.course_student.course_id</code>.
      */
     public CourseStudentRecord setCourseId(String value) {
         set(1, value);
@@ -53,7 +53,7 @@ public class CourseStudentRecord extends UpdatableRecordImpl<CourseStudentRecord
     }
 
     /**
-     * Getter for <code>era.course_student.course_id</code>.
+     * Getter for <code>dev.course_student.course_id</code>.
      */
     public String getCourseId() {
         return (String) get(1);
