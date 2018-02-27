@@ -150,8 +150,10 @@ public class AssignmentCreationService {
         // distribute out the labor of creating and saving.
         // TODO - saver creation should be done in the loop
 
-        //We do this because of a bug that exists in Java because of a static block that results in a deadlock when
-        //multiple threads are introduced
+        // BufferedImage has a bug where you if you have multiple threads in
+        // the class' static initialization block, the program will deadlock.
+        // We therefore have to create a temporary image in the main thread so
+        // our program can work. See java bug report 9052813
         BufferedImage temp = new BufferedImage(1,1,1);
         for (Map.Entry<Student, List<QRCode>> qrCode : studentBatches.entrySet()) {
             QRCreator creator = new QRCreator(
