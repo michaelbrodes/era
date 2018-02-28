@@ -1,5 +1,6 @@
 package era.server.api;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -12,6 +13,7 @@ import era.server.data.model.Course;
 import era.server.data.model.Semester;
 import era.server.data.model.Student;
 import era.server.data.model.Term;
+import org.omg.CORBA.INTERNAL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -44,9 +46,37 @@ public class UploadController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadController.class);
     private static final int TERM_INDEX = 0;
     private static final int YEAR_INDEX = 1;
+    // below are HTTP status codes that this API returns as well as documentation on how to handle them
+    /**
+     * Success, we inserted the uploader side object into the database. Don't
+     * worry about it.
+     */
+    private static final int CREATED = 201;
+    /**
+     * There was a bug on the server side. Look at the logs there should be an
+     * exception in there.
+     */
+    private static final int INTERNAL_SERVER_ERROR = 500;
+    /**
+     * An course or student that was on the uploader side was not on the server
+     * side. Notify the user that they should resubmit there roster csv with
+     * online mode turned on.
+     */
+    private static final int CONFLICT = 409;
+    /**
+     * This is a specific bug on the uploader side. Either the file that it is
+     * uploading isn't what we support or the client didn't properly set the
+     * Content-Type HTTP header.
+     */
+    private static final int BAD_CONTENT = 415;
+    /**
+     * This is a general bug on the uploader side. This is a bug that should
+     * never happen, so fail and log an exception on the Uploader side.
+     */
+    private static final int BAD_REQUEST = 400;
 
 
-    public UploadController(
+    UploadController(
             final CourseDAO courseDAO,
             final AssignmentDAO assignmentDAO,
             final StudentDAO studentDAO
@@ -86,17 +116,17 @@ public class UploadController {
             semesterName = URLDecoder.decode(request.params(":semesterName"), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("Cannot decode courseName or semesterName", e);
-            return APIMessage.error(request, response, 400, e.getMessage());
+            return APIMessage.error(request, response, BAD_REQUEST, e.getMessage());
         }
         // semester.term semester.year uploader-side
 
         if (courseName == null || semesterName == null) {
-            response.status(400);
+            response.status(BAD_REQUEST);
             return "";
-        }// if :coursId is null malformed request, return 400
+        }// if :courseId is null malformed request, return 400
 
         if (!contentType.contains("multipart/form-data")) {
-            response.status(415);
+            response.status(BAD_CONTENT);
             return "";
         }
 
@@ -105,7 +135,7 @@ public class UploadController {
         if (termAndYear.length != 2
                 || !Term.contains(termAndYear[TERM_INDEX])
                 || !canCastToInt(termAndYear[YEAR_INDEX])) {
-            response.status(400);
+            response.status(BAD_REQUEST);
             return "";
         }
 
@@ -134,13 +164,24 @@ public class UploadController {
                 if (storeInFileSystem(is, assignment)) {
                     assignmentDAO.storeAssignment(assignment);
                 }
+            } else {
+                LOGGER.warn(
+                        "The student {} or the course {} {} for assignment {} doesn't exist in the server database, therefore we cannot insert",
+                        studentNameHeader,
+                        courseName,
+                        semester,
+                        assignmentNameHeader
+                );
+                response.status(CONFLICT);
+                return "";
             }
         } catch (IOException | ServletException e) {
             e.printStackTrace();
-            response.status(500);
+            response.status(INTERNAL_SERVER_ERROR);
             return "";
         }
-        response.status(201);
+
+        response.status(CREATED);
         return "";
     }
 
@@ -191,10 +232,11 @@ public class UploadController {
             }
         } catch (IOException | ServletException e) {
             e.printStackTrace();
-            response.status(500);
+            response.status(INTERNAL_SERVER_ERROR);
             return "";
         }
-        response.status(201);
+
+        response.status(CREATED);
         return "";
     }
 
@@ -208,7 +250,7 @@ public class UploadController {
             return APIMessage.error(
                     request,
                     response,
-                    415,
+                    BAD_CONTENT,
                     "wrong content type, we require application/json"
             );
         }
@@ -221,7 +263,7 @@ public class UploadController {
         } catch(JsonSyntaxException e) {
             LOGGER.error("Exception when parsing course JSON \n{}", request.body());
             LOGGER.error("Detailed exception: ", e);
-            return APIMessage.error(request, response, 400, e.getMessage());
+            return APIMessage.error(request, response, BAD_REQUEST, e.getMessage());
         }
 
         // we cannot insert a null course or a course that has either a null
@@ -235,7 +277,7 @@ public class UploadController {
                         " into the database "
                         + e.getMessage();
                 LOGGER.error(errorMessage);
-                return APIMessage.error(request, response, 500, errorMessage);
+                return APIMessage.error(request, response, INTERNAL_SERVER_ERROR, errorMessage);
             }
         }
 
@@ -263,7 +305,7 @@ public class UploadController {
                 out.write(buffer, 0, bytesRead);
             }
         } catch (IOException e) {
-            System.err.println(e);
+            LOGGER.error("Error storing assignment into the filesystem", e);
             return false;
         }
         return true;

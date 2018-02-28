@@ -44,9 +44,13 @@ public class Assignment {
         this.student = builder.student;
         this.createdDateTime = createdDateTime;
 
-        this.imageFilePath = course == null || student == null ?
-                null :
-                generateFileLocation();
+        if (builder.imageFilePath != null) {
+            this.imageFilePath = builder.imageFilePath;
+        } else if (course != null && student != null){
+            this.imageFilePath = generateFileLocation();
+        } else {
+            this.imageFilePath = null;
+        }
 
         this.course_id = builder.course_id;
         this.student_id = builder.student_id;
