@@ -19,16 +19,7 @@ public class FailedAssignment {
 
     @Override
     public String toString() {
-        return "Failed Assignment: "
-                .concat(assignmentName)
-                .concat(" for student ")
-                .concat(studentName)
-                .concat(" and course ")
-                .concat(courseName)
-                .concat(" ")
-                .concat(semesterName)
-                .concat(" ")
-                .concat(reason);
-                
+        return "Failed Assignment for student "
+                .concat(studentName);
     }
 }
