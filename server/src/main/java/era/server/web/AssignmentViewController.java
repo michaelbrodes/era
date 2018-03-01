@@ -39,7 +39,7 @@ public class AssignmentViewController {
         Optional<String> studentUsername = context.getStudentUsername();
         List<Map<String, Object>> assignments = studentUsername
                 .map(assignmentDAO::fetchAllByStudent)
-                .orElse(Collections.emptySet())
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(Assignment::toViewModel)
                 .collect(Collectors.toList());

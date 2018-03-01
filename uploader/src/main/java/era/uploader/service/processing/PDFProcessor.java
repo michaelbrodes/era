@@ -177,6 +177,7 @@ public class PDFProcessor {
         QRCodeMapping QRCodeMappingFromDB;
         QRCodeMappingFromDB = QRCodeMappingDAO.read(QRCodeMapping.getUuid());
         if(QRCodeMappingFromDB == null){
+            scanningProgress.addError("Student Does Not Exist");
             return ArrayListMultimap.create();
         } else{
             QRCodeMappingFromDB = mergeMappings(QRCodeMappingFromDB, QRCodeMapping);
@@ -224,6 +225,8 @@ public class PDFProcessor {
                                 .withCreatedDateTime(LocalDateTime.now())
                                 .createUnique(assignmentName)
                 );
+            } else {
+                scanningProgress.addError("Student is null. SHOULDN'T HAPPEN");
             }
         }
         mergeAssignmentPages(assignments);
