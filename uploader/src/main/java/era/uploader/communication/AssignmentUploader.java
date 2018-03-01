@@ -33,10 +33,9 @@ public class AssignmentUploader {
 
             String courseName = URLEncoder.encode(current.getCourse().getName(), "UTF-8");
             String semesterName = URLEncoder.encode(current.getCourse().getSemester().apiToString(), "UTF-8");
+            String studentPath = host + "/api/course/" + courseName + "/semester/" + semesterName + "/assignment";
 
-            host += "/api/course/" + courseName + "/semester/" + semesterName + "/assignment";
-
-            HttpPost post = new HttpPost(host);
+            HttpPost post = new HttpPost(studentPath);
 
             File file = new File(current.getImageFilePath());
             String assignmentName = current.getName();
