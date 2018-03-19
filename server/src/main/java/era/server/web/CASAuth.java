@@ -55,29 +55,39 @@ public class CASAuth {
 
         String encodedURL = URLEncoder.encode("https://my-assignments.isg.siue.edu/student/login", "UTF-8");
 
-        if (Strings.isNullOrEmpty(request.session().attribute("user"))) { //the user is not authenticated
-            response.redirect("https://cas.isg.siue.edu/itscas/login?service=" + encodedURL, 302);
-        }
-        else if (request.queryParams("ticket") != null) { //if they came back from CAS
+        LOGGER.info("user was: {}", (String)request.session().attribute("user"));
+
+        if (request.queryParams("ticket") != null) { //the user is not authenticated
             CloseableHttpClient httpClient = HttpClients.createDefault();
+            LOGGER.info("ticket was: {}", request.queryParams("ticket"));
+
             HttpGet httpGet = new HttpGet("https://cas.isg.siue.edu/itscas/serviceValidate?ticket=" +
                     request.queryParams("ticket") +
                     "&service=" + encodedURL);
             try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) { //This shouldn't happen either
 
                 if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                    LOGGER.info("we got a 200");
                     InputStream httpStream = httpResponse.getEntity().getContent();
 
                     String username = getUsernameFromXML(httpStream);
                     if (username == null) {
                         response.redirect("/" + encodedURL, 302);
                     } else {
+
                         assertStudentInDatabase(username);
                         request.session().attribute("user", username);
                         response.redirect("/student/" + username, 302);
                     }
                 }
+                else {
+                    LOGGER.info("status code: {}", httpResponse.getStatusLine().getStatusCode());
+                }
             }
+        }
+        else if (Strings.isNullOrEmpty(request.session().attribute("user"))) { //if they came back from CAS
+            LOGGER.info("url was: {}", encodedURL);
+            response.redirect("https://cas.isg.siue.edu/itscas/login?service=" + encodedURL, 302);
         }
         else { //if the user is already authenticated, and in our session
             String username = request.session().attribute("user");
@@ -99,14 +109,14 @@ public class CASAuth {
     private String getUsernameFromXML(InputStream is) throws IOException, SAXException, ParserConfigurationException {
         try {
 
-            ByteSource byteSource = new ByteSource() {
-                @Override
-                public InputStream openStream() throws IOException {
-                    return is;
-                }
-            };
-            String text = byteSource.asCharSource(Charsets.UTF_8).read();
-            LOGGER.info("here's soap: {}" , text);
+//            ByteSource byteSource = new ByteSource() {
+//                @Override
+//                public InputStream openStream() throws IOException {
+//                    return is;
+//                }
+//            };
+//            String text = byteSource.asCharSource(Charsets.UTF_8).read();
+//            LOGGER.info("here's soap: {}", text);
             //Create a document we can parse, and parsing it
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -128,7 +138,7 @@ public class CASAuth {
         catch (IOException e) {
             LOGGER.error("Exception: ", e);
         }
-        return "";
+        return null;
     }
 }
 
