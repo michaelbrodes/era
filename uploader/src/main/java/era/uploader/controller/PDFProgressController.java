@@ -1,5 +1,6 @@
 package era.uploader.controller;
 
+import era.uploader.common.GUIUtil;
 import era.uploader.common.UploaderProperties;
 import era.uploader.data.viewmodel.ErrorMetaData;
 import era.uploader.service.processing.ScanningProgress;
@@ -30,26 +31,18 @@ public class PDFProgressController {
     private Label modeLabel;
 
     private ScanningProgress scanningProgress;
-
     private Task<Void> pipelineTask;
 
     @FXML
     void intialize(){
-        if (UploaderProperties.instance().isUploadingEnabled()){
-            modeLabel.setText("Online");
-            modeLabel.setTextFill(Color.web("#228b22"));
-        }
-        else {
-            modeLabel.setText("Offline");
-            modeLabel.setTextFill(Color.web("#ff0000"));
-        }
     }
+
     void setScanningProgress(ScanningProgress scanningProgress) {
         this.scanningProgress = scanningProgress;
         errorList.setPlaceholder(new Label("No Errors Currently Present"));
         final StringProperty percentage = new SimpleStringProperty("0%");
         numPercent.textProperty().bind(percentage);
-        pipelineTask = new Task() {
+        pipelineTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 while(true){
@@ -71,10 +64,11 @@ public class PDFProgressController {
             }
         };
         errorProgress.progressProperty().bind(pipelineTask.progressProperty());
-
         Thread checkingThread = new Thread(pipelineTask);
         checkingThread.setDaemon(false);
         checkingThread.start();
+
+        GUIUtil.displayConnectionStatus(modeLabel);
     }
 
     void checkForSuccessfulProcesses(){

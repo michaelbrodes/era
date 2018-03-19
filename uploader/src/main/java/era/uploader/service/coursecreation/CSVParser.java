@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
+import era.uploader.data.model.Teacher;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,12 +30,6 @@ public class CSVParser {
     private static final int COURSE_NBR = 1;
     private static final int SECTION_NBR = 2;
 
-    private final Semester semester;
-
-    public CSVParser(Semester semester) {
-        this.semester = semester;
-    }
-
     /**
      * Parses a single line from the CSV file and produces a singleton multimap
      * of a course to a student.
@@ -42,36 +37,31 @@ public class CSVParser {
      * @param fields a single line from the CSV file
      * @return Either a singleton multimap of a course to a student or null
      */
-    @Nullable
-    public Multimap<Course, Student> parseLine(@Nonnull String[] fields) {
+    @Nonnull
+    public ParsedLine parseLine(@Nonnull String[] fields) {
         Preconditions.checkNotNull(fields);
-        Multimap<Course, Student> ret = null;
+        ParsedLine.Builder lineBuilder = ParsedLine.builder();
 
         if (fields.length >= STUDENT_RECORD_SIZE) {
+            lineBuilder.firstName(fields[FIRST_NAME])
+                    .lastName(fields[LAST_NAME])
+                    .studentId(fields[SCHOOL_ID])
+                    .userName(fields[USER_NAME]);
+
             String[] courseRecord = fields[COURSE_ID].split("-");
             if (courseRecord.length >= COURSE_ID_SIZE) {
-                ret = ArrayListMultimap.create();
-                ret.put(
-                        Course.builder()
-                                .withSemester(semester)
-                                .createUnique(
-                                        courseRecord[DEPARTMENT],
-                                        courseRecord[COURSE_NBR],
-                                        courseRecord[SECTION_NBR]
-                                ),
-                        Student.builder()
-                                .withLastName(fields[LAST_NAME])
-                                .withFirstName(fields[FIRST_NAME])
-                                .withSchoolId(fields[SCHOOL_ID])
-                                .createUnique(fields[USER_NAME])
-                );
+                lineBuilder.courseDepartment(courseRecord[DEPARTMENT])
+                        .courseNumber(courseRecord[COURSE_NBR])
+                        .courseSection(courseRecord[SECTION_NBR]);
             } else {
-                System.err.println("Error Parsing Course CSV");
+                System.err.println("Malformed Course entry in roster CSV");
+                System.err.printf("%s\n", String.join(",", courseRecord));
             }
         } else {
-            System.err.println("Error Parsing Course CSV");
+            System.err.println("Malformed student entry in roster CSV");
+            System.err.printf("%s\n", String.join(",", String.join(",", fields)));
         }
 
-        return ret;
+        return lineBuilder.create();
     }
 }

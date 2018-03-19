@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collector;
 
@@ -28,40 +29,16 @@ public class StudentMetaData {
         setCourseName(courseName);
     }
 
-    public String getStudentName() {
-        return studentName.get();
-    }
+    public static ObservableList<StudentMetaData> fromCourses(Collection<Course> courses) {
+        ObservableList<StudentMetaData> students = FXCollections.observableArrayList();
+        for (Course course : courses) {
+            for (Student student : course.getStudentsEnrolled()) {
+                String fullname = student.getLastName() + ", " + student.getFirstName();
+                students.add(new StudentMetaData(fullname, student.getSchoolId(), course.getName()));
+            }
+        }
 
-    public SimpleStringProperty studentNameProperty() {
-        return studentName;
-    }
-
-    public void setStudentName(String studentName) {
-        this.studentName.set(studentName);
-    }
-
-    public String getStudentId() {
-        return studentId.get();
-    }
-
-    public SimpleStringProperty studentIdProperty() {
-        return studentId;
-    }
-
-    public void setStudentId(String studentId) {
-        this.studentId.set(studentId);
-    }
-
-    public String getCourseName() {
-        return courseName.get();
-    }
-
-    public SimpleStringProperty courseNameProperty() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName.set(courseName);
+        return students;
     }
 
     public static ObservableList<StudentMetaData> fromMultimap(Multimap<Course, Student> coursesToStudents) {
@@ -76,9 +53,45 @@ public class StudentMetaData {
 
                     return new StudentMetaData(name, id, course);
                 })
-                .collect(Collector.of(FXCollections::observableArrayList, List::add,(l, r) -> {
+                .collect(Collector.of(FXCollections::observableArrayList, List::add, (l, r) -> {
                     l.addAll(r);
                     return l;
                 }));
+    }
+
+    public String getStudentName() {
+        return studentName.get();
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName.set(studentName);
+    }
+
+    public SimpleStringProperty studentNameProperty() {
+        return studentName;
+    }
+
+    public String getStudentId() {
+        return studentId.get();
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId.set(studentId);
+    }
+
+    public SimpleStringProperty studentIdProperty() {
+        return studentId;
+    }
+
+    public String getCourseName() {
+        return courseName.get();
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName.set(courseName);
+    }
+
+    public SimpleStringProperty courseNameProperty() {
+        return courseName;
     }
 }

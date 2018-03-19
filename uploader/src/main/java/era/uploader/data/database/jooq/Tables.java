@@ -13,6 +13,7 @@ import era.uploader.data.database.jooq.tables.SchemaVersion;
 import era.uploader.data.database.jooq.tables.Semester;
 import era.uploader.data.database.jooq.tables.SqliteSequence;
 import era.uploader.data.database.jooq.tables.Student;
+import era.uploader.data.database.jooq.tables.Teacher;
 
 import javax.annotation.Generated;
 
@@ -74,4 +75,9 @@ public class Tables {
      * The table <code>student</code>.
      */
     public static final Student STUDENT = era.uploader.data.database.jooq.tables.Student.STUDENT;
+
+    /**
+     * The table <code>teacher</code>.
+     */
+    public static final Teacher TEACHER = era.uploader.data.database.jooq.tables.Teacher.TEACHER;
 }

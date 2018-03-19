@@ -1,6 +1,7 @@
 package era.uploader.controller;
 
 import com.google.common.base.Preconditions;
+import era.uploader.common.GUIUtil;
 import era.uploader.common.UploaderProperties;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.database.AssignmentDAOImpl;
@@ -58,14 +59,7 @@ public class FileExplorerController {
             return row;
         });
 
-        if (UploaderProperties.instance().isUploadingEnabled()){
-            modeLabel.setText("Online");
-            modeLabel.setTextFill(Color.web("#228b22"));
-        }
-        else {
-            modeLabel.setText("Offline");
-            modeLabel.setTextFill(Color.web("#ff0000"));
-        }
+        GUIUtil.displayConnectionStatus(modeLabel);
 
         ObservableList<AssignmentMetaData> assignments = allAssignments.getItems();
         assignments.addAll(loadFromDB());

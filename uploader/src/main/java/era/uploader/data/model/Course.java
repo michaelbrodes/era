@@ -28,7 +28,9 @@ public class Course {
     // will be an unsigned int in the database.
     private int uniqueId;
     private int semesterId;
+    private int teacherId;
     private Semester semester;
+    private Teacher teacher;
     private String name;                                    /* Name of Course */
 
     private Course(
@@ -51,6 +53,8 @@ public class Course {
                 builder.assignments;
         this.uniqueId = builder.uniqueId;
         this.uuid = uuid;
+        this.teacher = builder.teacher;
+        this.teacherId = builder.teacherId;
     }
 
     public static Builder builder() {
@@ -124,22 +128,32 @@ public class Course {
         return uuid;
     }
 
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public int getTeacherId() {
+        return teacherId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Course course = (Course) o;
-        return getUniqueId() == course.getUniqueId() &&
-                Objects.equal(getDepartment(), course.getDepartment()) &&
+        return Objects.equal(getDepartment(), course.getDepartment()) &&
                 Objects.equal(getCourseNumber(), course.getCourseNumber()) &&
                 Objects.equal(getSectionNumber(), course.getSectionNumber()) &&
-                Objects.equal(getUuid(), course.getUuid()) &&
                 Objects.equal(getSemester(), course.getSemester());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getDepartment(), getCourseNumber(), getSectionNumber(), getUuid(), getUniqueId(), getSemester());
+        return Objects.hashCode(getDepartment(), getCourseNumber(), getSectionNumber(), getSemester());
     }
 
     @Override
@@ -180,6 +194,9 @@ public class Course {
         private Set<Student> studentsEnrolled = new HashSet<>(); /* Set of Students in the Class */
         private Set<Assignment> assignments;
         private int semesterId;
+        private Teacher teacher;
+        private int teacherId;
+
 
         public Builder withDatabaseId(int uniqueId) {
             this.uniqueId = uniqueId;
@@ -208,6 +225,16 @@ public class Course {
 
         public Builder withAssignments(Set<Assignment> assignments) {
             this.assignments = assignments;
+            return this;
+        }
+
+        public Builder withTeacher(Teacher teacher) {
+            this.teacher = teacher;
+            return this;
+        }
+
+        public Builder withTeacherId(int teacherId) {
+            this.teacherId = teacherId;
             return this;
         }
 

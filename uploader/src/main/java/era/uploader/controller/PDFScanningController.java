@@ -2,6 +2,7 @@ package era.uploader.controller;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import era.uploader.common.GUIUtil;
 import era.uploader.common.UploaderProperties;
 import era.uploader.data.model.Course;
 import era.uploader.service.processing.ScanningProgress;
@@ -167,14 +168,7 @@ public class PDFScanningController {
                 }
         });
 
-        if (UploaderProperties.instance().isUploadingEnabled()){
-            modeLabel.setText("Online");
-            modeLabel.setTextFill(Color.web("#228b22"));
-        }
-        else {
-            modeLabel.setText("Offline");
-            modeLabel.setTextFill(Color.web("#ff0000"));
-        }
+        GUIUtil.displayConnectionStatus(modeLabel);
     }
 
     public void home() throws IOException {

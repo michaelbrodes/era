@@ -13,6 +13,7 @@ import era.uploader.data.database.jooq.tables.SchemaVersion;
 import era.uploader.data.database.jooq.tables.Semester;
 import era.uploader.data.database.jooq.tables.SqliteSequence;
 import era.uploader.data.database.jooq.tables.Student;
+import era.uploader.data.database.jooq.tables.Teacher;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +39,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = 1668393727;
+    private static final long serialVersionUID = 1788423674;
 
     /**
      * The reference instance of <code></code>
@@ -91,6 +92,11 @@ public class DefaultSchema extends SchemaImpl {
     public final Student STUDENT = era.uploader.data.database.jooq.tables.Student.STUDENT;
 
     /**
+     * The table <code>teacher</code>.
+     */
+    public final Teacher TEACHER = era.uploader.data.database.jooq.tables.Teacher.TEACHER;
+
+    /**
      * No further instances allowed
      */
     private DefaultSchema() {
@@ -123,6 +129,7 @@ public class DefaultSchema extends SchemaImpl {
             SchemaVersion.SCHEMA_VERSION,
             Semester.SEMESTER,
             SqliteSequence.SQLITE_SEQUENCE,
-            Student.STUDENT);
+            Student.STUDENT,
+            Teacher.TEACHER);
     }
 }

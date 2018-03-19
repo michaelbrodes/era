@@ -11,6 +11,7 @@ import era.uploader.data.database.jooq.tables.QrCodeMapping;
 import era.uploader.data.database.jooq.tables.SchemaVersion;
 import era.uploader.data.database.jooq.tables.Semester;
 import era.uploader.data.database.jooq.tables.Student;
+import era.uploader.data.database.jooq.tables.Teacher;
 
 import javax.annotation.Generated;
 
@@ -46,6 +47,7 @@ public class Indexes {
     public static final Index SQLITE_AUTOINDEX_SEMESTER_1 = Indexes0.SQLITE_AUTOINDEX_SEMESTER_1;
     public static final Index SQLITE_AUTOINDEX_STUDENT_1 = Indexes0.SQLITE_AUTOINDEX_STUDENT_1;
     public static final Index SQLITE_AUTOINDEX_STUDENT_2 = Indexes0.SQLITE_AUTOINDEX_STUDENT_2;
+    public static final Index SQLITE_AUTOINDEX_TEACHER_1 = Indexes0.SQLITE_AUTOINDEX_TEACHER_1;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
@@ -54,7 +56,7 @@ public class Indexes {
     private static class Indexes0 extends AbstractKeys {
         public static Index SQLITE_AUTOINDEX_ASSIGNMENT_1 = createIndex("sqlite_autoindex_assignment_1", Assignment.ASSIGNMENT, new OrderField[] { Assignment.ASSIGNMENT.UUID }, true);
         public static Index SQLITE_AUTOINDEX_COURSE_1 = createIndex("sqlite_autoindex_course_1", Course.COURSE, new OrderField[] { Course.COURSE.UUID }, true);
-        public static Index SQLITE_AUTOINDEX_COURSE_2 = createIndex("sqlite_autoindex_course_2", Course.COURSE, new OrderField[] { Course.COURSE.NAME, Course.COURSE.SEMESTER_ID }, true);
+        public static Index SQLITE_AUTOINDEX_COURSE_2 = createIndex("sqlite_autoindex_course_2", Course.COURSE, new OrderField[] { Course.COURSE.DEPARTMENT, Course.COURSE.COURSE_NUMBER, Course.COURSE.SECTION_NUMBER, Course.COURSE.SEMESTER_ID }, true);
         public static Index SQLITE_AUTOINDEX_COURSE_STUDENT_1 = createIndex("sqlite_autoindex_course_student_1", CourseStudent.COURSE_STUDENT, new OrderField[] { CourseStudent.COURSE_STUDENT.COURSE_ID, CourseStudent.COURSE_STUDENT.STUDENT_ID }, true);
         public static Index SQLITE_AUTOINDEX_QR_CODE_MAPPING_1 = createIndex("sqlite_autoindex_qr_code_mapping_1", QrCodeMapping.QR_CODE_MAPPING, new OrderField[] { QrCodeMapping.QR_CODE_MAPPING.UUID }, true);
         public static Index SCHEMA_VERSION_S_IDX = createIndex("schema_version_s_idx", SchemaVersion.SCHEMA_VERSION, new OrderField[] { SchemaVersion.SCHEMA_VERSION.SUCCESS }, false);
@@ -62,5 +64,6 @@ public class Indexes {
         public static Index SQLITE_AUTOINDEX_SEMESTER_1 = createIndex("sqlite_autoindex_semester_1", Semester.SEMESTER, new OrderField[] { Semester.SEMESTER.UUID }, true);
         public static Index SQLITE_AUTOINDEX_STUDENT_1 = createIndex("sqlite_autoindex_student_1", Student.STUDENT, new OrderField[] { Student.STUDENT.SCHOOL_ID }, true);
         public static Index SQLITE_AUTOINDEX_STUDENT_2 = createIndex("sqlite_autoindex_student_2", Student.STUDENT, new OrderField[] { Student.STUDENT.UUID }, true);
+        public static Index SQLITE_AUTOINDEX_TEACHER_1 = createIndex("sqlite_autoindex_teacher_1", Teacher.TEACHER, new OrderField[] { Teacher.TEACHER.NAME }, true);
     }
 }
