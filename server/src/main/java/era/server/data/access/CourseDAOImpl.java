@@ -32,7 +32,7 @@ import static era.server.data.database.Tables.STUDENT;
 
 /**
  * Provides CRUD functionality for {@link Course} objects stored in the
- * access. A course has many {@link Student}s and many Grader.
+ * access. A course has many {@link Student}s and many UploaderClient.
  */
 @ParametersAreNonnullByDefault
 public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {

@@ -79,7 +79,6 @@ public class QRCreator implements Callable<List<QRCode>> {
             System.err.println("Issue writing QR Code");
             throw e;
         }
-
         return qrCode;
     }
 
@@ -101,7 +100,6 @@ public class QRCreator implements Callable<List<QRCode>> {
                 qrWidth,
                 qrHeight
         );
-
         return MatrixToImageWriter.toBufferedImage(qrBitMatrix);
     }
 }

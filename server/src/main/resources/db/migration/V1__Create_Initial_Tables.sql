@@ -10,7 +10,7 @@
 CREATE TABLE student (
   unique_id  BIGINT        NOT NULL,
   -- not actually used in the application but here for future proofing
-  uuid       VARCHAR(36) NOT NULL DEFAULT UUID(),
+  uuid       VARCHAR(36) NOT NULL,
   username   VARCHAR (255) NOT NULL,
   /*
   For the most part this field is generated from the username when importing
@@ -29,7 +29,7 @@ CREATE TRIGGER `default_student_email` BEFORE INSERT ON student
 
 CREATE TABLE semester (
   unique_id BIGINT      NOT NULL,
-  uuid      VARCHAR(36) NOT NULL DEFAULT UUID(),
+  uuid      VARCHAR(36) NOT NULL,
   -- either FALL or SPRING based off of era.uploader.data.model.Semester.
   term      VARCHAR(6)  NOT NULL,
   year      INT(4)      NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE semester (
 
 CREATE TABLE course (
   unique_id      BIGINT        NOT NULL,
-  uuid           VARCHAR (36)  NOT NULL DEFAULT UUID(),
+  uuid           VARCHAR (36)  NOT NULL,
   -- TODO: send the department + course_number + section_number as name if not available
   name           VARCHAR (255) NULL,
   -- a course has to belong to one semester.
@@ -67,7 +67,7 @@ CREATE TABLE course_student (
 
 CREATE TABLE assignment (
   unique_id         BIGINT        NOT NULL,
-  uuid              VARCHAR(36)   NOT NULL DEFAULT UUID(),
+  uuid              VARCHAR(36)   NOT NULL,
   -- displayed directly in the UI so it cannot be null
   name              VARCHAR (255) NOT NULL,
   -- where this assignment PDF is stored in the filesystem

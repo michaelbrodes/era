@@ -5,6 +5,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import era.uploader.common.MultimapCollector;
+import era.uploader.communication.FailedAssignment;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.Assignment;
@@ -148,7 +149,10 @@ public class PDFProcessor {
             if (host != null) {
 
                 try {
-                    AssignmentUploader.uploadAssignments(assignments, host);
+                    List<FailedAssignment> failedAssignments = AssignmentUploader.uploadAssignments(assignments, host);
+                    for (FailedAssignment failure: failedAssignments) {
+                        scanningProgress.addError(failure.toString());
+                    }
                 } catch (IOException e) {
                     scanningProgress.addError("Unable to upload assignments to server.");
                     e.printStackTrace();
@@ -173,6 +177,7 @@ public class PDFProcessor {
         QRCodeMapping QRCodeMappingFromDB;
         QRCodeMappingFromDB = QRCodeMappingDAO.read(QRCodeMapping.getUuid());
         if(QRCodeMappingFromDB == null){
+            scanningProgress.addError("Student Does Not Exist");
             return ArrayListMultimap.create();
         } else{
             QRCodeMappingFromDB = mergeMappings(QRCodeMappingFromDB, QRCodeMapping);
@@ -220,6 +225,8 @@ public class PDFProcessor {
                                 .withCreatedDateTime(LocalDateTime.now())
                                 .createUnique(assignmentName)
                 );
+            } else {
+                scanningProgress.addError("Student is null. SHOULDN'T HAPPEN");
             }
         }
         mergeAssignmentPages(assignments);

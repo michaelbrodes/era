@@ -3,6 +3,7 @@ package era.server.data;
 import era.server.data.model.Assignment;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,5 +22,5 @@ public interface AssignmentDAO {
 
     Optional<Assignment> fetch(String uuid);
 
-    Set<Assignment> fetchAllByStudent(String username);
+    Collection<Assignment> fetchAllByStudent(String username);
 }
