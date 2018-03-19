@@ -2,6 +2,7 @@ package era.uploader.service.processing;
 
 
 import era.uploader.communication.AssignmentUploader;
+import era.uploader.communication.FailedAssignment;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
