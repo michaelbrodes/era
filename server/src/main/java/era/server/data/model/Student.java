@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import era.server.api.UUIDGenerator;
 import era.server.data.Model;
 
 import javax.annotation.Nonnull;
@@ -52,6 +53,7 @@ public class Student implements Model {
         this.email = email;
         this.courses = new HashSet<>();
         this.assignments = new HashSet<>();
+        this.uuid = UUIDGenerator.uuid();
     }
 
     /**

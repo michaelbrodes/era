@@ -11,6 +11,8 @@ import org.pac4j.core.config.Config;
 import org.pac4j.sparkjava.CallbackRoute;
 import org.pac4j.sparkjava.LogoutRoute;
 import org.pac4j.sparkjava.SecurityFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Spark;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -35,6 +37,7 @@ public class ServerWebModule implements ServerModule {
     private final AssignmentViewController assignmentViewController;
     private final CASAuth casAuth;
     private final Boolean casEnabled;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerWebModule.class);
 
     /**
      * Creates the controllers contained in this module
@@ -59,8 +62,10 @@ public class ServerWebModule implements ServerModule {
         Spark.get("/hello", healthController::checkHealth);
         Spark.get("/", indexController::checkIndex);
         Spark.get("/student/logout", (request, response)->{
-            request.session().attributes().clear();
-            response.redirect("/");
+            LOGGER.info("We are in the logout place");
+            request.session(false);
+            request.session().removeAttribute("user");
+            response.redirect("https://my-assignments.isg.siue.edu/");
             return null;
         });
         Spark.get("/student/:userName", assignmentViewController::assignmentList);

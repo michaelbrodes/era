@@ -96,10 +96,19 @@ public class CASAuth {
         return null;
     }
 
-    public static void assertAuthenticated(Request request, Response response) {
-        if  (Strings.isNullOrEmpty(request.session().attribute("user"))) {
+    public static Boolean assertAuthenticated(Request request, Response response) {
+        String student = request.params(":userName");
+        String user = request.session().attribute("user");
+        if  (Strings.isNullOrEmpty(user) || Strings.isNullOrEmpty(student)){
             response.redirect("/student/login", 302);
+            return false;
         }
+        else if (!user.equals(student)) {
+            response.redirect("/student/login", 302);
+            return false;
+        }
+        else
+            return true;
     }
 
     private void assertStudentInDatabase(String username) {
