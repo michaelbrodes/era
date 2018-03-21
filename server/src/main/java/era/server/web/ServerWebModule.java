@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import spark.Spark;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.net.URLEncoder;
 
 /**
  * The Server Web <em>module</em> is a module of the "Server" application
@@ -62,10 +63,8 @@ public class ServerWebModule implements ServerModule {
         Spark.get("/hello", healthController::checkHealth);
         Spark.get("/", indexController::checkIndex);
         Spark.get("/student/logout", (request, response)->{
-            LOGGER.info("We are in the logout place");
-            request.session(false);
-            request.session().removeAttribute("user");
-            response.redirect("https://my-assignments.isg.siue.edu/");
+            LOGGER.info("Logging out . . .");
+            CASAuth.logout(request, response);
             return null;
         });
         Spark.get("/student/:userName", assignmentViewController::assignmentList);

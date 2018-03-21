@@ -50,16 +50,17 @@ public class CASAuth {
         this.studentDAO = studentDAO;
     }
 
+    //Login a student using the CAS server
     public String login(Request request, Response response) throws Exception {
         request.session(true);//create the session
 
         String encodedURL = URLEncoder.encode("https://my-assignments.isg.siue.edu/student/login", "UTF-8");
 
-        LOGGER.info("user was: {}", (String)request.session().attribute("user"));
+        LOGGER.info("User was: {}", (String)request.session().attribute("user"));
 
         if (request.queryParams("ticket") != null) { //the user is not authenticated
             CloseableHttpClient httpClient = HttpClients.createDefault();
-            LOGGER.info("ticket was: {}", request.queryParams("ticket"));
+            LOGGER.info("Ticket: {}", request.queryParams("ticket"));
 
             HttpGet httpGet = new HttpGet("https://cas.isg.siue.edu/itscas/serviceValidate?ticket=" +
                     request.queryParams("ticket") +
@@ -67,7 +68,7 @@ public class CASAuth {
             try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) { //This shouldn't happen either
 
                 if (httpResponse.getStatusLine().getStatusCode() == 200) {
-                    LOGGER.info("we got a 200");
+                    LOGGER.info("We got a 200");
                     InputStream httpStream = httpResponse.getEntity().getContent();
 
                     String username = getUsernameFromXML(httpStream);
@@ -81,12 +82,12 @@ public class CASAuth {
                     }
                 }
                 else {
-                    LOGGER.info("status code: {}", httpResponse.getStatusLine().getStatusCode());
+                    LOGGER.info("Status code: {}", httpResponse.getStatusLine().getStatusCode());
                 }
             }
         }
         else if (Strings.isNullOrEmpty(request.session().attribute("user"))) { //if they came back from CAS
-            LOGGER.info("url was: {}", encodedURL);
+            LOGGER.info("Url was: {}", encodedURL);
             response.redirect("https://cas.isg.siue.edu/itscas/login?service=" + encodedURL, 302);
         }
         else { //if the user is already authenticated, and in our session
@@ -96,6 +97,7 @@ public class CASAuth {
         return null;
     }
 
+    //Make sure that the current user in our application is authenticated
     public static Boolean assertAuthenticated(Request request, Response response) {
         String student = request.params(":userName");
         String user = request.session().attribute("user");
@@ -111,21 +113,22 @@ public class CASAuth {
             return true;
     }
 
+    //Send a request to CAS to log all users out of our application
+    static void logout(Request request, Response response) throws Exception{
+        request.session(false);
+        request.session().removeAttribute("user");
+        String encodedURL = URLEncoder.encode("https://my-assignments.isg.siue.edu/", "UTF-8");
+        response.redirect("https://cas.isg.siue.edu/itscas/logout?service=" + encodedURL);
+    }
+
+    //Either return a student based on their username, or create one, if it doesn't exist
     private void assertStudentInDatabase(String username) {
         studentDAO.getOrCreateStudent(username);
     }
 
+    //Retrieve a username from XML
     private String getUsernameFromXML(InputStream is) throws IOException, SAXException, ParserConfigurationException {
         try {
-
-//            ByteSource byteSource = new ByteSource() {
-//                @Override
-//                public InputStream openStream() throws IOException {
-//                    return is;
-//                }
-//            };
-//            String text = byteSource.asCharSource(Charsets.UTF_8).read();
-//            LOGGER.info("here's soap: {}", text);
             //Create a document we can parse, and parsing it
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -150,33 +153,3 @@ public class CASAuth {
         return null;
     }
 }
-
-/*
-    public static Config initializeConfig() {
-        final CasConfiguration casConfig = new CasConfiguration("https://cas.isg.siue.edu/itscas/login");
-
-        casConfig.setProtocol(CasProtocol.CAS20);
-        //matcher to secure
-        final Client client = new CasClient(casConfig);
-        final Clients clients = new Clients("https://my-assignments.isg.siue.edu/casCallback", client);
-        final Config config = new Config(clients);
-        config.setHttpActionAdapter(new DefaultHttpActionAdapter());
-        return config;
-
-    }
-
-
-}
-/*
-* if theres a GET param called "ticket"
-*       then GET(casurl+"/serviceValidate"
-*                   ticket=>thisTicket (the one we got back)
-*                   serviceID=>the URL we sent them to
-*               -><cas:error>
-*             if  <cas:user>
-*                   set up their session, and send them to app
-*             else
-*                   send back to CAS
-*  else send back to CAS
-*               serviceID=>URL to send them back to in your app
-*/
