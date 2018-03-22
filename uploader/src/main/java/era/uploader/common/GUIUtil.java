@@ -1,9 +1,15 @@
 package era.uploader.common;
 
+import com.google.common.collect.Maps;
+import era.uploader.data.model.Course;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class GUIUtil {
     private static final Color GREEN = Color.web("#228b22");
@@ -33,5 +39,37 @@ public class GUIUtil {
                 offlineWarning.setTextFill(RED);
             }
         }
+    }
+
+    /**
+     * Dr. Jones would like to have each professor's version of a course
+     * displayed as a separate item in the courses dropdown. For example, if he
+     * is teaching a CHEM-121a course this semester and Dr. Holovics is also
+     * teaching that same course, we would have two drop down items, one
+     * stating "Dr. Jones's CHEM-121a" and one stating
+     * "Dr. Holovics's CHEM-121a"
+     *
+     * @param courses every section of every course in the database
+     * @return a mapping of a teacher and a course to the course's many
+     * sections
+     */
+    public static Map<String, List<Course>> groupSectionsByTeacher(Collection<Course> courses) {
+        Map<String, List<Course>> groupings = Maps.newHashMap();
+        for (Course course : courses) {
+            String teacherAndCourse = course.getTeacher().getName()
+                    + "'s "
+                    + course.getDepartment()
+                    + "-"
+                    + course.getCourseNumber()
+                    + " "
+                    + course.getSemester().getTerm().humanReadable()
+                    + " "
+                    + course.getSemester().getYear();
+
+            groupings.computeIfAbsent(teacherAndCourse, (k) -> new ArrayList<>())
+                    .add(course);
+        }
+
+        return groupings;
     }
 }

@@ -2,6 +2,7 @@ package era.uploader.data.model;
 
 import com.google.common.collect.Sets;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class Teacher {
@@ -39,5 +40,19 @@ public class Teacher {
 
     public void addCourses(Course course) {
         coursesTaught.add(course);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Teacher teacher = (Teacher) o;
+        return Objects.equals(getName(), teacher.getName());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getName());
     }
 }

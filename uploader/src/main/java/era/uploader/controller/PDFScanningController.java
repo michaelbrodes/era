@@ -1,12 +1,10 @@
 package era.uploader.controller;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import era.uploader.common.GUIUtil;
 import era.uploader.common.UploaderProperties;
 import era.uploader.data.model.Course;
-import era.uploader.service.processing.ScanningProgress;
 import era.uploader.service.PDFScanningService;
+import era.uploader.service.processing.ScanningProgress;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -20,7 +18,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -76,18 +73,8 @@ public class PDFScanningController {
 
         List<Course> courses = pdfServ.getAllCourses();
 
-        final Map<String, Course> nameToCourse = Maps.uniqueIndex(courses, course -> {
-
-            Preconditions.checkNotNull(course);
-
-            return course.getName() + " " + course.getSemester();
-
-        });
-
-
-
-        ObservableList<String> courseKeys = FXCollections.observableArrayList(nameToCourse.keySet());
-
+        final Map<String, List<Course>> nameToCourses = GUIUtil.groupSectionsByTeacher(courses);
+        ObservableList<String> courseKeys = FXCollections.observableArrayList(nameToCourses.keySet());
         courseNames.setItems(courseKeys);
 
 
@@ -109,7 +96,7 @@ public class PDFScanningController {
 
             String currentAssignment = assignmentName.getText();
             String currCourseName = courseNames.getValue();
-            Course currentCourse = nameToCourse.get(currCourseName);
+            List<Course> currentCourses = nameToCourses.get(currCourseName);
 
 
 
@@ -125,14 +112,14 @@ public class PDFScanningController {
             else if (fullFileName != null)
                 try {
                 boolean uploading = false;
-                if(currentCourse != null && currentAssignment != null) {
+                if(currentCourses != null && currentAssignment != null) {
                     if (UploaderProperties.instance().isUploadingEnabled() != null) {
                         uploading = UploaderProperties.instance().isUploadingEnabled();
                     }
                     if(uploading) {
 
                         String serverURL = UploaderProperties.instance().getServerURL().orElse(null);
-                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, serverURL);
+                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourses, currentAssignment, serverURL);
                         URL url = getClass().getResource("/gui/pdf-progress.fxml");
 
                         FXMLLoader fxmlloader = new FXMLLoader();
@@ -145,7 +132,7 @@ public class PDFScanningController {
                         mainScene.setRoot(root);
                     }
                     else {
-                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourse, currentAssignment, NULL_HOST);
+                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourses, currentAssignment, NULL_HOST);
                         URL url = getClass().getResource("/gui/pdf-progress.fxml");
 
                         FXMLLoader fxmlloader = new FXMLLoader();

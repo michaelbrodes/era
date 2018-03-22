@@ -101,15 +101,12 @@ public class Student {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Student student = (Student) o;
-        return getUniqueId() == student.getUniqueId() &&
-                Objects.equal(getUuid(), student.getUuid()) &&
-                Objects.equal(getSchoolId(), student.getSchoolId()) &&
-                Objects.equal(getUserName(), student.getUserName());
+        return Objects.equal(getUserName(), student.getUserName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getUuid(), getSchoolId(), getUserName(), getUniqueId());
+        return Objects.hashCode(getUserName());
     }
 
     @Override

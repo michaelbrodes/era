@@ -148,12 +148,13 @@ public class Course {
         return Objects.equal(getDepartment(), course.getDepartment()) &&
                 Objects.equal(getCourseNumber(), course.getCourseNumber()) &&
                 Objects.equal(getSectionNumber(), course.getSectionNumber()) &&
-                Objects.equal(getSemester(), course.getSemester());
+                Objects.equal(getSemester(), course.getSemester()) &&
+                Objects.equal(getTeacher(), course.getTeacher());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getDepartment(), getCourseNumber(), getSectionNumber(), getSemester());
+        return Objects.hashCode(getDepartment(), getCourseNumber(), getSectionNumber(), getSemester(), getTeacher());
     }
 
     @Override

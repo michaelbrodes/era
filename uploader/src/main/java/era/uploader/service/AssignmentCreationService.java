@@ -23,7 +23,6 @@ import era.uploader.service.assignment.ShippingLabelSaver;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.imageio.ImageIO;
-import java.awt.Desktop;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +63,7 @@ public class AssignmentCreationService {
     public Map<Student, List<AssignmentPrintoutMetaData>> groupAssignmentByStudent (List<AssignmentPrintoutMetaData> assignmentsList){
         Map< Student, List<AssignmentPrintoutMetaData>> assignmentsToPrint = new HashMap<>();
         for ( AssignmentPrintoutMetaData assignment : assignmentsList ) {
-            for ( Student student: assignment.getCourse().getStudentsEnrolled() ) {
+            for ( Student student: assignment.getCourseSection().getStudentsEnrolled() ) {
                 if ( !assignmentsToPrint.containsKey(student) ){
                     assignmentsToPrint.put(student, new LinkedList<>());
                 }
@@ -187,7 +186,7 @@ public class AssignmentCreationService {
             for (AssignmentPrintoutMetaData assignment: entry.getValue() ) {
                 Assignment currentAssignment =  createAssignmentForStudent(entry.getKey(), assignment);
                 for (int i = 1; i <= assignment.getNumPages(); i++){
-                    qrCodes.add(new QRCode(assignment.getCourse(), entry.getKey(), currentAssignment, i));
+                    qrCodes.add(new QRCode(assignment.getCourseSection(), entry.getKey(), currentAssignment, i));
                 }
             }
             studentToQRCodes.put(entry.getKey(), qrCodes );
@@ -197,7 +196,7 @@ public class AssignmentCreationService {
 
     private Assignment createAssignmentForStudent(Student student, AssignmentPrintoutMetaData assignmentPrintoutMetaData) {
         Preconditions.checkNotNull(student);
-        Course course = assignmentPrintoutMetaData.getCourse();
+        Course course = assignmentPrintoutMetaData.getCourseSection();
         Assignment.Builder assignmentBuilder = Assignment.builder()
                 .withCourse(course)
                 .withStudent(student);

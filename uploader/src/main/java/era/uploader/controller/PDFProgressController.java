@@ -11,11 +11,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 
 import java.io.IOException;
 
@@ -32,6 +32,7 @@ public class PDFProgressController {
 
     private ScanningProgress scanningProgress;
     private Task<Void> pipelineTask;
+    private boolean shownDone;
 
     @FXML
     void intialize(){
@@ -45,16 +46,29 @@ public class PDFProgressController {
         pipelineTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
+                //noinspection InfiniteLoopStatement
                 while(true){
                     updateProgress(scanningProgress.getSuccessfulProcesses(),scanningProgress.getPdfFileSize());
-                    Platform.runLater((new Runnable() {
-                        @Override
-                        public void run() {
-                            double successfulProcesses = scanningProgress.getSuccessfulProcesses();
-                            double totalProcesses = scanningProgress.getPdfFileSize();
-                            percentage.setValue(Integer.toString((int)(successfulProcesses/totalProcesses * 100)) + "%");
-                            final ObservableList<ErrorMetaData> errorMetaData = FXCollections.observableArrayList(scanningProgress.getErrorList());
-                            errorList.setItems(errorMetaData);
+                    Platform.runLater((() -> {
+                        double successfulProcesses = scanningProgress.getSuccessfulProcesses();
+                        double totalProcesses = scanningProgress.getPdfFileSize();
+                        percentage.setValue(Integer.toString((int)(successfulProcesses/totalProcesses * 100)) + "%");
+                        final ObservableList<ErrorMetaData> errorMetaData = FXCollections.observableArrayList(scanningProgress.getErrorList());
+                        errorList.setItems(errorMetaData);
+
+                        boolean done = scanningProgress.isDone();
+                        boolean uploadingEnabled = UploaderProperties.instance().isUploadingEnabled();
+                        if (done && !shownDone) {
+                            Alert doneAlert = new Alert(Alert.AlertType.INFORMATION);
+                            doneAlert.setHeaderText("Processed All PDF Pages");
+                            String content = "All pdf pages have been processed";
+                            if (uploadingEnabled) {
+                                content += " and uploaded to the server";
+                            }
+                            content += ".";
+                            doneAlert.setContentText(content);
+                            doneAlert.show();
+                            shownDone = true;
                         }
                     }));
                     Thread.sleep(200);

@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import javax.annotation.ParametersAreNullableByDefault;
+import java.util.Objects;
 
 /**
  * A javafx model representing all the information that a user would like to
@@ -16,14 +17,14 @@ import javax.annotation.ParametersAreNullableByDefault;
 public class AssignmentPrintoutMetaData {
     private final SimpleStringProperty assignmentName = new SimpleStringProperty("");
     private final SimpleIntegerProperty numPages = new SimpleIntegerProperty();
-    private Course course;
+    private Course courseSection;
     private final SimpleStringProperty courseName = new SimpleStringProperty("");
 
-    public AssignmentPrintoutMetaData( String assignmentName, int numPages, Course course ){
+    public AssignmentPrintoutMetaData( String assignmentName, int numPages, String courseName, Course courseSection){
         setAssignmentName(assignmentName);
         setNumPages(numPages);
-        setCourse(course);
-        setCourseName(course.getName());
+        setCourseSection(courseSection);
+        setCourseName(courseName);
     }
 
     public String getAssignmentName() {
@@ -50,12 +51,12 @@ public class AssignmentPrintoutMetaData {
         this.numPages.set(numPages);
     }
 
-    public Course getCourse() {
-        return course;
+    public Course getCourseSection() {
+        return courseSection;
     }
 
-    public void setCourse(Course course){
-        this.course = course;
+    public void setCourseSection(Course courseSection){
+        this.courseSection = courseSection;
     }
 
     public String getCourseName() {
@@ -70,4 +71,16 @@ public class AssignmentPrintoutMetaData {
         this.courseName.set(courseName);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AssignmentPrintoutMetaData that = (AssignmentPrintoutMetaData) o;
+        return Objects.equals(getCourseName(), that.getCourseName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCourseName());
+    }
 }

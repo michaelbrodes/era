@@ -59,16 +59,16 @@ public class AssignmentCreationController {
 
     private Map<String, List<Course>> sectionsGroupedByTeacher;
     private Map<String, AveryTemplate> descriptionToTemplate;
+    private List<AssignmentPrintoutMetaData> assignmentsToPrintOut = new ArrayList<>();
     private AssignmentCreationService service;
 
     @FXML
     void initialize() {
 
-        CourseDAO courseDAO;
-        courseDAO = CourseDAOImpl.instance();
+        CourseDAO courseDAO = CourseDAOImpl.instance();
 
         List<Course> courses = courseDAO.getAllCourses();
-        sectionsGroupedByTeacher = groupSectionsByTeacher(courses);
+        sectionsGroupedByTeacher = GUIUtil.groupSectionsByTeacher(courses);
         ObservableList<String> courseKeys = FXCollections
                 .observableArrayList(sectionsGroupedByTeacher.keySet());
         courseNamesComboBox.setItems(courseKeys);
@@ -99,7 +99,7 @@ public class AssignmentCreationController {
                 return;
             }
             AveryTemplate template = descriptionToTemplate.get(averyTemplateComboBox.getValue());
-            service.printAndSaveQRCodes(assignmentList.getItems(), template);
+            service.printAndSaveQRCodes(assignmentsToPrintOut, template);
 
             Path relativeAssignmentDir = Paths.get(AssignmentCreationService.ASSIGNMENTS_DIR);
             Path absoluteAssignmentDir = relativeAssignmentDir.toAbsolutePath();
@@ -176,38 +176,12 @@ public class AssignmentCreationController {
         List<Course> currentCourses = sectionsGroupedByTeacher.get(currentCourseName);
 
         for (Course course : currentCourses) {
-            AssignmentPrintoutMetaData apmd = new AssignmentPrintoutMetaData(assignmentName.getText(), numPagesComboBox.getValue(), course);
-            assignmentList.getItems().add(apmd);
+            AssignmentPrintoutMetaData apmd = new AssignmentPrintoutMetaData(assignmentName.getText(), numPagesComboBox.getValue(), currentCourseName, course);
+            if (!assignmentList.getItems().contains(apmd)) {
+                assignmentList.getItems().add(apmd);
+            }
+            assignmentsToPrintOut.add(apmd);
         }
-    }
-
-
-    /**
-     * Dr. Jones would like to have each professor's version of a course
-     * displayed as a separate item in the courses dropdown. For example, if he
-     * is teaching a CHEM-121a course this semester and Dr. Holovics is also
-     * teaching that same course, we would have two drop down items, one
-     * stating "Dr. Jones's CHEM-121a" and one stating
-     * "Dr. Holovics's CHEM-121a"
-     *
-     * @param courses every section of every course in the database
-     * @return a mapping of a teacher and a course to the course's many
-     * sections
-     */
-    private Map<String, List<Course>> groupSectionsByTeacher(List<Course> courses) {
-        Map<String, List<Course>> groupings = Maps.newHashMap();
-        for (Course course : courses) {
-            String teacherAndCourse = course.getTeacher().getName()
-                    + "'s "
-                    + course.getDepartment()
-                    + "-"
-                    + course.getCourseNumber();
-
-            groupings.computeIfAbsent(teacherAndCourse, (k) -> new ArrayList<>())
-                    .add(course);
-        }
-
-        return groupings;
     }
 
     public void home() throws IOException {

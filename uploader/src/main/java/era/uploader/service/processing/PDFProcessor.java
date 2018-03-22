@@ -36,7 +36,7 @@ import java.util.Set;
 @ParametersAreNonnullByDefault
 public class PDFProcessor {
     private final Path pdfInput;
-    private final Course course;
+    private final Collection<Course> courses;
     private final String assignmentName;
     private final QRCodeMappingDAO QRCodeMappingDAO;
     private final AssignmentDAO assignmentDAO;
@@ -47,13 +47,13 @@ public class PDFProcessor {
             QRCodeMappingDAO QRCodeMappingDao,
             AssignmentDAO assignmentDAO,
             Path pdfInput,
-            Course course,
+            Collection<Course> courses,
             String assignmentName,
             @Nullable String host
     ) {
         this.pdfInput = pdfInput;
         this.assignmentDAO = assignmentDAO;
-        this.course = course;
+        this.courses = courses;
         this.assignmentName = assignmentName;
         this.QRCodeMappingDAO = QRCodeMappingDao;
         this.host = host;
@@ -75,7 +75,7 @@ public class PDFProcessor {
      *
      * @param pdf            a path to a large pdf filled with multiple student
      *                       assignments, in arbitrary order.
-     * @param course         the course this pdf was submitted to.
+     * @param courses         the courses this pdf was submitted to.
      * @param assignmentName the name of the assignment that this pdf was for
      * @return a list of PDFs that have pdfInput that were associated with
      * students.
@@ -84,12 +84,12 @@ public class PDFProcessor {
             QRCodeMappingDAO QRCodeMappingDAO,
             AssignmentDAO assignmentDAO,
             Path pdf,
-            Course course,
+            Collection<Course> courses,
             String assignmentName,
             @Nullable String host
     ) {
         Preconditions.checkNotNull(pdf);
-        Preconditions.checkNotNull(course);
+        Preconditions.checkNotNull(courses);
         Preconditions.checkNotNull(assignmentName);
         Preconditions.checkNotNull(QRCodeMappingDAO);
 
@@ -97,7 +97,7 @@ public class PDFProcessor {
                 QRCodeMappingDAO,
                 assignmentDAO,
                 pdf,
-                course,
+                courses,
                 assignmentName,
                 host
         );
@@ -160,6 +160,8 @@ public class PDFProcessor {
 
             }
 
+            scanningProgress.done();
+
         };
 
         new Thread(pipelineTask).start();
@@ -215,23 +217,42 @@ public class PDFProcessor {
                 mmap.asMap().entrySet()
                 ) {
             Student student = pages.getKey();
-            if (student != null) {
+            Course studentsCourse = findCourseContainingStudent(student);
+            if (student != null && studentsCourse != null) {
                 Collection<QRCodeMapping> pagesToAdd = pages.getValue();
                 assignments.add(
                         Assignment.builder()
                                 .withQRCodeMappings(pagesToAdd)
                                 .withStudent(student)
-                                .withCourse(course)
+                                .withCourse(studentsCourse)
                                 .withCreatedDateTime(LocalDateTime.now())
                                 .createUnique(assignmentName)
                 );
+            } else if (student == null) {
+                scanningProgress.addError("Student doesn't exist. THIS SHOULDN'T HAPPEN");
             } else {
-                scanningProgress.addError("Student is null. SHOULDN'T HAPPEN");
+                scanningProgress.addError("Student " + student.getUserName() + " doesn't belong to an inputted course");
             }
         }
         mergeAssignmentPages(assignments);
 
         return assignments;
+    }
+
+    @Nullable
+    private Course findCourseContainingStudent(@Nullable Student student) {
+        Course studentsCourse = null;
+
+        if (student != null) {
+            for (Course  course : courses) {
+                if (course.getStudentsEnrolled().contains(student)) {
+                    studentsCourse = course;
+                    break;
+                }
+            }
+        }
+
+        return studentsCourse;
     }
 
     /**
