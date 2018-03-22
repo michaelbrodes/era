@@ -12,7 +12,8 @@ public enum ConfigOpts {
     DB_PORT,
     HOST,
     USER,
-    PASSWORD;
+    PASSWORD,
+    CAS_ENABLED;
 
     // here to make it easier to add new options per new enum constants
     static final String SERVER_PORT_OPT = "--app-port";
@@ -21,6 +22,7 @@ public enum ConfigOpts {
     static final String HOST_OPT = "--db-host";
     static final String USER_OPT = "--db-user";
     static final String PASSWORD_OPT = "--db-password";
+    static final String CAS_ENABLED_OPT = "--cas-enabled";
 
     /**
      * Parse arguments that have come in through the command line into a map

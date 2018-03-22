@@ -35,7 +35,11 @@ public class AssignmentViewController {
     }
 
     public String assignmentList(Request request, Response response) {
-        AssignmentViewContext context = AssignmentViewContext.initialize(request);
+        AssignmentViewContext context = AssignmentViewContext.initialize(request, response);
+
+        if (context == null)
+            return null;
+
         Optional<String> studentUsername = context.getStudentUsername();
         List<Map<String, Object>> assignments = studentUsername
                 .map(assignmentDAO::fetchAllByStudent)
@@ -59,7 +63,11 @@ public class AssignmentViewController {
      * response is already set when we copy the PDF to {@link Response#raw()}
      */
     public Object assignment(Request request, Response response) {
-        AssignmentViewContext context = AssignmentViewContext.initialize(request);
+        AssignmentViewContext context = AssignmentViewContext.initialize(request, response);
+
+        if (context == null)
+            return null;
+
         Optional<Assignment> assignment = context
                 .getAssignmentId()
                 .flatMap(assignmentDAO::fetch);

@@ -1,6 +1,7 @@
 package era.server.web;
 
 import spark.Request;
+import spark.Response;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -18,18 +19,18 @@ public class AssignmentViewContext {
         this.assignmentId = assignmentId;
     }
 
-    public static AssignmentViewContext initialize(Request request) {
-        // TODO wrap CASAuth#assertAuthed in this method
+    public static AssignmentViewContext initialize(Request request, Response response) {
         request.session(true);
-        String student = request.session().attribute("user");
-        // TODO remove this once authentication is in
-        if (student == null) {
-            student = request.params(":userName");
+        if (CASAuth.assertAuthenticated(request, response)) {
+            String student = request.session().attribute("user");
+            String assignmentId = request.params(":assignmentId");
+
+            return new AssignmentViewContext(student, assignmentId);
+        }
+        else {
+            return null;
         }
 
-        String assignmentId = request.params(":assignmentId");
-
-        return new AssignmentViewContext(student, assignmentId);
     }
 
     public Optional<String> getStudentUsername() {

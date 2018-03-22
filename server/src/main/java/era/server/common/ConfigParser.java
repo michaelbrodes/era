@@ -37,6 +37,8 @@ class ConfigParser {
                 case ConfigOpts.PASSWORD_OPT:
                     putArg(ConfigOpts.PASSWORD, i);
                     break;
+                case ConfigOpts.CAS_ENABLED_OPT:
+                    putArg(ConfigOpts.CAS_ENABLED, i);
                 default:
                     // NO-OP as there is no option to parse.
                     break;
@@ -53,6 +55,9 @@ class ConfigParser {
         if (allArgsIteration + 1 < allArgs.length) {
             configMap.put(option, allArgs[allArgsIteration + 1]);
         } else if (option == ConfigOpts.PASSWORD) {
+            configMap.put(option, "");
+        }
+        else if (option == ConfigOpts.PASSWORD) {
             configMap.put(option, "");
         }
     }

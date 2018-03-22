@@ -25,5 +25,8 @@ public interface StudentDAO {
      */
     Student read(String id);
 
+    Student getOrCreateStudent(String username);
+
+
     Optional<Student> readByUsername(String username);
 }

@@ -5,12 +5,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import era.server.api.UUIDGenerator;
 import era.server.data.Model;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNullableByDefault;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +32,7 @@ public class Student implements Model {
     // every course that the student belongs to
     private final Set<Course> courses;
     private final Set<Assignment> assignments;
-    private final String uuid;
+    private String uuid;
 
     /* Constructors */
     private Student(@Nonnull String userName, Builder builder) {
@@ -46,12 +48,24 @@ public class Student implements Model {
         return new Builder();
     }
 
+    public Student(String userName, String email) {
+        this.userName = userName;
+        this.email = email;
+        this.courses = new HashSet<>();
+        this.assignments = new HashSet<>();
+        this.uuid = UUIDGenerator.uuid();
+    }
+
     /**
      * This getter will return null if we haven't stored this student into the database.
      */
     @Nullable
     public String getUuid() {
         return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     @Override

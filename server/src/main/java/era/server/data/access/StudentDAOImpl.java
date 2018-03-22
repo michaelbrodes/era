@@ -5,12 +5,16 @@ import era.server.api.UUIDGenerator;
 import era.server.data.StudentDAO;
 import era.server.data.database.tables.records.StudentRecord;
 import era.server.data.model.Assignment;
+import era.server.data.database.tables.records.StudentRecord;
+import era.server.data.model.Course;
 import era.server.data.model.Student;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashSet;
+import java.util.Set;
 
 import java.util.List;
 import java.util.Optional;
@@ -122,6 +126,22 @@ public class StudentDAOImpl extends DatabaseDAO implements StudentDAO {
     @Nullable
     public Student read(String id) {
         return findStudent(STUDENT.UUID.eq(id), true).orElse(null);
+    }
+    @Override
+    public Student getOrCreateStudent(String username) {
+        Student newStudent = new Student(username, username + "@siue.edu");
+        try (DSLContext create = connect()) {
+            StudentRecord studentRecord = create.selectFrom(STUDENT)
+                    .where(STUDENT.USERNAME.eq(username))
+                    .fetchOne();
+            if (studentRecord == null) {
+                insert(newStudent);
+            }
+            else {
+                newStudent.setUuid(studentRecord.getUuid());
+            }
+        }
+        return newStudent;
     }
 
     @Override
