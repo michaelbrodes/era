@@ -122,7 +122,7 @@ public final class AveryConstants {
          * When we are starting a new text section of the Address label this
          * specifies margin from the top of label
          */
-        static final float TEXT_MARGIN_TOP       = 15.0f;
+        static final float TEXT_MARGIN_TOP       = 20.0f;
         /**
          * The margin between the top of the page and the header
          */

@@ -12,12 +12,14 @@ import era.uploader.service.AssignmentCreationService;
 import era.uploader.service.assignment.AveryTemplate;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
@@ -57,6 +59,9 @@ public class AssignmentCreationController {
     @FXML
     private Button createQRCodePageButton;
 
+    @FXML
+    private ProgressIndicator loadingSpinner;
+
     private Map<String, List<Course>> sectionsGroupedByTeacher;
     private Map<String, AveryTemplate> descriptionToTemplate;
     private List<AssignmentPrintoutMetaData> assignmentsToPrintOut = new ArrayList<>();
@@ -64,7 +69,7 @@ public class AssignmentCreationController {
 
     @FXML
     void initialize() {
-
+        loadingSpinner.setVisible(false);
         CourseDAO courseDAO = CourseDAOImpl.instance();
 
         List<Course> courses = courseDAO.getAllCourses();
@@ -99,16 +104,40 @@ public class AssignmentCreationController {
                 return;
             }
             AveryTemplate template = descriptionToTemplate.get(averyTemplateComboBox.getValue());
-            service.printAndSaveQRCodes(assignmentsToPrintOut, template);
 
-            Path relativeAssignmentDir = Paths.get(AssignmentCreationService.ASSIGNMENTS_DIR);
-            Path absoluteAssignmentDir = relativeAssignmentDir.toAbsolutePath();
+            loadingSpinner.setVisible(true);
 
-            Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
-            infoAlert.setHeaderText("QRCodes Saved Successfully");
-            infoAlert.setContentText("QRCode PDFs saved to " + absoluteAssignmentDir.toString());
-            infoAlert.showAndWait();
+            Task<Void> creationTask = AssignmentCreationTask.builder()
+                    .apmds(assignmentsToPrintOut)
+                    .assignmentCreationService(service)
+                    .printoutTemplate(template)
+                    .successHandler((e) -> {
+                        Path relativeAssignmentDir = Paths.get(AssignmentCreationService.ASSIGNMENTS_DIR);
+                        Path absoluteAssignmentDir = relativeAssignmentDir.toAbsolutePath();
+
+                        setFormEnabled(true);
+                        loadingSpinner.setVisible(false);
+
+                        Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
+                        infoAlert.setHeaderText("QR Codes Saved Successfully");
+                        infoAlert.setContentText("QR code PDFs saved to " + absoluteAssignmentDir.toString());
+                        infoAlert.show();
+                    })
+                    .errorHandler((e) -> {
+                        setFormEnabled(true);
+                        loadingSpinner.setVisible(false);
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                        errorAlert.setHeaderText("Couldn't Save QR Codes");
+                        errorAlert.setContentText("There was an unexpected error when saving the QR codes. Please contact a developer");
+                        errorAlert.show();
+                    })
+                    .create();
+            Thread creationThread = new Thread(creationTask);
+            creationThread.setDaemon(true);
+            creationThread.start();
+            setFormEnabled(false);
         });
+        setRightHandEnabled(false);
         GUIUtil.displayConnectionStatus(modeLabel);
 //
 //            String currentCourseName = courseNamesComboBox.getValue();
@@ -182,6 +211,29 @@ public class AssignmentCreationController {
             }
             assignmentsToPrintOut.add(apmd);
         }
+
+        if (createQRCodePageButton.isDisabled()) {
+            setRightHandEnabled(true);
+        }
+    }
+
+    private void setFormEnabled(boolean enabled) {
+        setLeftHandEnabled(enabled);
+        setRightHandEnabled(enabled);
+    }
+
+    @SuppressWarnings("unused")
+    private void setLeftHandEnabled(boolean enabled) {
+        this.createAssignmentButton.setDisable(!enabled);
+        this.assignmentName.setDisable(!enabled);
+        this.courseNamesComboBox.setDisable(!enabled);
+        this.numPagesComboBox.setDisable(!enabled);
+    }
+
+    private void setRightHandEnabled(boolean enabled) {
+        this.assignmentList.setDisable(!enabled);
+        this.createQRCodePageButton.setDisable(!enabled);
+        this.averyTemplateComboBox.setDisable(!enabled);
     }
 
     public void home() throws IOException {

@@ -15,6 +15,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ProgressIndicator?>
 <AnchorPane prefHeight="603.0" prefWidth="1003.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.AssignmentCreationController">
 
     <Button layoutX="873.0" layoutY="53.0" mnemonicParsing="false" onAction="#home" prefHeight="27.0" prefWidth="107.0" text="Home" />
@@ -50,6 +51,7 @@
     <fx:define>
         <ToggleGroup fx:id="databaseLocation" />
     </fx:define>
+    <ProgressIndicator fx:id="loadingSpinner" layoutX="502.0" layoutY="302.0"/>
     <children>
         <Label layoutX="62.0" layoutY="346.0" prefHeight="37.0" prefWidth="416.0" text="Assignment Length (pages)">
             <tooltip>
@@ -77,7 +79,7 @@
                 <Menu mnemonicParsing="false" text="Navigation Menu">
                     <items>
                         <MenuItem fx:id="home" mnemonicParsing="false" onAction="#home" text="Home" />
-                        <MenuItem fx:id="createCourse" mnemonicParsing="false" onAction="#course" text="Create Course" />
+                        <MenuItem fx:id="course" mnemonicParsing="false" onAction="#course" text="Create Course" />
                         <MenuItem fx:id="scanPDF" mnemonicParsing="false" onAction="#scanPDF" text="Process PDF" />
                     </items>
                 </Menu>

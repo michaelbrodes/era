@@ -1,11 +1,8 @@
 package era.uploader.controller;
 
-import era.uploader.data.model.Course;
 import javafx.event.Event;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
-
-import java.util.Collection;
 
 public class TaskSuccessEvent<T> extends Event {
     private final T result;
