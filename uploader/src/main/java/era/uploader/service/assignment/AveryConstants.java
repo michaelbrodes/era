@@ -101,7 +101,7 @@ public final class AveryConstants {
         /**
          * The amount of points to jump to the next column
          */
-        static final float POINTS_TO_NEXT_COLUMN = 200.0f;
+        static final float POINTS_TO_NEXT_COLUMN = 205.0f;
         /**
          * Height of the QR code in a 1" by 2.625" address label
          */
@@ -140,11 +140,11 @@ public final class AveryConstants {
         /**
          * Points from the left hand side of the page to the first label.
          */
-        static final float POINTS_FROM_LEFT_EDGE = 20.0f;
+        static final float POINTS_FROM_LEFT_EDGE = 5.0f;
         /**
          * Points from the QR code to the meta data text.
          */
-        static final float TEXT_MARGIN_LEFT      = 5.0f;
+        static final float TEXT_MARGIN_LEFT      = 0.0f;
     }
 
     /**

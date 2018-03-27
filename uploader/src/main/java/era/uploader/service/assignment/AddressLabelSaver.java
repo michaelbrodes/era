@@ -78,6 +78,9 @@ public class AddressLabelSaver extends AbstractQRSaver {
         editor.showText("Page number: " + qrCode.getPageNumber());
         editor.newLine();
 
+        editor.showText("Student: " + qrCode.getStudentName());
+        editor.newLine();
+
         editor.endText();
 
     }
