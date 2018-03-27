@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -169,7 +170,7 @@ public class AssignmentCreationService {
             futures.add(creationFuture);
         }
 
-        waitTillSavingIsDone(finishedLatch);
+        waitTillSavingIsDone(finishedLatch, threadPool);
 
         // gather the results of each QRCreator#call into one list of QRCodeMappings and insert them into the DB
         ImmutableList<QRCode> studentQRCodes = gatherQrCodes(futures);
@@ -239,12 +240,16 @@ public class AssignmentCreationService {
      * @param finishedLatch the {@link CountDownLatch} that will be decremented
      *                      when each QRSaver is finished.
      */
-    private void waitTillSavingIsDone(CountDownLatch finishedLatch) {
+    private void waitTillSavingIsDone(CountDownLatch finishedLatch, ExecutorService threadpool) {
         try {
             finishedLatch.await();
         } catch (InterruptedException e) {
             System.err.println("QR Creation tasks got interrupted before getting finished.");
             e.printStackTrace();
+        }
+
+        if (!threadpool.isShutdown()) {
+            threadpool.shutdownNow();
         }
     }
 
