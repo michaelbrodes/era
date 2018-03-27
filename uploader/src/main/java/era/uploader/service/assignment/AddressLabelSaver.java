@@ -69,7 +69,7 @@ public class AddressLabelSaver extends AbstractQRSaver {
         );
 
         // The student's name is already in the header so, to save space, we omit it here.
-        editor.showText("Name: " + qrCode.getStudentName());
+        editor.showText("Course: " + qrCode.getCourseName());
         editor.newLine();
 
         editor.showText("Assignment: " + qrCode.getAssignmentName());
