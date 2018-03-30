@@ -2,6 +2,7 @@ package era.server.web;
 
 import com.google.common.collect.ImmutableMap;
 import era.server.common.PageRenderer;
+import era.server.common.UnauthorizedException;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.model.Assignment;
@@ -35,22 +36,24 @@ public class AssignmentViewController {
     }
 
     public String assignmentList(Request request, Response response) {
-        AssignmentViewContext context = AssignmentViewContext.initialize(request, response);
+        try {
+            UserContext context = UserContext.initialize(request, response);
+            
+            Optional<String> studentUsername = context.getStudentUsername();
+            List<Map<String, Object>> assignments = studentUsername
+                    .map(assignmentDAO::fetchAllByStudent)
+                    .orElse(Collections.emptyList())
+                    .stream()
+                    .map(Assignment::toViewModel)
+                    .collect(Collectors.toList());
+            // view models require the second template parameter to be of type Object
+            Map<String, Object> viewModel = ImmutableMap.of("assignmentList", assignments);
 
-        if (context == null)
-            return null;
-
-        Optional<String> studentUsername = context.getStudentUsername();
-        List<Map<String, Object>> assignments = studentUsername
-                .map(assignmentDAO::fetchAllByStudent)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(Assignment::toViewModel)
-                .collect(Collectors.toList());
-        // view models require the second template parameter to be of type Object
-        Map<String, Object> viewModel = ImmutableMap.of("assignmentList", assignments);
-
-        return renderer.render(viewModel, "assignment-view.hbs");
+            return renderer.render(viewModel, "assignment-view.hbs");
+            
+        } catch (UnauthorizedException e) {
+            throw Spark.halt(403);
+        }
     }
 
 
@@ -63,29 +66,31 @@ public class AssignmentViewController {
      * response is already set when we copy the PDF to {@link Response#raw()}
      */
     public Object assignment(Request request, Response response) {
-        AssignmentViewContext context = AssignmentViewContext.initialize(request, response);
+        try {
+            UserContext context = UserContext.initialize(request, response);
+            Optional<Assignment> assignment = context
+                    .getAssignmentId()
+                    .flatMap(assignmentDAO::fetch);
 
-        if (context == null)
-            return null;
-
-        Optional<Assignment> assignment = context
-                .getAssignmentId()
-                .flatMap(assignmentDAO::fetch);
-
-        if (assignment.isPresent()) {
-            try (OutputStream out = response.raw().getOutputStream()) {
-                response.raw().setContentType("application/pdf");
-                Path pdf = Paths.get(assignment.get().getImageFilePath());
-                Files.copy(pdf, out);
-            } catch (IOException e) {
-                LOGGER.error("Problem reading PDF from filesystem.", e);
+            if (assignment.isPresent()) {
+                try (OutputStream out = response.raw().getOutputStream()) {
+                    response.raw().setContentType("application/pdf");
+                    Path pdf = Paths.get(assignment.get().getImageFilePath());
+                    Files.copy(pdf, out);
+                } catch (IOException e) {
+                    LOGGER.error("Problem reading PDF from filesystem.", e);
+                    throw Spark.halt(404);
+                }
+            } else {
                 throw Spark.halt(404);
             }
-        } else {
-            throw Spark.halt(404);
+
+            return null;
+        } catch (UnauthorizedException e) {
+            throw Spark.halt(403);
         }
 
-        return null;
+
     }
 
 }

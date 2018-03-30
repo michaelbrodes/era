@@ -4,6 +4,7 @@
 package era.server.data.database;
 
 
+import era.server.data.database.tables.Admin;
 import era.server.data.database.tables.Assignment;
 import era.server.data.database.tables.Course;
 import era.server.data.database.tables.CourseStudent;
@@ -35,12 +36,17 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Dev extends SchemaImpl {
 
-    private static final long serialVersionUID = 1817395866;
+    private static final long serialVersionUID = 1199421274;
 
     /**
      * The reference instance of <code>dev</code>
      */
     public static final Dev DEV = new Dev();
+
+    /**
+     * The table <code>dev.admin</code>.
+     */
+    public final Admin ADMIN = era.server.data.database.tables.Admin.ADMIN;
 
     /**
      * The table <code>dev.assignment</code>.
@@ -97,6 +103,7 @@ public class Dev extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
+            Admin.ADMIN,
             Assignment.ASSIGNMENT,
             Course.COURSE,
             CourseStudent.COURSE_STUDENT,

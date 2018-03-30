@@ -4,12 +4,14 @@
 package era.server.data.database;
 
 
+import era.server.data.database.tables.Admin;
 import era.server.data.database.tables.Assignment;
 import era.server.data.database.tables.Course;
 import era.server.data.database.tables.CourseStudent;
 import era.server.data.database.tables.SchemaVersion;
 import era.server.data.database.tables.Semester;
 import era.server.data.database.tables.Student;
+import era.server.data.database.tables.records.AdminRecord;
 import era.server.data.database.tables.records.AssignmentRecord;
 import era.server.data.database.tables.records.CourseRecord;
 import era.server.data.database.tables.records.CourseStudentRecord;
@@ -47,6 +49,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<AdminRecord> KEY_ADMIN_PRIMARY = UniqueKeys0.KEY_ADMIN_PRIMARY;
     public static final UniqueKey<AssignmentRecord> KEY_ASSIGNMENT_PRIMARY = UniqueKeys0.KEY_ASSIGNMENT_PRIMARY;
     public static final UniqueKey<CourseRecord> KEY_COURSE_PRIMARY = UniqueKeys0.KEY_COURSE_PRIMARY;
     public static final UniqueKey<CourseRecord> KEY_COURSE_COURSE_SEMESTER_NAME_UK = UniqueKeys0.KEY_COURSE_COURSE_SEMESTER_NAME_UK;
@@ -61,6 +64,7 @@ public class Keys {
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final ForeignKey<AdminRecord, StudentRecord> ADMIN_STUDENT_FK = ForeignKeys0.ADMIN_STUDENT_FK;
     public static final ForeignKey<AssignmentRecord, StudentRecord> ASSIGNMENT_STUDENT_FK = ForeignKeys0.ASSIGNMENT_STUDENT_FK;
     public static final ForeignKey<AssignmentRecord, CourseRecord> ASSIGNMENT_COURSE_FK = ForeignKeys0.ASSIGNMENT_COURSE_FK;
     public static final ForeignKey<CourseRecord, SemesterRecord> COURSE_SEMESTER_FK = ForeignKeys0.COURSE_SEMESTER_FK;
@@ -72,6 +76,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     private static class UniqueKeys0 extends AbstractKeys {
+        public static final UniqueKey<AdminRecord> KEY_ADMIN_PRIMARY = createUniqueKey(Admin.ADMIN, "KEY_admin_PRIMARY", Admin.ADMIN.STUDENT_ID);
         public static final UniqueKey<AssignmentRecord> KEY_ASSIGNMENT_PRIMARY = createUniqueKey(Assignment.ASSIGNMENT, "KEY_assignment_PRIMARY", Assignment.ASSIGNMENT.UUID);
         public static final UniqueKey<CourseRecord> KEY_COURSE_PRIMARY = createUniqueKey(Course.COURSE, "KEY_course_PRIMARY", Course.COURSE.UUID);
         public static final UniqueKey<CourseRecord> KEY_COURSE_COURSE_SEMESTER_NAME_UK = createUniqueKey(Course.COURSE, "KEY_course_course_semester_name_uk", Course.COURSE.NAME, Course.COURSE.SEMESTER_ID);
@@ -84,6 +89,7 @@ public class Keys {
     }
 
     private static class ForeignKeys0 extends AbstractKeys {
+        public static final ForeignKey<AdminRecord, StudentRecord> ADMIN_STUDENT_FK = createForeignKey(era.server.data.database.Keys.KEY_STUDENT_PRIMARY, Admin.ADMIN, "admin_student_fk", Admin.ADMIN.STUDENT_ID);
         public static final ForeignKey<AssignmentRecord, StudentRecord> ASSIGNMENT_STUDENT_FK = createForeignKey(era.server.data.database.Keys.KEY_STUDENT_PRIMARY, Assignment.ASSIGNMENT, "assignment_student_fk", Assignment.ASSIGNMENT.STUDENT_ID);
         public static final ForeignKey<AssignmentRecord, CourseRecord> ASSIGNMENT_COURSE_FK = createForeignKey(era.server.data.database.Keys.KEY_COURSE_PRIMARY, Assignment.ASSIGNMENT, "assignment_course_fk", Assignment.ASSIGNMENT.COURSE_ID);
         public static final ForeignKey<CourseRecord, SemesterRecord> COURSE_SEMESTER_FK = createForeignKey(era.server.data.database.Keys.KEY_SEMESTER_PRIMARY, Course.COURSE, "course_semester_fk", Course.COURSE.SEMESTER_ID);

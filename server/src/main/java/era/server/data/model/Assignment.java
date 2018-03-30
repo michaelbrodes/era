@@ -18,7 +18,7 @@ import java.util.Map;
  * assignments.
  */
 @ParametersAreNullableByDefault
-public class Assignment implements Model {
+public class Assignment implements Model, Comparable<Assignment> {
     public static final String ENDPOINT = "/assignment";
     /* Class Fields */
     private String imageFilePath;               /* Path to the PDF file with the images associated with the assignment */
@@ -148,6 +148,14 @@ public class Assignment implements Model {
         return uuid;
     }
 
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public String getStudentUname() {
+        return studentUname;
+    }
+
     @Override
     public Map<String, Object> toViewModel() {
         // Format: Month/Day/Year e.g. July/13/2014
@@ -163,6 +171,11 @@ public class Assignment implements Model {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    public int compareTo(@Nonnull Assignment other) {
+        return other.createdDateTime.compareTo(this.createdDateTime);
     }
 
     /**

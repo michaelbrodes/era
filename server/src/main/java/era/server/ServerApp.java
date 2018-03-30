@@ -3,9 +3,11 @@ package era.server;
 import era.server.api.UploaderAPIModule;
 import era.server.common.AppConfig;
 import era.server.common.ConfigOpts;
+import era.server.data.AdminDAO;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.StudentDAO;
+import era.server.data.access.AdminDAOImpl;
 import era.server.data.access.AssignmentDAOImpl;
 import era.server.data.access.CourseDAOImpl;
 import era.server.data.access.StudentDAOImpl;
@@ -35,11 +37,13 @@ public class ServerApp {
         AppConfig config = AppConfig.instance();
         config.setPort(port);
         config.setConnectionString(dbName, host, dbPort, user, password);
+        config.setCASEnabled(casEnabled);
 
         // startup all the DAOs so we don't have any duplicated connections
         final StudentDAO studentDAOImpl = StudentDAOImpl.instance();
         final CourseDAO courseDAOImpl = CourseDAOImpl.instance();
         final AssignmentDAO assignmentDAOImpl = AssignmentDAOImpl.instance();
+        final AdminDAO adminDAO = AdminDAOImpl.instance();
 
         ServerModule[] modules = new ServerModule[] {
                 UploaderAPIModule.instance(
@@ -50,7 +54,7 @@ public class ServerApp {
                         studentDAOImpl,
                         courseDAOImpl,
                         assignmentDAOImpl,
-                        casEnabled)
+                        adminDAO)
         };
 
         Spark.staticFiles.location("/static");

@@ -12,14 +12,18 @@ import era.server.data.model.Course;
 import era.server.data.model.Semester;
 import era.server.data.model.Student;
 import era.server.data.model.Term;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.Timestamp;
 import java.time.Year;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -205,24 +209,6 @@ public class CourseDAOImpl extends DatabaseDAO implements CourseDAO {
                          .and(COURSE.SEMESTER_ID.eq(dbSemester.get().getUuid())));
         } else {
             return Optional.empty();
-        }
-    }
-
-    @Override
-    public Set<Course> readAllCoursesEnrolledIn(String byStudent) {
-        try (DSLContext ctx = connect()) {
-            return ctx.select(COURSE.UUID, COURSE.NAME)
-                    .from(COURSE)
-                    .join(COURSE_STUDENT)
-                        .on(COURSE.UUID.eq(COURSE_STUDENT.COURSE_ID))
-                    .join(STUDENT)
-                        .on(COURSE_STUDENT.STUDENT_ID.eq(STUDENT.UUID))
-                    .where(STUDENT.USERNAME.eq(byStudent))
-                    .fetchStream()
-                    .map(record -> Course.builder()
-                            .withName(record.get(COURSE.NAME))
-                            .create())
-                    .collect(Collectors.toSet());
         }
     }
 

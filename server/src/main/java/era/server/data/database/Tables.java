@@ -4,6 +4,7 @@
 package era.server.data.database;
 
 
+import era.server.data.database.tables.Admin;
 import era.server.data.database.tables.Assignment;
 import era.server.data.database.tables.Course;
 import era.server.data.database.tables.CourseStudent;
@@ -26,6 +27,11 @@ import javax.annotation.Generated;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
+
+    /**
+     * The table <code>dev.admin</code>.
+     */
+    public static final Admin ADMIN = era.server.data.database.tables.Admin.ADMIN;
 
     /**
      * The table <code>dev.assignment</code>.

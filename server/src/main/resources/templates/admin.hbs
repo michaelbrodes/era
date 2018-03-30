@@ -1,0 +1,26 @@
+<!Doctype html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <ul>
+            {{#each courses}}
+            <li>
+                Course: {{course}}
+                <ul>
+                    {{#each assignments}}
+                    <li>
+                        Assignment: {{name}}
+                    </li>
+                    <ul>
+                        <li>Created: {{createdDateTime}}</li>
+                        <li>Student: {{username}}</li>
+                    </ul>
+                    {{/each}}
+                </ul>
+            </li>
+            {{/each}}
+        </ul>
+    </body>
+</html>

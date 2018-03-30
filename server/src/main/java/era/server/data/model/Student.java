@@ -35,7 +35,7 @@ public class Student implements Model {
     private String uuid;
 
     /* Constructors */
-    private Student(@Nonnull String userName, Builder builder) {
+    protected Student(@Nonnull String userName, Builder builder) {
         Preconditions.checkNotNull(userName, "Cannot create a Student object with a null userName");
         this.userName = userName;
         this.uuid = builder.uuid;

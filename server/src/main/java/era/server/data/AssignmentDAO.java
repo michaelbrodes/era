@@ -4,6 +4,8 @@ import era.server.data.model.Assignment;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,4 +25,6 @@ public interface AssignmentDAO {
     Optional<Assignment> fetch(String uuid);
 
     Collection<Assignment> fetchAllByStudent(String username);
+
+    Map<String, Collection<Assignment>> fetchAllAssignmentsGroupedByCourse();
 }

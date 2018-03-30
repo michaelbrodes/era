@@ -4,6 +4,7 @@
 package era.server.data.database;
 
 
+import era.server.data.database.tables.Admin;
 import era.server.data.database.tables.Assignment;
 import era.server.data.database.tables.Course;
 import era.server.data.database.tables.CourseStudent;
@@ -35,6 +36,7 @@ public class Indexes {
     // INDEX definitions
     // -------------------------------------------------------------------------
 
+    public static final Index ADMIN_PRIMARY = Indexes0.ADMIN_PRIMARY;
     public static final Index ASSIGNMENT_ASSIGNMENT_COURSE_FK = Indexes0.ASSIGNMENT_ASSIGNMENT_COURSE_FK;
     public static final Index ASSIGNMENT_ASSIGNMENT_STUDENT_IDX = Indexes0.ASSIGNMENT_ASSIGNMENT_STUDENT_IDX;
     public static final Index ASSIGNMENT_PRIMARY = Indexes0.ASSIGNMENT_PRIMARY;
@@ -55,6 +57,7 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     private static class Indexes0 extends AbstractKeys {
+        public static Index ADMIN_PRIMARY = createIndex("PRIMARY", Admin.ADMIN, new OrderField[] { Admin.ADMIN.STUDENT_ID }, true);
         public static Index ASSIGNMENT_ASSIGNMENT_COURSE_FK = createIndex("assignment_course_fk", Assignment.ASSIGNMENT, new OrderField[] { Assignment.ASSIGNMENT.COURSE_ID }, false);
         public static Index ASSIGNMENT_ASSIGNMENT_STUDENT_IDX = createIndex("assignment_student_idx", Assignment.ASSIGNMENT, new OrderField[] { Assignment.ASSIGNMENT.STUDENT_ID }, false);
         public static Index ASSIGNMENT_PRIMARY = createIndex("PRIMARY", Assignment.ASSIGNMENT, new OrderField[] { Assignment.ASSIGNMENT.UUID }, true);

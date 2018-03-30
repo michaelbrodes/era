@@ -1,24 +1,12 @@
 package era.server.web;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
-import com.google.common.io.ByteSource;
 import era.server.common.AppConfig;
 import era.server.data.StudentDAO;
-import era.server.data.access.StudentDAOImpl;
-import era.server.data.model.Student;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.pac4j.cas.client.CasClient;
-import org.pac4j.cas.config.CasConfiguration;
-import org.pac4j.cas.config.CasProtocol;
-import org.pac4j.core.client.Client;
-import org.pac4j.core.client.Clients;
-import org.pac4j.core.config.Config;
-import org.pac4j.sparkjava.DefaultHttpActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -31,17 +19,22 @@ import spark.Response;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.file.Files;
 
-import static spark.Spark.get;
-import static spark.Spark.secure;
-
+/**
+ * A Controller (I didn't name the class) that handles
+ * authentication/authorization for students/admins. It provides authentication
+ * using the "Central Authentication Service" protocol. SIUE CAS
+ * implementation isn't very sophisticated (shocker) and only supports signing
+ * in for a signle user and <strong>service-wide</strong> sign out (it will
+ * drop the session on their server for every student currently logged in into
+ * my-assignments).
+ *
+ * HTTP flow diagram for login: https://apereo.github.io/cas/4.2.x/images/cas_flow_diagram.png
+ * logout is basically "redirect the user to a CAS logout endpoint"
+ */
 public class CASAuth {
     private static final Logger LOGGER = LoggerFactory.getLogger(CASAuth.class);
     private StudentDAO studentDAO;
@@ -56,11 +49,9 @@ public class CASAuth {
 
         String encodedURL = URLEncoder.encode("https://my-assignments.isg.siue.edu/student/login", "UTF-8");
 
-        LOGGER.info("User was: {}", (String)request.session().attribute("user"));
 
         if (request.queryParams("ticket") != null) { //the user is not authenticated
             CloseableHttpClient httpClient = HttpClients.createDefault();
-            LOGGER.info("Ticket: {}", request.queryParams("ticket"));
 
             HttpGet httpGet = new HttpGet("https://cas.isg.siue.edu/itscas/serviceValidate?ticket=" +
                     request.queryParams("ticket") +
@@ -68,7 +59,6 @@ public class CASAuth {
             try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) { //This shouldn't happen either
 
                 if (httpResponse.getStatusLine().getStatusCode() == 200) {
-                    LOGGER.info("We got a 200");
                     InputStream httpStream = httpResponse.getEntity().getContent();
 
                     String username = getUsernameFromXML(httpStream);
@@ -82,12 +72,13 @@ public class CASAuth {
                     }
                 }
                 else {
-                    LOGGER.info("Status code: {}", httpResponse.getStatusLine().getStatusCode());
+                    LOGGER.info(
+                            "Invalid status code from CAS ticket validation: {}", 
+                            httpResponse.getStatusLine().getStatusCode());
                 }
             }
         }
         else if (Strings.isNullOrEmpty(request.session().attribute("user"))) { //if they came back from CAS
-            LOGGER.info("Url was: {}", encodedURL);
             response.redirect("https://cas.isg.siue.edu/itscas/login?service=" + encodedURL, 302);
         }
         else { //if the user is already authenticated, and in our session
@@ -99,26 +90,28 @@ public class CASAuth {
 
     //Make sure that the current user in our application is authenticated
     public static Boolean assertAuthenticated(Request request, Response response) {
+        boolean casEnabled = AppConfig.instance().isCASEnabled();
+        
         String student = request.params(":userName");
         String user = request.session().attribute("user");
-        if  (Strings.isNullOrEmpty(user) || Strings.isNullOrEmpty(student)){
-            response.redirect("/student/login", 302);
-            return false;
-        }
-        else if (!user.equals(student)) {
-            response.redirect("/student/login", 302);
-            return false;
-        }
-        else
+        if (!casEnabled) {
             return true;
+        } else if  (Strings.isNullOrEmpty(user) || Strings.isNullOrEmpty(student) || !user.equals(student)){
+            response.redirect("/student/login", 302);
+            return false;
+        } else {
+            return true;
+        }
     }
 
     //Send a request to CAS to log all users out of our application
-    static void logout(Request request, Response response) throws Exception{
+    public Object logout(Request request, Response response) throws Exception{
         request.session(false);
         request.session().removeAttribute("user");
         String encodedURL = URLEncoder.encode("https://my-assignments.isg.siue.edu/", "UTF-8");
         response.redirect("https://cas.isg.siue.edu/itscas/logout?service=" + encodedURL);
+        
+        return null;
     }
 
     //Either return a student based on their username, or create one, if it doesn't exist
@@ -127,7 +120,7 @@ public class CASAuth {
     }
 
     //Retrieve a username from XML
-    private String getUsernameFromXML(InputStream is) throws IOException, SAXException, ParserConfigurationException {
+    private String getUsernameFromXML(InputStream is) throws SAXException, ParserConfigurationException {
         try {
             //Create a document we can parse, and parsing it
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -148,7 +141,7 @@ public class CASAuth {
 
         }
         catch (IOException e) {
-            LOGGER.error("Exception: ", e);
+            LOGGER.error("IOException when reading from cas XML document: ", e);
         }
         return null;
     }

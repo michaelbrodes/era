@@ -31,6 +31,7 @@ public class AppConfig {
     private String dbPort;
     private String dbUser;
     private String password;
+    private boolean casEnabled;
 
     private AppConfig() {
     }
@@ -117,5 +118,14 @@ public class AppConfig {
 
     public String getDbPassword() {
         return password;
+    }
+
+    public boolean isCASEnabled() {
+        return casEnabled;
+    }
+
+    public void setCASEnabled(Boolean casEnabled) {
+        // checking if equal to true prevents null pointer exceptions if casEnabled is null
+        this.casEnabled = Boolean.TRUE.equals(casEnabled);
     }
 }

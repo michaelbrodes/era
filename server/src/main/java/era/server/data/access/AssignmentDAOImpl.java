@@ -4,15 +4,19 @@ import com.google.common.base.Preconditions;
 import era.server.data.AssignmentDAO;
 import era.server.data.model.Assignment;
 import org.jooq.DSLContext;
-import org.jooq.Record;
 import org.jooq.Record5;
 import org.jooq.Result;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-
-import java.sql.ResultSet;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static era.server.data.database.Tables.ASSIGNMENT;
@@ -32,6 +36,18 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
      */
     private AssignmentDAOImpl() {
 
+    }
+
+    public static AssignmentDAO instance() {
+        if (INSTANCE == null) {
+            synchronized (AssignmentDAOImpl.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new AssignmentDAOImpl();
+                }
+            }
+        }
+
+        return INSTANCE;
     }
 
     public void storeAssignment(Assignment assignment) {
@@ -65,7 +81,7 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
     @Override
     public Collection<Assignment> fetchAllByStudent(String username) {
         try (DSLContext create = connect()) {
-           ArrayList<Assignment> assignments = new ArrayList<>();
+            ArrayList<Assignment> assignments = new ArrayList<>();
             Result<Record5<String, String, Timestamp, String, String>> result = create.select(ASSIGNMENT.UUID, ASSIGNMENT.NAME, ASSIGNMENT.CREATED_DATE_TIME, COURSE.NAME, STUDENT.USERNAME)
                     .from(ASSIGNMENT)
                     .join(STUDENT)
@@ -76,7 +92,7 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
                     .orderBy(ASSIGNMENT.CREATED_DATE_TIME.desc())
                     .fetch();
 
-            for (Record5<String, String, Timestamp, String, String> record: result) {
+            for (Record5<String, String, Timestamp, String, String> record : result) {
 
                 Assignment assignment = Assignment.builder()
                         .withStudentUname(record.get(STUDENT.USERNAME))
@@ -109,15 +125,30 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
         }
     }
 
-    public static AssignmentDAO instance() {
-        if (INSTANCE == null) {
-            synchronized (AssignmentDAOImpl.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new AssignmentDAOImpl();
-                }
-            }
-        }
+    public Map<String, Collection<Assignment>> fetchAllAssignmentsGroupedByCourse() {
+        try (DSLContext create = connect()) {
+            List<Assignment> assignments = create.select()
+                    .from(ASSIGNMENT)
+                    .join(COURSE)
+                    .on(ASSIGNMENT.COURSE_ID.eq(COURSE.UUID))
+                    .join(STUDENT)
+                    .on(ASSIGNMENT.STUDENT_ID.eq(STUDENT.UUID))
+                    .orderBy(ASSIGNMENT.CREATED_DATE_TIME.desc())
+                    .fetch()
+                    .map((record) -> Assignment.builder()
+                            .withCourseName(record.get(COURSE.NAME))
+                            .withStudentUname(record.get(STUDENT.USERNAME))
+                            .withCreatedDateTime(record.get(ASSIGNMENT.CREATED_DATE_TIME).toLocalDateTime())
+                            .withImageFilePath(record.get(ASSIGNMENT.IMAGE_FILE_PATH))
+                            .create(record.get(ASSIGNMENT.NAME), record.get(ASSIGNMENT.UUID))
+                    );
+            Map<String, Collection<Assignment>> assignmentsByCourse = new HashMap<>();
 
-        return INSTANCE;
+            for (Assignment assignment : assignments) {
+                assignmentsByCourse.computeIfAbsent(assignment.getCourseName(), (c) -> new TreeSet<>()).add(assignment);
+            }
+
+            return assignmentsByCourse;
+        }
     }
 }

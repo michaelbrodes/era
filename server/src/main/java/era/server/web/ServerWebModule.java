@@ -2,21 +2,15 @@ package era.server.web;
 
 
 import era.server.ServerModule;
+import era.server.common.AppConfig;
 import era.server.common.PageRenderer;
-import era.server.common.UnauthorizedException;
+import era.server.data.AdminDAO;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.StudentDAO;
-import org.pac4j.core.config.Config;
-import org.pac4j.sparkjava.CallbackRoute;
-import org.pac4j.sparkjava.LogoutRoute;
-import org.pac4j.sparkjava.SecurityFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import spark.Spark;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.net.URLEncoder;
 
 /**
  * The Server Web <em>module</em> is a module of the "Server" application
@@ -36,9 +30,8 @@ public class ServerWebModule implements ServerModule {
     private final HealthController healthController;
     private final IndexController indexController;
     private final AssignmentViewController assignmentViewController;
+    private final AdminController adminController;
     private final CASAuth casAuth;
-    private final Boolean casEnabled;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerWebModule.class);
 
     /**
      * Creates the controllers contained in this module
@@ -47,29 +40,26 @@ public class ServerWebModule implements ServerModule {
             StudentDAO studentDAO,
             CourseDAO courseDAO,
             AssignmentDAO assignmentDAO,
-            Boolean casEnabled) {
+            AdminDAO adminDAO) {
         this.healthController = new HealthController();
         this.casAuth = new CASAuth(studentDAO);
-        this.casEnabled = casEnabled;
         this.indexController = new IndexController(RENDERER);
         this.assignmentViewController = new AssignmentViewController(RENDERER, assignmentDAO, courseDAO);
+        this.adminController = new AdminController(RENDERER, adminDAO, assignmentDAO);
     }
 
     @Override
     public void setupRoutes() {
-        if (casEnabled) {
+        if (AppConfig.instance().isCASEnabled()) {
             Spark.get("/student/login", casAuth::login);
+            Spark.get("/student/logout", casAuth::logout);
         }
         Spark.get("/hello", healthController::checkHealth);
         Spark.get("/", indexController::checkIndex);
-        Spark.get("/student/logout", (request, response)->{
-            LOGGER.info("Logging out . . .");
-            CASAuth.logout(request, response);
-            return null;
-        });
         Spark.get("/student/:userName", assignmentViewController::assignmentList);
         Spark.get("/student/:userName/assignment/:assignmentId", assignmentViewController::assignment);
-
+        Spark.get("/admin/:userName", adminController::viewAllAssignments);
+        Spark.post("/admin", adminController::createNewAdmin);
     }
 
     /**
@@ -81,7 +71,7 @@ public class ServerWebModule implements ServerModule {
             StudentDAO studentDAO,
             CourseDAO courseDAO,
             AssignmentDAO assignmentDAO,
-            Boolean casEnabled) {
+            AdminDAO adminDAO) {
         if (INSTANCE == null) {
             synchronized (ServerWebModule.class) {
                 if (INSTANCE == null) {
@@ -89,7 +79,7 @@ public class ServerWebModule implements ServerModule {
                             studentDAO,
                             courseDAO,
                             assignmentDAO,
-                            casEnabled
+                            adminDAO
                     );
                 }
             }
