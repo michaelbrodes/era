@@ -88,12 +88,25 @@ class QRScanner {
             document = PDDocument.load(new File(idToDocument.getValue()));
             PDFRenderer renderer = new PDFRenderer(document);
 
-            tmpFinalResult = searchForQRCode(renderer, idToDocument);
+            BufferedImage pdf = renderer.renderImageWithDPI(0, 300);
+
+            LuminanceSource tmpSource = new BufferedImageLuminanceSource(pdf);
+            BinaryBitmap tmpBitmap = new BinaryBitmap(new HybridBinarizer(tmpSource));
+            Result tmpResult;
+            try{
+                tmpResult = multiForm.decodeWithState(tmpBitmap);
+                tmpFinalResult = String.valueOf(tmpResult.getText());
+            }//inner try
+            //if tmpFinalResult is null search harder
+            catch (NotFoundException e){
+                tmpFinalResult = searchForQRCode(renderer, idToDocument);
+            }
+            //if tmpFinalResult still null log error and return
             if (tmpFinalResult == null){
                 progress.addError(QRErrorStatus.UUID_ERROR.getReason(), idToDocument.getKey().toString());
                 return null;
             }
-        }
+        }//outer try
         catch (IOException e) {
             System.out.println("Error: " + e );
             progress.addError(QRErrorStatus.UUID_ERROR.getReason(), idToDocument.getKey().toString());
