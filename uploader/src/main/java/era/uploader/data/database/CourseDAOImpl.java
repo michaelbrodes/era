@@ -11,10 +11,12 @@ import era.uploader.data.database.jooq.tables.records.CourseRecord;
 import era.uploader.data.database.jooq.tables.records.CourseStudentRecord;
 import era.uploader.data.database.jooq.tables.records.SemesterRecord;
 import era.uploader.data.database.jooq.tables.records.StudentRecord;
+import era.uploader.data.database.jooq.tables.records.TeacherRecord;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
+import era.uploader.data.model.Teacher;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -35,6 +37,7 @@ import static era.uploader.data.database.jooq.Tables.COURSE;
 import static era.uploader.data.database.jooq.Tables.COURSE_STUDENT;
 import static era.uploader.data.database.jooq.Tables.SEMESTER;
 import static era.uploader.data.database.jooq.Tables.STUDENT;
+import static era.uploader.data.database.jooq.Tables.TEACHER;
 
 /**
  * Provides CRUD functionality for {@link Course} objects stored in the
@@ -70,14 +73,16 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
                             COURSE.SECTION_NUMBER,
                             COURSE.NAME,
                             COURSE.SEMESTER_ID,
-                            COURSE.UUID
+                            COURSE.UUID,
+                            COURSE.TEACHER_ID
                     ).values(
                             course.getDepartment(),
                             course.getCourseNumber(),
                             course.getSectionNumber(),
                             course.getName(),
                             course.getSemester().getUniqueId(),
-                            course.getUuid()
+                            course.getUuid(),
+                            course.getTeacher().getUniqueId()
                     ).returning(
                             COURSE.UNIQUE_ID
                     ).fetchOne()
@@ -100,16 +105,16 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
      * students to the course they are grouped by. Then it iterates over the
      * keys of the multimap, and inserts them all.
      *
-     * @param coursesToStudents Students grouped by the course they belong to.
+     * @param courses Students grouped by the course they belong to.
      */
     @Override
-    public void insertCourseAndStudents(@Nonnull Multimap<Course, Student> coursesToStudents, @Nonnull Semester semester) {
+    public void insertCourseAndStudents(@Nonnull Collection<Course> courses, @Nonnull Semester semester) {
         Preconditions.checkNotNull(semester);
-        Preconditions.checkNotNull(coursesToStudents, "Cannot insert null multimap");
+        Preconditions.checkNotNull(courses, "Cannot insert null set of courses");
 
         Semester sem = resolveSemester(semester);
 
-        for (Course course: squashMap(coursesToStudents)) {
+        for (Course course: courses) {
             CourseRecord cRec = getCourseByNameAndSemester(course.getName(), course.getSemester());
             if (cRec == null) {
                 course.setSemester(sem);
@@ -348,11 +353,20 @@ public class CourseDAOImpl extends DatabaseDAO<CourseRecord, Course> implements 
         List<Course> courses;
         StudentDAOImpl studentDAO = StudentDAOImpl.instance();
         try(DSLContext ctx = DSL.using(CONNECTION_STR)) {
-             courses = ctx.selectFrom(COURSE).fetch().map(this::convertToModel);
+             courses = ctx.selectFrom(COURSE)
+                     .fetch()
+                     .map(this::convertToModel);
 
             for (Course course : courses) {
-                SemesterRecord semRec = ctx.selectFrom(SEMESTER).where(SEMESTER.UNIQUE_ID.eq(course.getSemesterId())).fetchOne();
+                SemesterRecord semRec = ctx.selectFrom(SEMESTER)
+                        .where(SEMESTER.UNIQUE_ID.eq(course.getSemesterId()))
+                        .fetchOne();
+                TeacherRecord teacherRecord = ctx.selectFrom(TEACHER)
+                        .where(TEACHER.UNIQUE_ID.eq(course.getTeacherId()))
+                        .fetchOne();
                 Semester semester = Semester.of(semRec.getTerm(), semRec.getYear());
+                Teacher teacher = new Teacher(teacherRecord.getUniqueId(), teacherRecord.getName());
+                course.setTeacher(teacher);
                 course.setSemester(semester);
 
                 List<Integer> student_ids = new ArrayList<>(ctx.selectFrom(COURSE_STUDENT)

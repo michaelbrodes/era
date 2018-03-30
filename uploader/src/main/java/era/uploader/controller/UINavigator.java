@@ -9,8 +9,9 @@ import java.io.IOException;
 
 public class UINavigator {
 
-    private static final int GUI_WIDTH = 1000;
-    private static final int GUI_HEIGHT = 600;
+    // you might be asking yourself: "Why the extra 3's?" That is a good question.
+    private static final int GUI_WIDTH = 1003;
+    private static final int GUI_HEIGHT = 603;
 
     private Scene mainScene;
     private Window primaryWindow;

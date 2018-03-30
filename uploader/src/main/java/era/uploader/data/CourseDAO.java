@@ -1,6 +1,5 @@
 package era.uploader.data;
 
-import com.google.common.collect.Multimap;
 import era.uploader.data.model.Assignment;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
@@ -9,6 +8,7 @@ import era.uploader.data.model.Student;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +19,7 @@ import java.util.Set;
 @ParametersAreNonnullByDefault
 public interface CourseDAO extends DAO {
     Course insert(Course course);                               /* Create new course object */
-    void insertCourseAndStudents(Multimap<Course, Student> coursesToStudents, Semester semester);
+    void insertCourseAndStudents(Collection<Course> courses, Semester semester);
     @Nullable
     Course read(long id);                               /* Access data from course object */
     void update(Course changedCourse); /* Change data from existing course object */

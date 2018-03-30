@@ -39,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Course extends TableImpl<CourseRecord> {
 
-    private static final long serialVersionUID = -430950381;
+    private static final long serialVersionUID = -252118734;
 
     /**
      * The reference instance of <code>course</code>
@@ -83,6 +83,11 @@ public class Course extends TableImpl<CourseRecord> {
      * The column <code>course.semester_id</code>.
      */
     public final TableField<CourseRecord, Integer> SEMESTER_ID = createField("semester_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
+     * The column <code>course.teacher_id</code>.
+     */
+    public final TableField<CourseRecord, Integer> TEACHER_ID = createField("teacher_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>course.uuid</code>.
@@ -155,7 +160,7 @@ public class Course extends TableImpl<CourseRecord> {
      */
     @Override
     public List<ForeignKey<CourseRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<CourseRecord, ?>>asList(Keys.FK_COURSE_SEMESTER_1);
+        return Arrays.<ForeignKey<CourseRecord, ?>>asList(Keys.FK_COURSE_SEMESTER_1, Keys.FK_COURSE_TEACHER_1);
     }
 
     /**

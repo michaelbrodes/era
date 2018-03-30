@@ -78,6 +78,9 @@ public class AddressLabelSaver extends AbstractQRSaver {
         editor.showText("Page number: " + qrCode.getPageNumber());
         editor.newLine();
 
+        editor.showText("Student: " + qrCode.getStudentName());
+        editor.newLine();
+
         editor.endText();
 
     }
@@ -93,17 +96,17 @@ public class AddressLabelSaver extends AbstractQRSaver {
     @Override
     void writeHeader(@WillNotClose PDPageContentStream editor, float height, float width) throws IOException {
         // Old versions of QRSaverFactory#saver do not supply the owner, so we need to check for null.
-        if (getStudent() != null) {
-            beginText(editor, AveryConstants.Address.NEW_LINE_OFFSET, AveryConstants.Address.FONT_SIZE);
-            editor.newLineAtOffset(
-                    width/2.0f - AveryConstants.Address.HEADER_MARGIN_CENTER,
-                    height - AveryConstants.Address.HEADER_MARGIN_TOP
-            );
-
-            editor.showText("Student: " + getStudent().getLastName() + ", " + getStudent().getFirstName());
-            editor.newLine();
-            editor.endText();
-        }
+//        if (getStudent() != null) {
+//            beginText(editor, AveryConstants.Address.NEW_LINE_OFFSET, AveryConstants.Address.FONT_SIZE);
+//            editor.newLineAtOffset(
+//                    width/2.0f - AveryConstants.Address.HEADER_MARGIN_CENTER,
+//                    height - AveryConstants.Address.HEADER_MARGIN_TOP
+//            );
+//
+//            editor.showText("Student: " + getStudent().getLastName() + ", " + getStudent().getFirstName());
+//            editor.newLine();
+//            editor.endText();
+//        }
     }
 
     @Override

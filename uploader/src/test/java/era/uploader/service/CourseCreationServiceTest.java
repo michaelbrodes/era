@@ -4,9 +4,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import era.uploader.common.IOUtil;
 import era.uploader.data.database.MockCourseDAOImpl;
+import era.uploader.data.database.MockTeacherDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
+import era.uploader.data.model.Teacher;
 import era.uploader.data.model.Term;
 import org.junit.Test;
 
@@ -23,7 +25,7 @@ public class CourseCreationServiceTest {
     @Test
     public void generateStudents_MyronsFile() throws Exception {
         String roster = IOUtil.convertToLocal("src/test/resources/mockRoll.csv");
-        CourseCreationService service = new CourseCreationService(new MockCourseDAOImpl());
+        CourseCreationService service = new CourseCreationService(new MockCourseDAOImpl(), new MockTeacherDAOImpl());
         List<String> sections = ImmutableList.of(
                 "004",
                 "018",
@@ -52,25 +54,10 @@ public class CourseCreationServiceTest {
         Course notExist = Course.builder()
                 .withSemester(currentSemester)
                 .createUnique("Spooky spooky ghosts", "101", "001");
-        Multimap<Course, Student> coursesToStudents = service.createCourses(Paths.get(roster), currentSemester, false);
+        Teacher teacher = new Teacher(1, "Mr. Spooky");
+        Collection<Course> courses = service.createCourses(Paths.get(roster), currentSemester, teacher);
 
-        Map<Course, Collection<Student>> coursesToStudentsMap = coursesToStudents.asMap();
         // 002 and 018 each have one member while 018 has two
-        assertTrue(coursesToStudents.size() == 4);
-        assertTrue(coursesToStudents.get(eighteen).size() == 2);
-        assertTrue(coursesToStudents.get(two).size() == 1);
-        assertTrue(coursesToStudents.get(notExist).isEmpty());
-        for (Map.Entry<Course, Collection<Student>> courseToStudents :
-                coursesToStudentsMap.entrySet()) {
-            Course course = courseToStudents.getKey();
-            assertEquals("CHEM", course.getDepartment());
-            assertEquals("131", course.getCourseNumber());
-            assertTrue(sections.contains(course.getSectionNumber()));
-            Collection<Student> students = courseToStudents.getValue();
-            for (Student student: students) {
-                assertTrue(firstNames.contains(student.getFirstName()));
-                assertTrue(studentIds.contains(student.getSchoolId()));
-            }
-        }
+        assertTrue(courses.size() == 3);
     }
 }

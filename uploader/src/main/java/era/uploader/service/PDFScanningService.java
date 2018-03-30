@@ -1,6 +1,5 @@
 package era.uploader.service;
 
-import era.uploader.common.UploaderProperties;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.QRCodeMappingDAO;
@@ -12,8 +11,8 @@ import era.uploader.service.processing.PDFProcessor;
 import era.uploader.service.processing.ScanningProgress;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * This service is responsible for taking in PDFs, extracting the UUID
@@ -34,12 +33,12 @@ public class PDFScanningService {
      */
     public ScanningProgress scanPDF(
             Path pdf,
-            Course course,
+            Collection<Course> courses,
             String assignment,
             String host
     ) {
 
-        return PDFProcessor.process(qrCodeMappingDAO, assignmentDAO, pdf, course, assignment, host);
+        return PDFProcessor.process(qrCodeMappingDAO, assignmentDAO, pdf, courses, assignment, host);
     }
 
     public List<Course> getAllCourses() {

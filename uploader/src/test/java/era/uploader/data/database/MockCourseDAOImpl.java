@@ -37,16 +37,7 @@ public class MockCourseDAOImpl implements CourseDAO, MockDAO<Course> {
     }
 
     @Override
-    public void insertCourseAndStudents(@Nonnull Multimap<Course, Student> coursesToStudents, @Nonnull Semester semester) {
-        coursesToStudents.keys()
-                .forEach((course) -> course.setSemester(semester));
-        courses.addAll(coursesToStudents.keys());
-        for(Map.Entry<Course, Collection<Student>> studentsInCourse:
-                coursesToStudents.asMap().entrySet()) {
-            Course key = studentsInCourse.getKey();
-            key.getStudentsEnrolled().addAll(studentsInCourse.getValue());
-        }
-    }
+    public void insertCourseAndStudents(@Nonnull Collection<Course> courses, @Nonnull Semester semester) { }
 
     /* Access data from existing Course object from database */
     @Override

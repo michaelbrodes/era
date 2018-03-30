@@ -23,7 +23,6 @@ import era.uploader.service.assignment.ShippingLabelSaver;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.imageio.ImageIO;
-import java.awt.Desktop;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +36,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -64,7 +64,7 @@ public class AssignmentCreationService {
     public Map<Student, List<AssignmentPrintoutMetaData>> groupAssignmentByStudent (List<AssignmentPrintoutMetaData> assignmentsList){
         Map< Student, List<AssignmentPrintoutMetaData>> assignmentsToPrint = new HashMap<>();
         for ( AssignmentPrintoutMetaData assignment : assignmentsList ) {
-            for ( Student student: assignment.getCourse().getStudentsEnrolled() ) {
+            for ( Student student: assignment.getCourseSection().getStudentsEnrolled() ) {
                 if ( !assignmentsToPrint.containsKey(student) ){
                     assignmentsToPrint.put(student, new LinkedList<>());
                 }
@@ -170,7 +170,7 @@ public class AssignmentCreationService {
             futures.add(creationFuture);
         }
 
-        waitTillSavingIsDone(finishedLatch);
+        waitTillSavingIsDone(finishedLatch, threadPool);
 
         // gather the results of each QRCreator#call into one list of QRCodeMappings and insert them into the DB
         ImmutableList<QRCode> studentQRCodes = gatherQrCodes(futures);
@@ -187,7 +187,7 @@ public class AssignmentCreationService {
             for (AssignmentPrintoutMetaData assignment: entry.getValue() ) {
                 Assignment currentAssignment =  createAssignmentForStudent(entry.getKey(), assignment);
                 for (int i = 1; i <= assignment.getNumPages(); i++){
-                    qrCodes.add(new QRCode(assignment.getCourse(), entry.getKey(), currentAssignment, i));
+                    qrCodes.add(new QRCode(assignment.getCourseSection(), entry.getKey(), currentAssignment, i));
                 }
             }
             studentToQRCodes.put(entry.getKey(), qrCodes );
@@ -197,7 +197,7 @@ public class AssignmentCreationService {
 
     private Assignment createAssignmentForStudent(Student student, AssignmentPrintoutMetaData assignmentPrintoutMetaData) {
         Preconditions.checkNotNull(student);
-        Course course = assignmentPrintoutMetaData.getCourse();
+        Course course = assignmentPrintoutMetaData.getCourseSection();
         Assignment.Builder assignmentBuilder = Assignment.builder()
                 .withCourse(course)
                 .withStudent(student);
@@ -240,12 +240,16 @@ public class AssignmentCreationService {
      * @param finishedLatch the {@link CountDownLatch} that will be decremented
      *                      when each QRSaver is finished.
      */
-    private void waitTillSavingIsDone(CountDownLatch finishedLatch) {
+    private void waitTillSavingIsDone(CountDownLatch finishedLatch, ExecutorService threadpool) {
         try {
             finishedLatch.await();
         } catch (InterruptedException e) {
             System.err.println("QR Creation tasks got interrupted before getting finished.");
             e.printStackTrace();
+        }
+
+        if (!threadpool.isShutdown()) {
+            threadpool.shutdownNow();
         }
     }
 

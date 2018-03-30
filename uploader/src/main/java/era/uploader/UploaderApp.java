@@ -22,7 +22,7 @@ public class UploaderApp extends Application {
         // if Class#getResource cannot resolve the resource it will throw an NPE
         // The resource is guessed to be at /src/main/resources/gui/file-explorer.fxml
         Parent root = FXMLLoader.load(getClass().getResource("/gui/file-explorer.fxml"));
-        Scene mainScene = new Scene(root, 1000, 600);
+        Scene mainScene = new Scene(root, 997, 597);
 
         primaryStage.setScene(mainScene);
         primaryStage.show();

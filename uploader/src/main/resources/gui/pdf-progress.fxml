@@ -8,7 +8,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.PDFProgressController">
+<AnchorPane prefHeight="603.0" prefWidth="1003.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="era.uploader.controller.PDFProgressController">
    <children>
       <ProgressBar fx:id="errorProgress" layoutX="380.0" layoutY="157.0" prefWidth="200.0" progress="0.0" />
       <Label layoutX="407.0" layoutY="130.0" text="Percent of Pages Processed" />
