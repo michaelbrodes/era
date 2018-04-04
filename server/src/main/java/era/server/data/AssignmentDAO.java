@@ -27,4 +27,13 @@ public interface AssignmentDAO {
     Collection<Assignment> fetchAllByStudent(String username);
 
     Map<String, Collection<Assignment>> fetchAllAssignmentsGroupedByCourse();
+
+    /**
+     * Deletes an assignment from the database if one exists with the supplied
+     * uuid.
+     *
+     * @param uuid the uuid of the assignment we want to delete.
+     * @return whether or not we deleted the assignment
+     */
+    boolean delete(String uuid);
 }

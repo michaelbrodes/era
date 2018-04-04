@@ -2,11 +2,13 @@ body {
     background-color: #767676;
 }
 
-.btn{
+.btn {
     text-decoration: none;
     color: black;
     background-color: #77A774;
     float: right;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .rbtn{

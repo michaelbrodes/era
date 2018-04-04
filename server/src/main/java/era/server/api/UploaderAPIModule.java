@@ -4,6 +4,7 @@ import era.server.ServerModule;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.StudentDAO;
+import era.server.data.model.Assignment;
 import era.server.data.model.Course;
 import spark.Spark;
 
@@ -26,6 +27,7 @@ public class UploaderAPIModule implements ServerModule {
     private static UploaderAPIModule INSTANCE;
 
     private final UploadController upc;
+    private final AssignmentController assignmentController;
 
     /**
      * Creates all the controllers in this module using the DAOs provided.
@@ -35,6 +37,7 @@ public class UploaderAPIModule implements ServerModule {
             CourseDAO courseDAO,
             AssignmentDAO assignmentDAO) {
         this.upc = new UploadController(courseDAO, assignmentDAO, studentDAO);
+        this.assignmentController = new AssignmentController(assignmentDAO);
     }
 
     @Override
@@ -42,6 +45,7 @@ public class UploaderAPIModule implements ServerModule {
         Spark.post(API_PREFIX + Course.ENDPOINT, upc::uploadCourses);
         Spark.post(API_PREFIX + Course.ENDPOINT + "/:courseId/assignment", upc::uploadAssignment);
         Spark.post(API_PREFIX + Course.ENDPOINT + "/:courseName/semester/:semesterName/assignment", upc::uploadAssignmentPDF);
+        Spark.delete(API_PREFIX + Assignment.ENDPOINT + "/:uuid", assignmentController::deleteAssignment);
     }
 
     /**

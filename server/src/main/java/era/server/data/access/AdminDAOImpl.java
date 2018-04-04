@@ -1,6 +1,7 @@
 package era.server.data.access;
 
 import era.server.data.AdminDAO;
+import era.server.data.database.tables.records.StudentRecord;
 import era.server.data.model.Admin;
 import era.server.data.model.Student;
 import org.jooq.DSLContext;
@@ -62,19 +63,29 @@ public class AdminDAOImpl extends DatabaseDAO implements AdminDAO {
     }
 
     @Override
-    public Admin storeAsAdmin(Student student) {
+    public boolean storeAsAdmin(String student) {
         try (DSLContext create = connect()) {
-            create.insertInto(
-                    STUDENT,
-                    STUDENT.EMAIL,
-                    STUDENT.USERNAME,
-                    STUDENT.UUID)
-                    .values(student.getEmail(), student.getUserName(), student.getUuid())
-                    .execute();
-            create.insertInto(ADMIN, ADMIN.STUDENT_ID)
-                    .values(student.getUuid())
-                    .execute();
-            return new Admin(student);
+            Optional<StudentRecord> studentRecord = create.selectFrom(STUDENT)
+                    .where(STUDENT.USERNAME.eq(student))
+                    .fetchOptional();
+            int stored;
+            if (studentRecord.isPresent()) {
+                stored = create.insertInto(ADMIN, ADMIN.STUDENT_ID)
+                        .values(studentRecord.get().getUuid())
+                        .execute();
+            } else {
+                StudentRecord inserted = create.insertInto(STUDENT,
+                        STUDENT.USERNAME,
+                        STUDENT.EMAIL)
+                        .values(student, student + "@siue.edu")
+                        .returning(STUDENT.UUID)
+                        .fetchOne();
+                stored = create.insertInto(ADMIN, ADMIN.STUDENT_ID)
+                        .values(inserted.getUuid())
+                        .execute();
+            }
+
+            return stored != 0;
         }
     }
 }

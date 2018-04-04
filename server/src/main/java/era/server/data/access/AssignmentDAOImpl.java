@@ -151,4 +151,14 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
             return assignmentsByCourse;
         }
     }
+
+    @Override
+    public boolean delete(String uuid) {
+        try (DSLContext create = connect()) {
+            int deleted = create.deleteFrom(ASSIGNMENT)
+                    .where(ASSIGNMENT.UUID.eq(uuid))
+                    .execute();
+            return deleted != 0;
+        }
+    }
 }

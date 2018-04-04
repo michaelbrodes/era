@@ -1,5 +1,6 @@
 package era.server.web;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import era.server.common.PageRenderer;
 import era.server.common.UnauthorizedException;
@@ -68,6 +69,19 @@ public class AdminController {
      * allows the admin to create a new admin. This is where it posts to.
      */
     public String createNewAdmin(Request request, Response response) {
+        LOGGER.info("Current query params {}", request.queryParams());
+        String username = request.queryParams("username");
+        boolean success = false;
+
+        if (!Strings.isNullOrEmpty(username)) {
+            success = adminDAO.storeAsAdmin(username);
+        }
+
+        if (success && request.session().attribute("user") != null) {
+            response.redirect("/admin/" + request.session().attribute("user"));
+        } else {
+            throw Spark.halt(500, "Couldn't create Admin. See server log for details.");
+        }
 
         return "";
     }

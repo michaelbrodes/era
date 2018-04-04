@@ -1,80 +1,91 @@
 <!Doctype html>
-<html>
+<html lang="en">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css"
           integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/styles/admin-view.css">
-
-    <title>Admin Viewer Login</title>
-
+    <title>Admin View</title>
 </head>
 <body>
+    <header class="dropdown-header">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn" data-toggle="modal" data-target="#newAdminModal">
+            New Admin
+        </button>
 
-<header class="dropdown-header">
-    <a href="/student/logout" class="btn">
-        Logout
-    </a>
-</header>
-
-<section class="" id="">
-
-
-    {{#each courses}}
-
-    <div class="classAssignments">
-
-        <h1>Course: {{course}}</h1>
-
-        {{#each assignments}}
-
-        <div class="container">
-            <h3>Assignment: {{name}}</h3>
-            <table class="table">
-                <thead class="thead-light">
-                <tr>
-
-                    <th scope="col">Student</th>
-                    <th scope="col">Created</th>
-                    <th scope="col"></th>
-
-                </tr>
-                </thead>
-                <tbody>
-
-                <td><a href="/student/{{username}}/assignment/{{uuid}}" target="_blank" rel="noopener">{{username}}</a>
-                </td>
-                <td>{{createdDateTime}}</td>
-                <td><a href="" class="rbtn">Remove</a></td>
-                </tr>
-
-                </tbody>
-            </table>
-
+        <!-- Modal -->
+        <div class="modal fade" id="newAdminModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Create a new admin</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="POST" action="/admin">
+                        <div class="modal-body">
+                            <label for="username">Admin Username: </label>
+                            <input name="username" id="username" type="text" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
+        <a href="/student/logout" class="btn">
+            Logout
+        </a>
+    </header>
+    <section class="" id="">
+        {{#each courses}}
+        <div class="classAssignments">
+            <h1>Course: {{course}}</h1>
+            {{#each assignments}}
+            <div class="container">
+                <h3>Assignment: {{name}}</h3>
+                <table class="table">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Student</th>
+                            <th scope="col">Created</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <a href="/student/{{username}}/assignment/{{uuid}}" target="_blank" rel="noopener">{{username}}</a>
+                            </td>
+                            <td>{{createdDateTime}}</td>
+                            <td>
+                                <a href="#" class="rbtn">Remove</a>
+                                <input class="uuid" type="hidden" value="{{uuid}}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {{/each}}
+        </div>
         {{/each}}
-
-    </div>
-
-    {{/each}}
-
-</section>
-
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js"
-        integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4"
-        crossorigin="anonymous"></script>
-
+    </section>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js"
+            integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4"
+            crossorigin="anonymous"></script>
+    <script src="/js/admin.js"></script>
 </body>
 </html>
