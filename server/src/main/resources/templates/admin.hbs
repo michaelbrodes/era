@@ -1,26 +1,80 @@
 <!Doctype html>
 <html>
-    <head>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    </head>
-    <body>
-        <ul>
-            {{#each courses}}
-            <li>
-                Course: {{course}}
-                <ul>
-                    {{#each assignments}}
-                    <li>
-                        Assignment: {{name}}
-                    </li>
-                    <ul>
-                        <li>Created: {{createdDateTime}}</li>
-                        <li>Student: {{username}}</li>
-                    </ul>
-                    {{/each}}
-                </ul>
-            </li>
-            {{/each}}
-        </ul>
-    </body>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css"
+          integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/styles/admin-view.css">
+
+    <title>Admin Viewer Login</title>
+
+</head>
+<body>
+
+<header class="dropdown-header">
+    <a href="/student/logout" class="btn">
+        Logout
+    </a>
+</header>
+
+<section class="" id="">
+
+
+    {{#each courses}}
+
+    <div class="classAssignments">
+
+        <h1>Course: {{course}}</h1>
+
+        {{#each assignments}}
+
+        <div class="container">
+            <h3>Assignment: {{name}}</h3>
+            <table class="table">
+                <thead class="thead-light">
+                <tr>
+
+                    <th scope="col">Student</th>
+                    <th scope="col">Created</th>
+                    <th scope="col"></th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+                <td><a href="/student/{{username}}/assignment/{{uuid}}" target="_blank" rel="noopener">{{username}}</a>
+                </td>
+                <td>{{createdDateTime}}</td>
+                <td><a href="" class="rbtn">Remove</a></td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+
+        {{/each}}
+
+    </div>
+
+    {{/each}}
+
+</section>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js"
+        integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4"
+        crossorigin="anonymous"></script>
+
+</body>
 </html>

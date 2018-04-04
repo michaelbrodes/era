@@ -1,0 +1,42 @@
+body {
+    background-color: #767676;
+}
+
+.btn{
+    text-decoration: none;
+    color: black;
+    background-color: #77A774;
+    float: right;
+}
+
+.rbtn{
+    text-decoration: none;
+    text-underline: none;
+    color: whitesmoke;
+    background-color: #D3482A;
+    float: right;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+div.container {
+    width:60%;
+    background-color: #e9f3ff;
+    align-self: center;
+}
+
+.classAssignments {
+    width: 75%;
+    padding: 1%;
+    margin-top: 5%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #27AE60;
+    box-shadow: 5px 5px #888888;
+    border-radius: 5px;
+}
+
+.table {
+    align-self: center;
+    width: 75%;
+}

@@ -1,0 +1,71 @@
+Index: gradle.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># DO NOT DELETE THIS FILE, IT WILL BREAK THE BUILD\n# IF YOU CHANGE THIS FILE DO NOT COMMIT IT, IT HAS SECRET INFORMATION\n# I LOVE YOU\ndb.user=root\ndb.password=fake password
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- gradle.properties	(revision e9ec96311f05951a2fede684e79f696d0986d06c)
++++ gradle.properties	(revision )
+@@ -2,4 +2,4 @@
+ # IF YOU CHANGE THIS FILE DO NOT COMMIT IT, IT HAS SECRET INFORMATION
+ # I LOVE YOU
+ db.user=root
+-db.password=fake password
+\ No newline at end of file
++db.password=
+\ No newline at end of file
+Index: ../uploader/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\n    id 'nu.studer.jooq' version '2.0.9'\n    id \"org.flywaydb.flyway\" version \"4.2.0\"\n}\n\ngroup 'era.uploader'\nversion '1.0-SNAPSHOT'\n\napply plugin: 'java'\n\nsourceCompatibility = 1.8\n\nrepositories {\n    mavenCentral()\n}\n\ndependencies {\n    // google repos\n    compile 'com.google.zxing:core:3.3.0'\n    compile 'com.google.zxing:javase:3.3.0'\n    compile 'com.google.guava:guava:23.0'\n    compile 'com.google.code.gson:gson:2.8.2'\n    // pdf stuff\n    compile 'org.apache.pdfbox:pdfbox:2.0.7'\n    //Client communication stuff\n    compile 'org.apache.httpcomponents:httpclient:4.5.3'\n    compile 'org.apache.httpcomponents:httpmime:4.5.3'\n    // database stuff\n    compile 'org.xerial:sqlite-jdbc:3.20.0'\n    compile 'org.jooq:jooq:3.10.0'\n    testCompile 'junit:junit:4.12'\n    jooqRuntime 'org.xerial:sqlite-jdbc:3.20.0'\n}\n\nFile dbFile = file(\"uploader.db\")\n\ntask statOrCreateDB() {\n    doLast {\n        def propertiesFile = file(\"uploader.properties\")\n        if (!propertiesFile.exists()) {\n            throw new InvalidUserDataException(\"Could not find file uploader.properties\")\n        }\n\n        println \"Checking \" + propertiesFile.absolutePath + \" for db.url\"\n        def props = new Properties()\n        propertiesFile.withInputStream { props.load(it) }\n        def dbUrl = props.getProperty(\"db.url\")\n        if (dbUrl == null) {\n            throw new InvalidUserDataException(\"No db.url property in the uploader.properties file\")\n        }\n\n        println \"Checking if \" + dbUrl + \" exists yet\"\n        dbFile = file(dbUrl)\n        if (!dbFile.exists()) {\n            println \"Creating a new db file at \" + dbFile.absolutePath\n            if (!dbFile.createNewFile()) {\n                throw new UncheckedIOException(\n                        new IOException(\"Cannot create \" + dbFile.absolutePath + \". Possibly bad permissions?\")\n                )\n            }\n        }\n    }\n}\n\nflywayMigrate.dependsOn statOrCreateDB\nflywayBaseline.dependsOn statOrCreateDB\nflywayClean.dependsOn statOrCreateDB\nflywayInfo.dependsOn statOrCreateDB\nflywayRepair.dependsOn statOrCreateDB\nflywayValidate.dependsOn statOrCreateDB\n\nflyway {\n    url = 'jdbc:sqlite:' + dbFile.absolutePath\n    locations = [\n            'filesystem:src/main/resources/migrations'\n    ]\n}\n\njooq {\n    version = '3.10.0'\n    edition = 'OSS'\n    uploaderDB(sourceSets.main) {\n        jdbc {\n            driver = 'org.sqlite.JDBC'\n            url = 'jdbc:sqlite:' + dbFile.absolutePath\n        }\n        generator {\n            name = 'org.jooq.util.DefaultGenerator'\n            strategy {\n                name = 'org.jooq.util.DefaultGeneratorStrategy'\n            }\n            database {\n                name = 'org.jooq.util.sqlite.SQLiteDatabase'\n            }\n            generate {\n                relations = true\n                deprecated = false\n                generatedAnnotation = true\n                records = true\n                fluentSetters = true\n            }\n            target {\n                packageName = 'era.uploader.data.database.jooq'\n                directory = 'src/main/java'\n            }\n        }\n    }\n}\n\njar {\n    from configurations.compile.collect {\n        zipTree it\n    }\n\n    manifest.attributes \"Main-Class\" : \"era.uploader.UploaderApp\"\n}\n\ntask run (type: JavaExec, dependsOn: classes) {\n    main 'era.uploader.UploaderApp'\n    classpath sourceSets.main.runtimeClasspath\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../uploader/build.gradle	(revision e9ec96311f05951a2fede684e79f696d0986d06c)
++++ ../uploader/build.gradle	(revision )
+@@ -119,3 +119,7 @@
+     main 'era.uploader.UploaderApp'
+     classpath sourceSets.main.runtimeClasspath
+ }
++
++task getHomeDir << {
++  println gradle.gradleHomeDir
++}
+\ No newline at end of file
+Index: .idea/runConfigurations/Run_JAR.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><component name=\"ProjectRunConfigurationManager\">\n  <configuration default=\"false\" name=\"Run JAR\" type=\"JarApplication\" factoryName=\"JAR Application\">\n    <extension name=\"coverage\" enabled=\"false\" merge=\"false\" sample_coverage=\"true\" runner=\"idea\" />\n    <option name=\"JAR_PATH\" value=\"$PROJECT_DIR$/build/libs/server-1.0-SNAPSHOT.jar\" />\n    <option name=\"PROGRAM_PARAMETERS\" value=\"--app-port 3001 --db-host localhost --db-port 3306 --db-user root --db-password w8SvS%fyB^^E47m --db-name era\" />\n    <option name=\"WORKING_DIRECTORY\" value=\"C:\\Dev\\era\\server\" />\n    <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"true\" />\n    <option name=\"ALTERNATIVE_JRE_PATH\" value=\"1.8\" />\n    <envs />\n    <method>\n      <option name=\"Gradle.BeforeRunTask\" enabled=\"true\" tasks=\"jar\" externalProjectPath=\"$PROJECT_DIR$\" vmOptions=\"\" scriptParameters=\"\" />\n    </method>\n  </configuration>\n</component>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/runConfigurations/Run_JAR.xml	(revision e9ec96311f05951a2fede684e79f696d0986d06c)
++++ .idea/runConfigurations/Run_JAR.xml	(revision )
+@@ -2,8 +2,8 @@
+   <configuration default="false" name="Run JAR" type="JarApplication" factoryName="JAR Application">
+     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+     <option name="JAR_PATH" value="$PROJECT_DIR$/build/libs/server-1.0-SNAPSHOT.jar" />
+-    <option name="PROGRAM_PARAMETERS" value="--app-port 3001 --db-host localhost --db-port 3306 --db-user root --db-password w8SvS%fyB^^E47m --db-name era" />
+-    <option name="WORKING_DIRECTORY" value="C:\Dev\era\server" />
++    <option name="PROGRAM_PARAMETERS" value="--app-port 3001 --db-host localhost --db-port 3306 --db-user root --db-name era --db-password" />
++    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+     <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
+     <envs />
+Index: ../uploader/uploader.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>#uploader.properties updated\n#Tue Feb 27 15:06:57 CST 2018\nuploading.server.protocol=http\ndb.url=uploader.db\nuploading.enabled=true\nuploading.server.port=3001\nuploading.server.hostname=localhost\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../uploader/uploader.properties	(revision e9ec96311f05951a2fede684e79f696d0986d06c)
++++ ../uploader/uploader.properties	(revision )
+@@ -1,5 +1,5 @@
+ #uploader.properties updated
+-#Tue Feb 27 15:06:57 CST 2018
++#Wed Feb 28 19:54:19 CST 2018
+ uploading.server.protocol=http
+ db.url=uploader.db
+ uploading.enabled=true
