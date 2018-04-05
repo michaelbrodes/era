@@ -9,6 +9,7 @@ import era.server.data.AssignmentDAO;
 import era.server.data.Model;
 import era.server.data.model.Admin;
 import era.server.data.model.Assignment;
+import era.server.data.model.CourseTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -48,13 +49,12 @@ public class AdminController {
                     .flatMap(adminDAO::fetchByUsername);
             if (maybeAdmin.isPresent()) {
                 Map<String, List<Assignment>> assignmentsByCourse = assignmentDAO.fetchAllAssignmentsGroupedByCourse();
-                List<ImmutableMap<String, Object>> courseTables = assignmentsByCourse
-                        .entrySet()
-                        .stream()
-                        .map(entry -> ImmutableMap.of("course", entry.getKey(), "assignments", transformToViewModel(entry.getValue())))
+                Collection<CourseTable> courseTables = CourseTable.fromAssignmentGroupings(assignmentsByCourse);
+                List<Map<String, Object>> courseTableViewModels = courseTables.stream()
+                        .map(CourseTable::toViewModel)
                         .collect(Collectors.toList());
 
-                Map<String, Object> viewModel = ImmutableMap.of("courses", courseTables);
+                Map<String, Object> viewModel = ImmutableMap.of("courses", courseTableViewModels);
                 return renderer.render(viewModel, "admin.hbs");
             } else {
                 throw Spark.halt(403);

@@ -48,7 +48,12 @@
         {{#each courses}}
         <div class="classAssignments">
             <h1>Course: {{course}}</h1>
-            {{#each assignments}}
+            {{#each assignmentTables}}
+                {{assignmentName}}
+                {{#each assignments}}
+                    {{uuid}}
+                {{/each}}
+            {{/each}}
             <div class="container">
                 <h3>Assignment: {{name}}</h3>
                 <table class="table">
