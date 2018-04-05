@@ -11,6 +11,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +127,8 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
         }
     }
 
-    public Map<String, Collection<Assignment>> fetchAllAssignmentsGroupedByCourse() {
+    @Override
+    public Map<String, List<Assignment>> fetchAllAssignmentsGroupedByCourse() {
         try (DSLContext create = connect()) {
             List<Assignment> assignments = create.select()
                     .from(ASSIGNMENT)
@@ -142,10 +145,14 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
                             .withImageFilePath(record.get(ASSIGNMENT.IMAGE_FILE_PATH))
                             .create(record.get(ASSIGNMENT.NAME), record.get(ASSIGNMENT.UUID))
                     );
-            Map<String, Collection<Assignment>> assignmentsByCourse = new HashMap<>();
+            Map<String, List<Assignment>> assignmentsByCourse = new HashMap<>();
 
             for (Assignment assignment : assignments) {
-                assignmentsByCourse.computeIfAbsent(assignment.getCourseName(), (c) -> new TreeSet<>()).add(assignment);
+                assignmentsByCourse.computeIfAbsent(assignment.getCourseName(), (c) -> new ArrayList<>()).add(assignment);
+            }
+
+            for (List<Assignment> unsortedAssignments : assignmentsByCourse.values()) {
+                unsortedAssignments.sort(Comparator.comparing(Assignment::getCreatedDateTime).reversed());
             }
 
             return assignmentsByCourse;

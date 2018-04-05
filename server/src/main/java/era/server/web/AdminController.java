@@ -47,7 +47,7 @@ public class AdminController {
             Optional<Admin> maybeAdmin = userContext.getStudentUsername()
                     .flatMap(adminDAO::fetchByUsername);
             if (maybeAdmin.isPresent()) {
-                Map<String, Collection<Assignment>> assignmentsByCourse = assignmentDAO.fetchAllAssignmentsGroupedByCourse();
+                Map<String, List<Assignment>> assignmentsByCourse = assignmentDAO.fetchAllAssignmentsGroupedByCourse();
                 List<ImmutableMap<String, Object>> courseTables = assignmentsByCourse
                         .entrySet()
                         .stream()

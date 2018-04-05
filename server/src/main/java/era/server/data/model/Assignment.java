@@ -18,7 +18,7 @@ import java.util.Map;
  * assignments.
  */
 @ParametersAreNullableByDefault
-public class Assignment implements Model, Comparable<Assignment> {
+public class Assignment implements Model {
     public static final String ENDPOINT = "/assignment";
     /* Class Fields */
     private String imageFilePath;               /* Path to the PDF file with the images associated with the assignment */
@@ -171,11 +171,6 @@ public class Assignment implements Model, Comparable<Assignment> {
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    @Override
-    public int compareTo(@Nonnull Assignment other) {
-        return other.createdDateTime.compareTo(this.createdDateTime);
     }
 
     /**

@@ -26,7 +26,7 @@ public interface AssignmentDAO {
 
     Collection<Assignment> fetchAllByStudent(String username);
 
-    Map<String, Collection<Assignment>> fetchAllAssignmentsGroupedByCourse();
+    Map<String, List<Assignment>> fetchAllAssignmentsGroupedByCourse();
 
     /**
      * Deletes an assignment from the database if one exists with the supplied
