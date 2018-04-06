@@ -28,7 +28,8 @@ div.container {
 }
 
 .classAssignments {
-    width: 75%;
+    width: 60%;
+    min-width: 400px;
     padding: 1%;
     margin-top: 5%;
     margin-left: auto;

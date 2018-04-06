@@ -44,18 +44,17 @@
             Logout
         </a>
     </header>
+
+
+
     <section class="" id="">
         {{#each courses}}
         <div class="classAssignments">
             <h1>Course: {{course}}</h1>
             {{#each assignmentTables}}
-                {{assignmentName}}
-                {{#each assignments}}
-                    {{uuid}}
-                {{/each}}
-            {{/each}}
             <div class="container">
-                <h3>Assignment: {{name}}</h3>
+
+                <h3>Assignment: {{assignmentName}}</h3>
                 <table class="table">
                     <thead class="thead-light">
                         <tr>
@@ -65,6 +64,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                    {{#each assignments}}
                         <tr>
                             <td>
                                 <a href="/student/{{username}}/assignment/{{uuid}}" target="_blank" rel="noopener">{{username}}</a>
@@ -75,6 +75,7 @@
                                 <input class="uuid" type="hidden" value="{{uuid}}"/>
                             </td>
                         </tr>
+                    {{/each}}
                     </tbody>
                 </table>
             </div>

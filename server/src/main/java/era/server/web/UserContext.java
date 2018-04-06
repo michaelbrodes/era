@@ -1,6 +1,7 @@
 package era.server.web;
 
 import era.server.common.UnauthorizedException;
+import era.server.data.AdminDAO;
 import spark.Request;
 import spark.Response;
 
@@ -20,18 +21,13 @@ public class UserContext {
         this.assignmentId = assignmentId;
     }
 
-    public static UserContext initialize(Request request, Response response) throws UnauthorizedException {
+    public static UserContext initialize(Request request, Response response, AdminDAO adminDAO) throws UnauthorizedException {
         request.session(true);
-        if (CASAuth.assertAuthenticated(request, response)) {
-            String student = request.session().attribute("user");
-            if (student == null) {
-                student = request.params(":userName");
-            }
+        if (CASAuth.assertAuthenticated(request, response, adminDAO)) {
             String assignmentId = request.params(":assignmentId");
-
+            String student = request.params(":userName");
             return new UserContext(student, assignmentId);
-        }
-        else {
+        } else {
             throw new UnauthorizedException();
         }
 

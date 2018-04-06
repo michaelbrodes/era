@@ -2,6 +2,7 @@ package era.server.web;
 
 import com.google.common.base.Strings;
 import era.server.common.AppConfig;
+import era.server.data.AdminDAO;
 import era.server.data.StudentDAO;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -89,18 +90,21 @@ public class CASAuth {
     }
 
     //Make sure that the current user in our application is authenticated
-    public static Boolean assertAuthenticated(Request request, Response response) {
+    public static Boolean assertAuthenticated(Request request, Response response, AdminDAO adminDAO) {
         boolean casEnabled = AppConfig.instance().isCASEnabled();
         
         String student = request.params(":userName");
         String user = request.session().attribute("user");
         if (!casEnabled) {
             return true;
-        } else if  (Strings.isNullOrEmpty(user) || Strings.isNullOrEmpty(student) || !user.equals(student)){
+        } else if  (!Strings.isNullOrEmpty(user) && !Strings.isNullOrEmpty(student) && user.equals(student)){
+            return true;
+        } else if (user != null && adminDAO.fetchByUsername(user).isPresent()){
+            //User is an admin
+            return true;
+        } else {
             response.redirect("/student/login", 302);
             return false;
-        } else {
-            return true;
         }
     }
 

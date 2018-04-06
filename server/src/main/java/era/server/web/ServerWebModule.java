@@ -44,7 +44,7 @@ public class ServerWebModule implements ServerModule {
         this.healthController = new HealthController();
         this.casAuth = new CASAuth(studentDAO);
         this.indexController = new IndexController(RENDERER);
-        this.assignmentViewController = new AssignmentViewController(RENDERER, assignmentDAO, courseDAO);
+        this.assignmentViewController = new AssignmentViewController(RENDERER, assignmentDAO, courseDAO, adminDAO);
         this.adminController = new AdminController(RENDERER, adminDAO, assignmentDAO);
     }
 

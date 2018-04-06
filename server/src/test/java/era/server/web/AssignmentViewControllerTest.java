@@ -3,6 +3,7 @@ package era.server.web;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import era.server.common.PageRenderer;
+import era.server.data.AdminDAO;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.model.Assignment;
@@ -20,6 +21,7 @@ import spark.Session;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -35,6 +37,8 @@ public class AssignmentViewControllerTest {
     private AssignmentDAO assignmentDAO;
     @Mock
     private CourseDAO courseDAO;
+    @Mock
+    private AdminDAO adminDAO;
 
     @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -42,6 +46,7 @@ public class AssignmentViewControllerTest {
             .withCreatedDateTime(LocalDateTime.now())
             .withImageFilePath("test.pdf")
             .withCourseName("course")
+            .withStudentUname("sarcher")
             .create("name", "uuid");
 
     @Before
@@ -51,18 +56,21 @@ public class AssignmentViewControllerTest {
         // disabled because if it is null then we should fail the test.
         //noinspection ConstantConditions
         when(assignmentDAO.fetchAllByStudent(not(eq("sarcher")))).thenReturn(Collections.emptySet());
+        when(adminDAO.fetchByUsername("sarcher")).thenReturn(Optional.empty());
     }
 
     @Test
     public void assignmentList_studentInDatabase() {
-        AssignmentViewController controller = new AssignmentViewController(renderer, assignmentDAO, courseDAO);
+        AssignmentViewController controller = new AssignmentViewController(renderer, assignmentDAO, courseDAO, adminDAO);
         Request request = Mockito.mock(Request.class);
         Response response = Mockito.mock(Response.class);
         Session session = Mockito.mock(Session.class);
 
         when(session.attribute("user")).thenReturn("sarcher");
         when(request.session()).thenReturn(session);
-        Map<String, Object> expectedViewModel = ImmutableMap.of("assignmentList", Collections.singletonList(testAss.toViewModel()));
+        when(request.params(":userName")).thenReturn("sarcher");
+
+        Map<String, Object> expectedViewModel = ImmutableMap.of("assignmentList", Collections.singletonList(testAss.toViewModel()), "isAdmin", false, "username", "sarcher");
 
         controller.assignmentList(request, response);
 
@@ -71,14 +79,14 @@ public class AssignmentViewControllerTest {
 
     @Test
     public void assignmentList_studentNotInDatabase() {
-        AssignmentViewController controller = new AssignmentViewController(renderer, assignmentDAO, courseDAO);
+        AssignmentViewController controller = new AssignmentViewController(renderer, assignmentDAO, courseDAO, adminDAO);
         Request request = Mockito.mock(Request.class);
         Response response = Mockito.mock(Response.class);
         Session session = Mockito.mock(Session.class);
 
         when(session.attribute("user")).thenReturn("lkane");
         when(request.session()).thenReturn(session);
-        Map<String, Object> expectedViewModel = ImmutableMap.of("assignmentList", Collections.emptyList());
+        Map<String, Object> expectedViewModel = ImmutableMap.of("assignmentList", Collections.emptyList(),"isAdmin", false);
 
         controller.assignmentList(request, response);
 

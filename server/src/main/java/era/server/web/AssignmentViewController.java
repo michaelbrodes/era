@@ -3,8 +3,10 @@ package era.server.web;
 import com.google.common.collect.ImmutableMap;
 import era.server.common.PageRenderer;
 import era.server.common.UnauthorizedException;
+import era.server.data.AdminDAO;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
+import era.server.data.model.Admin;
 import era.server.data.model.Assignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,26 +30,35 @@ public class AssignmentViewController {
     private final AssignmentDAO assignmentDAO;
     private final CourseDAO courseDAO;
     private final PageRenderer renderer;
+    private final AdminDAO adminDAO;
 
-    public AssignmentViewController(PageRenderer renderer, AssignmentDAO assignmentDAO, CourseDAO courseDAO) {
+    public AssignmentViewController(PageRenderer renderer, AssignmentDAO assignmentDAO, CourseDAO courseDAO, AdminDAO adminDAO) {
         this.renderer = renderer;
         this.assignmentDAO = assignmentDAO;
         this.courseDAO = courseDAO;
+        this.adminDAO = adminDAO;
     }
 
     public String assignmentList(Request request, Response response) {
         try {
-            UserContext context = UserContext.initialize(request, response);
-            
+            UserContext context = UserContext.initialize(request, response, adminDAO);
+
             Optional<String> studentUsername = context.getStudentUsername();
+            Optional<Admin> maybeAdmin = studentUsername.flatMap(name -> adminDAO.fetchByUsername(name));
             List<Map<String, Object>> assignments = studentUsername
                     .map(assignmentDAO::fetchAllByStudent)
                     .orElse(Collections.emptyList())
                     .stream()
                     .map(Assignment::toViewModel)
                     .collect(Collectors.toList());
-            // view models require the second template parameter to be of type Object
-            Map<String, Object> viewModel = ImmutableMap.of("assignmentList", assignments);
+            Map<String, Object> viewModel;
+            if (studentUsername.isPresent()){
+                // view models require the second template parameter to be of type Object
+                viewModel = ImmutableMap.of("assignmentList", assignments, "isAdmin", maybeAdmin.isPresent(), "username", studentUsername.get());
+            } else {
+                viewModel = ImmutableMap.of("assignmentList", assignments, "isAdmin", false);
+            }
+
 
             return renderer.render(viewModel, "assignment-view.hbs");
             
@@ -67,7 +78,7 @@ public class AssignmentViewController {
      */
     public Object assignment(Request request, Response response) {
         try {
-            UserContext context = UserContext.initialize(request, response);
+            UserContext context = UserContext.initialize(request, response, adminDAO);
             Optional<Assignment> assignment = context
                     .getAssignmentId()
                     .flatMap(assignmentDAO::fetch);

@@ -16,10 +16,18 @@
             if(restCall.readyState === XMLHttpRequest.DONE && restCall.status === 204) {
                 // success! remove the tr housing this rbtn
                 var parentRow = e.target.parentNode.parentNode;
-                var parentTable = parentRow.parentNode;
-                parentTable.removeChild(parentRow);
+                var parentTableBody = parentRow.parentNode;
+                var parentTable = parentTableBody.parentNode.parentNode;
+                var parentClass = parentTable.parentNode;
+
+                parentTableBody.removeChild(parentRow);
+                if (parentTableBody.getElementsByTagName("tr").length === 0) {
+                    parentClass.removeChild(parentTable);
+                }
+
             } else if (restCall.readyState === XMLHttpRequest.DONE && restCall.status !== 200) {
-                alert("Couldn't delete assignment in the database. HTTP status " + restCall.status + ". See server log for details.");
+                alert("Couldn't delete assignment in the database. HTTP status " + restCall.status +
+                    ". See server log for details.");
             }
         };
     }

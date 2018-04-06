@@ -1,5 +1,6 @@
 package era.server.data.access;
 
+import era.server.api.UUIDGenerator;
 import era.server.data.AdminDAO;
 import era.server.data.database.tables.records.StudentRecord;
 import era.server.data.model.Admin;
@@ -74,14 +75,15 @@ public class AdminDAOImpl extends DatabaseDAO implements AdminDAO {
                         .values(studentRecord.get().getUuid())
                         .execute();
             } else {
-                StudentRecord inserted = create.insertInto(STUDENT,
+                String uuid = UUIDGenerator.uuid();
+                create.insertInto(STUDENT,
+                        STUDENT.UUID,
                         STUDENT.USERNAME,
                         STUDENT.EMAIL)
-                        .values(student, student + "@siue.edu")
-                        .returning(STUDENT.UUID)
-                        .fetchOne();
+                        .values(uuid, student, student + "@siue.edu")
+                        .execute();
                 stored = create.insertInto(ADMIN, ADMIN.STUDENT_ID)
-                        .values(inserted.getUuid())
+                        .values(uuid)
                         .execute();
             }
 

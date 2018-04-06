@@ -6,7 +6,6 @@ import era.server.common.PageRenderer;
 import era.server.common.UnauthorizedException;
 import era.server.data.AdminDAO;
 import era.server.data.AssignmentDAO;
-import era.server.data.Model;
 import era.server.data.model.Admin;
 import era.server.data.model.Assignment;
 import era.server.data.model.CourseTable;
@@ -44,7 +43,7 @@ public class AdminController {
      */
     public String viewAllAssignments(Request request, Response response) {
         try {
-            UserContext userContext = UserContext.initialize(request, response);
+            UserContext userContext = UserContext.initialize(request, response, adminDAO);
             Optional<Admin> maybeAdmin = userContext.getStudentUsername()
                     .flatMap(adminDAO::fetchByUsername);
             if (maybeAdmin.isPresent()) {
@@ -69,8 +68,19 @@ public class AdminController {
      * allows the admin to create a new admin. This is where it posts to.
      */
     public String createNewAdmin(Request request, Response response) {
-        LOGGER.info("Current query params {}", request.queryParams());
+        request.session(true);
+
         String username = request.queryParams("username");
+        String user = request.session().attribute("user");
+
+
+        Optional<Admin> maybeAdmin = adminDAO.fetchByUsername(user);
+
+        if (user == null || !adminDAO.fetchByUsername(user).isPresent()) {
+            //Not an Admin
+            throw Spark.halt(403);
+        }
+
         boolean success = false;
 
         if (!Strings.isNullOrEmpty(username)) {
@@ -84,11 +94,7 @@ public class AdminController {
         }
 
         return "";
+
     }
 
-    private List<Map<String, Object>> transformToViewModel(Collection<? extends Model> models) {
-        return models.stream()
-                .map(Model::toViewModel)
-                .collect(Collectors.toList());
-    }
 }

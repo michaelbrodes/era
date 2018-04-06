@@ -17,6 +17,9 @@
 <body>
 
 <header class="dropdown-header">
+    {{#isAdmin}}
+    <a href="/admin/{{username}}" class="btn">Admin Page</a>
+    {{/isAdmin}}
     <a href="/student/logout" class="btn">
         Logout
     </a>
