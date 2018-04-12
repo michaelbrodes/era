@@ -1,7 +1,5 @@
 package era.uploader.communication;
 
-import com.google.common.base.MoreObjects;
-
 public class FailedAssignment {
     private final String assignmentName;
     private final String studentName; 

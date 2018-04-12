@@ -2,9 +2,9 @@ package era.uploader.communication;
 
 import com.google.common.collect.Lists;
 import era.uploader.data.model.Assignment;
+import era.uploader.data.model.Course;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class AssignmentUploader {
@@ -60,6 +61,18 @@ public class AssignmentUploader {
 
             String humanSemester = current.getCourse().getSemester().toString();
             if (response.getStatusLine().getStatusCode() == CONFLICT) {
+                Course conflictCourse = current.getCourse();
+                // we don't want to upload the entire course worth of students, but just the one student
+                Course courseCopy = Course.builder()
+                        .withDatabaseId(conflictCourse.getUniqueId())
+                        .withName(conflictCourse.getName())
+                        .withSemester(conflictCourse.getSemester())
+                        .withTeacher(conflictCourse.getTeacher())
+                        .withTeacherId(conflictCourse.getTeacherId())
+                        .withSemesterId(conflictCourse.getSemesterId())
+                        .withStudents(Collections.singleton(current.getStudent()))
+                        .create(conflictCourse.getDepartment(), conflictCourse.getCourseNumber(), conflictCourse.getSectionNumber(), conflictCourse.getUuid());
+                CourseUploader.uploadCourses(Collections.singletonList(courseCopy), host);
                 failedAssignments.add(new FailedAssignment(
                         assignmentName,
                         studentName,

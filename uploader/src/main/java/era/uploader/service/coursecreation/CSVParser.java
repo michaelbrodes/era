@@ -1,15 +1,8 @@
 package era.uploader.service.coursecreation;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import era.uploader.data.model.Course;
-import era.uploader.data.model.Semester;
-import era.uploader.data.model.Student;
-import era.uploader.data.model.Teacher;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class CSVParser {
     /*

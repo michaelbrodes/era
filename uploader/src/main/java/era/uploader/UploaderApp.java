@@ -16,7 +16,7 @@ public class UploaderApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        // needed by PDFBox
+        // needed to make Apache PDFBox faster.
         System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
 
         // if Class#getResource cannot resolve the resource it will throw an NPE
@@ -26,7 +26,5 @@ public class UploaderApp extends Application {
 
         primaryStage.setScene(mainScene);
         primaryStage.show();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> System.out.println("Shutting down...")));
     }
 }

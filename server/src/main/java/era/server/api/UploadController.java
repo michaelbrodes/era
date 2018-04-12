@@ -1,6 +1,6 @@
 package era.server.api;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -13,7 +13,6 @@ import era.server.data.model.Course;
 import era.server.data.model.Semester;
 import era.server.data.model.Student;
 import era.server.data.model.Term;
-import org.omg.CORBA.INTERNAL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -35,6 +34,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
+import java.util.Set;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.WRITE;
@@ -282,6 +282,21 @@ public class UploadController {
         }
 
         return APIMessage.created(response);
+    }
+
+    public String checkCourseExistence(Request request, Response response) {
+        if(request.queryParams().contains("courses[]")) {
+            String[] courses = request.queryParamsValues("courses[]");
+            Gson gson = JSONUtil.gson();
+            Set<String> queryCourses = Sets.newHashSet(courses);
+            Set<String> matchingCourses = courseDAO.findCoursesInDB(queryCourses);
+            // take difference of two sets
+            queryCourses.removeAll(matchingCourses);
+
+            return gson.toJson(queryCourses);
+        } else {
+            return "[]";
+        }
     }
 
     private boolean canCastToInt(String value) {

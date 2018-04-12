@@ -13,14 +13,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 import javax.annotation.Nonnull;
 import java.awt.Desktop;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
