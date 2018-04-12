@@ -10,13 +10,13 @@ import java.util.Objects;
 
 public class AssignmentTable implements ViewableModel {
     private final String assignmentName;
-    private final Collection<Assignment> assignmentsSubmitted;
+    private final List<Assignment> assignmentsSubmitted;
 
     public AssignmentTable(String assignmentName) {
         this.assignmentName = assignmentName;
         this.assignmentsSubmitted = Lists.newArrayList();
     }
-    public AssignmentTable(String assignmentName, Collection<Assignment> assignmentsSubmitted) {
+    public AssignmentTable(String assignmentName, List<Assignment> assignmentsSubmitted) {
         this.assignmentName = assignmentName;
         this.assignmentsSubmitted = assignmentsSubmitted;
     }
@@ -25,7 +25,7 @@ public class AssignmentTable implements ViewableModel {
         return assignmentName;
     }
 
-    public Collection<Assignment> getAssignmentsSubmitted() {
+    public List<Assignment> getAssignmentsSubmitted() {
         return assignmentsSubmitted;
     }
 

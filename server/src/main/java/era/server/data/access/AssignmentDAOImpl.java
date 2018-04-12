@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static era.server.data.database.Tables.ASSIGNMENT;
 import static era.server.data.database.Tables.COURSE;
+import static era.server.data.database.Tables.SEMESTER;
 import static era.server.data.database.Tables.STUDENT;
 
 /**
@@ -132,14 +133,21 @@ public class AssignmentDAOImpl extends DatabaseDAO implements AssignmentDAO {
                     .on(ASSIGNMENT.COURSE_ID.eq(COURSE.UUID))
                     .join(STUDENT)
                     .on(ASSIGNMENT.STUDENT_ID.eq(STUDENT.UUID))
+                    .join(SEMESTER)
+                    .on(COURSE.SEMESTER_ID.eq(SEMESTER.UUID))
                     .orderBy(ASSIGNMENT.CREATED_DATE_TIME.desc())
                     .fetch()
-                    .map((record) -> Assignment.builder()
-                            .withCourseName(record.get(COURSE.NAME))
-                            .withStudentUname(record.get(STUDENT.USERNAME))
-                            .withCreatedDateTime(record.get(ASSIGNMENT.CREATED_DATE_TIME).toLocalDateTime())
-                            .withImageFilePath(record.get(ASSIGNMENT.IMAGE_FILE_PATH))
-                            .create(record.get(ASSIGNMENT.NAME), record.get(ASSIGNMENT.UUID))
+                    .map((record) -> {
+                                String course = record.get(COURSE.NAME);
+                                String courseSemester = record.get(SEMESTER.TERM) + " " + record.get(SEMESTER.YEAR);
+                                String courseName = course.substring(0, course.lastIndexOf('-')) + " " + courseSemester;
+                                return Assignment.builder()
+                                        .withCourseName(courseName)
+                                        .withStudentUname(record.get(STUDENT.USERNAME))
+                                        .withCreatedDateTime(record.get(ASSIGNMENT.CREATED_DATE_TIME).toLocalDateTime())
+                                        .withImageFilePath(record.get(ASSIGNMENT.IMAGE_FILE_PATH))
+                                        .create(record.get(ASSIGNMENT.NAME), record.get(ASSIGNMENT.UUID));
+                            }
                     );
             Map<String, List<Assignment>> assignmentsByCourse = new HashMap<>();
 

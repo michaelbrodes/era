@@ -16,6 +16,7 @@ import spark.Response;
 import spark.Spark;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,6 +51,7 @@ public class AdminController {
                 Map<String, List<Assignment>> assignmentsByCourse = assignmentDAO.fetchAllAssignmentsGroupedByCourse();
                 Collection<CourseTable> courseTables = CourseTable.fromAssignmentGroupings(assignmentsByCourse);
                 List<Map<String, Object>> courseTableViewModels = courseTables.stream()
+                        .sorted(courseTableComparator())
                         .map(CourseTable::toViewModel)
                         .collect(Collectors.toList());
 
@@ -61,6 +63,31 @@ public class AdminController {
         } catch (UnauthorizedException e) {
             throw Spark.halt(403);
         }
+    }
+
+    private Comparator<CourseTable> courseTableComparator() {
+        return (left, right) -> {
+            if (right.getAssignmentsInCourse().isEmpty() && left.getAssignmentsInCourse().isEmpty()) {
+                return 0;
+            } else if (right.getAssignmentsInCourse().isEmpty() && !left.getAssignmentsInCourse().isEmpty()) {
+                return 1;
+            } else if (!right.getAssignmentsInCourse().isEmpty() && left.getAssignmentsInCourse().isEmpty()) {
+                return -1;
+            } else {
+                // won't IndexOutOfBounds because a CourseTable will only have a AssignmentsTable if the assignment table has an assignment
+                return right.getAssignmentsInCourse()
+                        .get(0)
+                        .getAssignmentsSubmitted()
+                        .get(0)
+                        .getCreatedDateTime()
+                        .compareTo(left.getAssignmentsInCourse()
+                                .get(0)
+                                .getAssignmentsSubmitted()
+                                .get(0)
+                                .getCreatedDateTime()
+                        );
+            }
+        };
     }
 
     /**
