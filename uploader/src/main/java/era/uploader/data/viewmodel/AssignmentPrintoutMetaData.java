@@ -76,11 +76,12 @@ public class AssignmentPrintoutMetaData {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AssignmentPrintoutMetaData that = (AssignmentPrintoutMetaData) o;
-        return Objects.equals(getCourseName(), that.getCourseName());
+        return Objects.equals(getCourseName(), that.getCourseName())
+                && Objects.equals(getAssignmentName(), that.getAssignmentName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCourseName());
+        return Objects.hash(getCourseName(), getAssignmentName());
     }
 }
