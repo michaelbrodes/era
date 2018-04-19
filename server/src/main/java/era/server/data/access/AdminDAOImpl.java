@@ -50,7 +50,7 @@ public class AdminDAOImpl extends DatabaseDAO implements AdminDAO {
     @Override
     public Optional<Admin> fetchByUsername(String username) {
         try(DSLContext create = connect()) {
-            return create.select(STUDENT.UUID, STUDENT.EMAIL, STUDENT.USERNAME)
+            return create.select(STUDENT.UUID, STUDENT.EMAIL, STUDENT.USERNAME, ADMIN.UPLOADER_PASSWORD)
                     .from(ADMIN)
                     .join(STUDENT)
                     .on(ADMIN.STUDENT_ID.eq(STUDENT.UUID))
@@ -58,6 +58,7 @@ public class AdminDAOImpl extends DatabaseDAO implements AdminDAO {
                     .fetchOptional()
                     .map((record) -> Admin.builder()
                             .withUUID(record.get(STUDENT.UUID))
+                            .withPassword(record.get(ADMIN.UPLOADER_PASSWORD))
                             .withEmail(record.get(STUDENT.EMAIL))
                             .create(record.get(STUDENT.USERNAME)));
         }

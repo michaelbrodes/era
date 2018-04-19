@@ -1,5 +1,6 @@
 package era.uploader.controller;
 
+import era.uploader.communication.RESTException;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Teacher;
@@ -36,7 +37,11 @@ public class CourseCreationTask extends BackendTask<Collection<Course>> {
                 .createCourses(this.rosterFilePath, this.semester, this.teacher);
 
         if (isUploadingEnabled) {
-            courseCreationService.upload(createdCourses);
+            try{
+                courseCreationService.upload(createdCourses);
+            } catch (RESTException e){
+                onWarning(e.getMessage());
+            }
         } else {
             onWarning("The Uploader is in \"Offline\" mode so these courses were not uploaded to the server. "
                     + "If you would like their assignments to be posted to the server, resubmit the roster file with \"Online\" mode enabled.");

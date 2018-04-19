@@ -146,7 +146,7 @@ public class PDFScanningController {
                 } catch (RESTException e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                     errorAlert.setHeaderText("Server Error");
-                    errorAlert.setContentText("Can't process Assignments because server is not online. See logs for details");
+                    errorAlert.setContentText("Can't process Assignments " + e.getMessage());
                     errorAlert.showAndWait();
                 } catch (IOException | IllegalArgumentException e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);

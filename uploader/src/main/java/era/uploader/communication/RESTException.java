@@ -6,4 +6,8 @@ public class RESTException extends IOException {
     public RESTException(IOException e) {
         super(e);
     }
+
+    public RESTException(String message) {
+        super(message);
+    }
 }
