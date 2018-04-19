@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import era.server.common.PageRenderer;
 import era.server.common.UnauthorizedException;
+import era.server.communication.UploaderAuthentication;
 import era.server.data.AdminDAO;
 import era.server.data.AssignmentDAO;
 import era.server.data.model.Admin;
@@ -55,7 +56,19 @@ public class AdminController {
                         .map(CourseTable::toViewModel)
                         .collect(Collectors.toList());
 
-                Map<String, Object> viewModel = ImmutableMap.of("courses", courseTableViewModels);
+                String generatedPassword = request.session().attribute("password");
+                Map<String, Object> viewModel;
+
+                if (generatedPassword != null)
+                {
+                    viewModel = ImmutableMap.of("courses", courseTableViewModels, "password", generatedPassword);
+                }
+                else
+                {
+                    viewModel = ImmutableMap.of("courses", courseTableViewModels);
+                }
+
+
                 return renderer.render(viewModel, "admin.hbs");
             } else {
                 throw Spark.halt(403);
@@ -110,11 +123,23 @@ public class AdminController {
 
         boolean success = false;
 
+        String password = UploaderAuthentication.generatePassword();
+        String hashedPassword = "";
+
         if (!Strings.isNullOrEmpty(username)) {
-            success = adminDAO.storeAsAdmin(username);
+            try
+            {
+                hashedPassword = UploaderAuthentication.generateStrongPasswordHash(password);
+            }
+            catch(Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+            success = adminDAO.storeAsAdmin(username, hashedPassword);
         }
 
         if (success && request.session().attribute("user") != null) {
+            request.session().attribute("password", password);
             response.redirect("/admin/" + request.session().attribute("user"));
         } else {
             throw Spark.halt(500, "Couldn't create Admin. See server log for details.");

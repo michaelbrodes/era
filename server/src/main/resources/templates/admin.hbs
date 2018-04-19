@@ -13,6 +13,13 @@
 </head>
 <body>
     <header class="dropdown-header">
+        <!-- Password trigger alert -->
+        {{#if password}}
+        <div class="alert alert-success" role="alert">
+            <strong>Password Generated: </strong> {{password}}
+        </div>
+        {{/if}}
+
         <!-- Button trigger modal -->
         <button type="button" class="btn" data-toggle="modal" data-target="#newAdminModal">
             New Admin

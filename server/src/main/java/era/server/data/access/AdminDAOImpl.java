@@ -64,15 +64,16 @@ public class AdminDAOImpl extends DatabaseDAO implements AdminDAO {
     }
 
     @Override
-    public boolean storeAsAdmin(String student) {
+    public boolean storeAsAdmin(String student, String password) {
         try (DSLContext create = connect()) {
             Optional<StudentRecord> studentRecord = create.selectFrom(STUDENT)
                     .where(STUDENT.USERNAME.eq(student))
                     .fetchOptional();
             int stored;
             if (studentRecord.isPresent()) {
-                stored = create.insertInto(ADMIN, ADMIN.STUDENT_ID)
-                        .values(studentRecord.get().getUuid())
+                stored = create.insertInto(ADMIN, ADMIN.STUDENT_ID, ADMIN.UPLOADER_PASSWORD)
+                        .values(studentRecord.get().getUuid(), password)
+                        .onDuplicateKeyIgnore()
                         .execute();
             } else {
                 String uuid = UUIDGenerator.uuid();
@@ -82,8 +83,9 @@ public class AdminDAOImpl extends DatabaseDAO implements AdminDAO {
                         STUDENT.EMAIL)
                         .values(uuid, student, student + "@siue.edu")
                         .execute();
-                stored = create.insertInto(ADMIN, ADMIN.STUDENT_ID)
-                        .values(uuid)
+                stored = create.insertInto(ADMIN, ADMIN.STUDENT_ID, ADMIN.UPLOADER_PASSWORD)
+                        .values(uuid, password)
+                        .onDuplicateKeyIgnore()
                         .execute();
             }
 
