@@ -29,7 +29,7 @@ public class IndexController {
 
         }
 
-        request.session().attribute("user","mjones");
+        //request.session().attribute("user","mjones");
 
         Map<String, Object> model = new HashMap<>();
 
