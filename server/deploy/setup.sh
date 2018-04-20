@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+tar xzcf assignments.tar.gz *.pdf
+rm *.pdf
 PID=$(ps aux | grep era.jar | grep -v grep | awk '{print $2}')
 kill -9 $PID
 mysql -u root --password=fakepassword dev < dump.sql
