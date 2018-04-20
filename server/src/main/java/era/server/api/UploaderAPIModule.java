@@ -1,6 +1,7 @@
 package era.server.api;
 
 import era.server.ServerModule;
+import era.server.data.AdminDAO;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.StudentDAO;
@@ -28,6 +29,7 @@ public class UploaderAPIModule implements ServerModule {
 
     private final UploadController upc;
     private final AssignmentController assignmentController;
+    private final RequestFilter requestFilter;
 
     /**
      * Creates all the controllers in this module using the DAOs provided.
@@ -35,13 +37,15 @@ public class UploaderAPIModule implements ServerModule {
     private UploaderAPIModule(
             StudentDAO studentDAO,
             CourseDAO courseDAO,
-            AssignmentDAO assignmentDAO) {
-        this.upc = new UploadController(courseDAO, assignmentDAO, studentDAO);
+            AssignmentDAO assignmentDAO, AdminDAO adminDAO) {
+        this.upc = new UploadController(courseDAO, assignmentDAO, studentDAO, adminDAO);
         this.assignmentController = new AssignmentController(assignmentDAO);
+        this.requestFilter = new RequestFilter(adminDAO);
     }
 
     @Override
     public void setupRoutes() {
+        Spark.before(API_PREFIX + Course.ENDPOINT, this.requestFilter);
         Spark.get(API_PREFIX + Course.ENDPOINT, upc::checkCourseExistence);
         Spark.post(API_PREFIX + Course.ENDPOINT, upc::uploadCourses);
         Spark.post(API_PREFIX + Course.ENDPOINT + "/:courseId/assignment", upc::uploadAssignment);
@@ -57,6 +61,7 @@ public class UploaderAPIModule implements ServerModule {
     public static UploaderAPIModule instance(
             StudentDAO studentDAO,
             CourseDAO courseDAO,
+            AdminDAO adminDAO,
             AssignmentDAO assignmentDAO) {
         if (INSTANCE == null) {
             synchronized (UploaderAPIModule.class) {
@@ -64,7 +69,8 @@ public class UploaderAPIModule implements ServerModule {
                     INSTANCE = new UploaderAPIModule(
                             studentDAO,
                             courseDAO,
-                            assignmentDAO
+                            assignmentDAO,
+                            adminDAO
                     );
                 }
             }

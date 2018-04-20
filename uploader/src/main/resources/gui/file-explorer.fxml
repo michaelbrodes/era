@@ -31,10 +31,11 @@
     <Label layoutX="11.0" layoutY="59.0" styleClass="main-heading" text="Electronically Returned Assignments" />
     <Label layoutX="852.0" layoutY="6.0" text="Current Mode:" />
     <Label fx:id="modeLabel" layoutX="950.0" layoutY="6.0" text="null" />
-    <ButtonBar layoutX="842.0" layoutY="40.0">
+    <ButtonBar layoutX="750.0" layoutY="40.0">
         <buttons>
             <Button onMouseClicked="#changeToOnline" text="Online" ButtonBar.buttonData="LEFT" />
             <Button onMouseClicked="#changeToOffline" text="Offline" ButtonBar.buttonData="LEFT" />
+            <Button onMouseClicked="#enterCredentials" text="Credentials" ButtonBar.buttonData="LEFT"/>
         </buttons>
     </ButtonBar>
 

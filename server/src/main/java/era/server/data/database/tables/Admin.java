@@ -39,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Admin extends TableImpl<AdminRecord> {
 
-    private static final long serialVersionUID = 655583447;
+    private static final long serialVersionUID = -1616553239;
 
     /**
      * The reference instance of <code>dev.admin</code>
@@ -58,6 +58,11 @@ public class Admin extends TableImpl<AdminRecord> {
      * The column <code>dev.admin.student_id</code>.
      */
     public final TableField<AdminRecord, String> STUDENT_ID = createField("student_id", org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false), this, "");
+
+    /**
+     * The column <code>dev.admin.uploader_password</code>.
+     */
+    public final TableField<AdminRecord, String> UPLOADER_PASSWORD = createField("uploader_password", org.jooq.impl.SQLDataType.VARCHAR(300).defaultValue(org.jooq.impl.DSL.field("NULL", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * Create a <code>dev.admin</code> table reference

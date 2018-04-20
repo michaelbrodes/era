@@ -13,7 +13,7 @@ public class AssignmentController {
 
     public Object deleteAssignment(Request request, Response response) {
         if (request.params("uuid") != null
-                && assignmentDAO.delete(request.params("uuid"))) {
+                && assignmentDAO.delete(request.params("uuid")) && request.session().attribute("user") != null) {
             response.status(204);
         } else {
             response.status(404);

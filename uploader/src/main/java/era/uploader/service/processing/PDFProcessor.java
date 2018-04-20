@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import era.uploader.communication.AssignmentUploader;
 import era.uploader.communication.FailedAssignment;
+import era.uploader.communication.RESTException;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.Assignment;
@@ -157,7 +158,10 @@ public class PDFProcessor {
                     for (FailedAssignment failure : failedAssignments) {
                         scanningProgress.addError(failure.toString());
                     }
-                } catch (IOException e) {
+                } catch(RESTException e){
+                    scanningProgress.addError("Unable to upload: invalid credentials");
+                }
+                  catch (IOException e) {
                     scanningProgress.addError("Unable to upload assignments to server.");
                     e.printStackTrace();
                 }

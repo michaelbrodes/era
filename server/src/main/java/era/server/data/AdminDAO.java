@@ -13,5 +13,5 @@ import java.util.Optional;
 public interface AdminDAO {
     Optional<Admin> fetchByStudentId(String studentId);
     Optional<Admin> fetchByUsername(String username);
-    boolean storeAsAdmin(String student);
+    boolean storeAsAdmin(String student, String password);
 }

@@ -50,7 +50,7 @@ public class AdminDAOImpl extends DatabaseDAO implements AdminDAO {
     @Override
     public Optional<Admin> fetchByUsername(String username) {
         try(DSLContext create = connect()) {
-            return create.select(STUDENT.UUID, STUDENT.EMAIL, STUDENT.USERNAME)
+            return create.select(STUDENT.UUID, STUDENT.EMAIL, STUDENT.USERNAME, ADMIN.UPLOADER_PASSWORD)
                     .from(ADMIN)
                     .join(STUDENT)
                     .on(ADMIN.STUDENT_ID.eq(STUDENT.UUID))
@@ -58,21 +58,23 @@ public class AdminDAOImpl extends DatabaseDAO implements AdminDAO {
                     .fetchOptional()
                     .map((record) -> Admin.builder()
                             .withUUID(record.get(STUDENT.UUID))
+                            .withPassword(record.get(ADMIN.UPLOADER_PASSWORD))
                             .withEmail(record.get(STUDENT.EMAIL))
                             .create(record.get(STUDENT.USERNAME)));
         }
     }
 
     @Override
-    public boolean storeAsAdmin(String student) {
+    public boolean storeAsAdmin(String student, String password) {
         try (DSLContext create = connect()) {
             Optional<StudentRecord> studentRecord = create.selectFrom(STUDENT)
                     .where(STUDENT.USERNAME.eq(student))
                     .fetchOptional();
             int stored;
             if (studentRecord.isPresent()) {
-                stored = create.insertInto(ADMIN, ADMIN.STUDENT_ID)
-                        .values(studentRecord.get().getUuid())
+                stored = create.insertInto(ADMIN, ADMIN.STUDENT_ID, ADMIN.UPLOADER_PASSWORD)
+                        .values(studentRecord.get().getUuid(), password)
+                        .onDuplicateKeyIgnore()
                         .execute();
             } else {
                 String uuid = UUIDGenerator.uuid();
@@ -82,8 +84,9 @@ public class AdminDAOImpl extends DatabaseDAO implements AdminDAO {
                         STUDENT.EMAIL)
                         .values(uuid, student, student + "@siue.edu")
                         .execute();
-                stored = create.insertInto(ADMIN, ADMIN.STUDENT_ID)
-                        .values(uuid)
+                stored = create.insertInto(ADMIN, ADMIN.STUDENT_ID, ADMIN.UPLOADER_PASSWORD)
+                        .values(uuid, password)
+                        .onDuplicateKeyIgnore()
                         .execute();
             }
 

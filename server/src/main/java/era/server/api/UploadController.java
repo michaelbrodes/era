@@ -5,14 +5,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import era.server.common.JSONUtil;
+import era.server.communication.UploaderAuthentication;
+import era.server.data.AdminDAO;
 import era.server.data.AssignmentDAO;
 import era.server.data.CourseDAO;
 import era.server.data.StudentDAO;
-import era.server.data.model.Assignment;
-import era.server.data.model.Course;
-import era.server.data.model.Semester;
-import era.server.data.model.Student;
-import era.server.data.model.Term;
+import era.server.data.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -30,10 +28,14 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.Year;
+import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.nio.file.StandardOpenOption.CREATE;
@@ -43,6 +45,7 @@ public class UploadController {
     private final CourseDAO courseDAO;
     private final AssignmentDAO assignmentDAO;
     private final StudentDAO studentDAO;
+    private final AdminDAO adminDAO;
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadController.class);
     private static final int TERM_INDEX = 0;
     private static final int YEAR_INDEX = 1;
@@ -79,11 +82,13 @@ public class UploadController {
     UploadController(
             final CourseDAO courseDAO,
             final AssignmentDAO assignmentDAO,
-            final StudentDAO studentDAO
+            final StudentDAO studentDAO,
+            final AdminDAO adminDAO
     ) {
         this.courseDAO = courseDAO;
         this.assignmentDAO = assignmentDAO;
         this.studentDAO = studentDAO;
+        this.adminDAO = adminDAO;
     }
 
     /**
@@ -244,8 +249,9 @@ public class UploadController {
      * Stores a list of courses into the database. Each course object can have
      * many students.
      */
-    public String uploadCourses(Request request, Response response) {
+    public String uploadCourses(Request request, Response response) throws UnsupportedEncodingException, InvalidKeySpecException, NoSuchAlgorithmException {
         // json is the only input type we have
+
         if (!request.contentType().contains("application/json")) {
             return APIMessage.error(
                     request,
