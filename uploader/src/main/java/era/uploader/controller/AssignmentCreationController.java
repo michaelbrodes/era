@@ -188,7 +188,6 @@ public class AssignmentCreationController {
      * to a single assignment and one for displaying all assignments created
      * thus far.
      */
-    @SuppressWarnings("unused")
     private void addAssignmentToTable(ActionEvent actionEvent) {
         // If the user does not enter values for each field
         if (courseNamesComboBox.getValue() == null ||

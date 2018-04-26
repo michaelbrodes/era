@@ -2,37 +2,30 @@ package era.uploader.service;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import era.uploader.common.UploaderProperties;
-import era.uploader.communication.RESTException;
-import era.uploader.data.TeacherDAO;
-import era.uploader.data.model.Teacher;
-import era.uploader.service.coursecreation.CSVParser;
 import era.uploader.communication.CourseUploader;
+import era.uploader.communication.RESTException;
 import era.uploader.data.CourseDAO;
+import era.uploader.data.TeacherDAO;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
 import era.uploader.data.model.Student;
+import era.uploader.data.model.Teacher;
+import era.uploader.service.coursecreation.CSVParser;
 import era.uploader.service.coursecreation.ParsedLine;
 import era.uploader.service.coursecreation.RosterFileException;
 
 import javax.annotation.Nonnull;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static era.uploader.common.MultimapCollector.toMultimap;
 
 public class CourseCreationService {
     private final CourseDAO courseDAO;

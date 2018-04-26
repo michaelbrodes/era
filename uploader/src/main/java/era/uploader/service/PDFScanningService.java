@@ -1,5 +1,8 @@
 package era.uploader.service;
 
+import era.uploader.common.UploaderProperties;
+import era.uploader.communication.CourseUploader;
+import era.uploader.communication.RESTException;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.CourseDAO;
 import era.uploader.data.QRCodeMappingDAO;
@@ -45,4 +48,18 @@ public class PDFScanningService {
         return courseDAO.getAllCourses();
     }
 
+    /**
+     * The user could upload assignments for courses that don't currently exist
+     * on the server (has happened in the wild). This method checks if the
+     * supplied courses exist on the server and, if not, it will upload them.
+     *
+     * @param currentCourses
+     */
+    public void createConflictingCourses(List<Course> currentCourses) throws RESTException {
+        UploaderProperties uploaderConfiguration = UploaderProperties.instance();
+        String serverURL = uploaderConfiguration
+                .getServerURL()
+                .orElse("http://localhost:3001");
+        CourseUploader.uploadBadCourses(currentCourses, serverURL);
+    }
 }

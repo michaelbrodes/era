@@ -49,6 +49,7 @@ public class ServerApp {
                 UploaderAPIModule.instance(
                         studentDAOImpl,
                         courseDAOImpl,
+                        adminDAO,
                         assignmentDAOImpl),
                 ServerWebModule.instance(
                         studentDAOImpl,

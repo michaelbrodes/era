@@ -1,7 +1,7 @@
 package era.uploader.controller;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
+import era.uploader.common.CaseInsensitiveMap;
 import era.uploader.common.GUIUtil;
 import era.uploader.common.UploaderProperties;
 import era.uploader.communication.RESTException;
@@ -9,22 +9,16 @@ import era.uploader.data.database.CourseDAOImpl;
 import era.uploader.data.database.TeacherDAOImpl;
 import era.uploader.data.model.Course;
 import era.uploader.data.model.Semester;
-import era.uploader.data.model.Student;
 import era.uploader.data.model.Teacher;
 import era.uploader.data.model.Term;
 import era.uploader.data.viewmodel.StudentMetaData;
 import era.uploader.service.CourseCreationService;
 import era.uploader.service.coursecreation.RosterFileException;
-import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -32,7 +26,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -46,7 +39,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.IntStream;
 
 /**
@@ -112,10 +104,7 @@ public class CourseCreationController {
         yearDropdown.setPromptText("Year...");
         yearDropdown.setItems(availableYears);
 
-        nameToTeacher = Maps.uniqueIndex(service.getAllTeachers(), Teacher::getName);
-        instructorDropdown.setPromptText("Instructor...");
-        instructorDropdown.getItems().addAll(nameToTeacher.keySet());
-        instructorDropdown.setEditable(true);
+        loadTeachers();
 
         loadingSpinner.setVisible(false);
 
@@ -217,10 +206,15 @@ public class CourseCreationController {
                 .semester(semester.get())
                 .teacher(teacher.get())
                 .warningHandler(warningEvent -> {
-                    Alert warningAlert = new Alert(Alert.AlertType.WARNING);
-                    warningAlert.setHeaderText("Course Creation Warning");
-                    warningAlert.setContentText(warningEvent.getWarningMessage());
-                    warningAlert.show();
+                    // javafx will not allow us to interact with the main
+                    // thread using a background thread, so we do #runLater to
+                    // schedule it on the main thread
+                    Platform.runLater(() -> {
+                        Alert warningAlert = new Alert(Alert.AlertType.WARNING);
+                        warningAlert.setHeaderText("Course Creation Warning");
+                        warningAlert.setContentText(warningEvent.getWarningMessage());
+                        warningAlert.show();
+                    });
                 })
                 .errorHandler((errorEvent) -> {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);
@@ -243,11 +237,14 @@ public class CourseCreationController {
                     ObservableList<StudentMetaData> students = StudentMetaData.fromCourses(courses);
                     output.setItems(students);
 
+                    clearForm();
                     enableForm(true);
                     Alert uploadSuccessful = new Alert(Alert.AlertType.INFORMATION);
-                    uploadSuccessful.setHeaderText("Courses Uploaded");
-                    uploadSuccessful.setContentText(courses.size() + " courses uploaded to the server");
-                    uploadSuccessful.showAndWait();
+                    if (UploaderProperties.instance().isUploadingEnabled()) {
+                        uploadSuccessful.setHeaderText("Courses Uploaded");
+                        uploadSuccessful.setContentText(courses.size() + " courses uploaded to the server");
+                        uploadSuccessful.showAndWait();
+                    }
                 })
                 .create();
 
@@ -255,47 +252,6 @@ public class CourseCreationController {
         Thread backgroundThread = new Thread(backgroundTask);
         backgroundThread.setDaemon(true);
         backgroundThread.start();
-
-
-//        Collection<Course> courses;
-//        try {
-//            courses = service.createCourses(inputPath, semester.get(), teacher.get());
-//        } catch (IOException e) {
-//            // technically shouldn't be possible but we need to be defensive
-//            Alert fileOperationError = new Alert(Alert.AlertType.ERROR);
-//            fileOperationError.setHeaderText("Error trying to open roster file.");
-//            fileOperationError.setContentText("There was an error trying to open the roster file." +
-//                    " Make sure you have permission to access the file's directory.");
-//            fileOperationError.showAndWait();
-//            // short circuit because cannot process anymore
-//            return;
-//        }
-//
-//        try {
-//            if (uploading) {
-//                service.upload(courses);
-//                Alert uploadSuccessful = new Alert(Alert.AlertType.INFORMATION);
-//                uploadSuccessful.setHeaderText("Courses Uploaded");
-//                uploadSuccessful.setContentText(courses.size() + " courses uploaded to the server");
-//                uploadSuccessful.show();
-//            } else {
-//                Alert notUploaded = new Alert(Alert.AlertType.WARNING);
-//                notUploaded.setHeaderText("Offline Mode Enabled");
-//                notUploaded.setContentText(
-//                        "The Uploader is in \"Offline\" mode so these courses were not uploaded to the server. "
-//                                + "If you would like their assignments to be posted to the server, resubmit the roster file with \"Online\" mode enabled.");
-//                notUploaded.show();
-//            }
-//        } catch (IOException e) {
-//            Alert fileOperationError = new Alert(Alert.AlertType.ERROR);
-//            fileOperationError.setHeaderText("Cannot connect to Server.");
-//            fileOperationError.setContentText("There was an error connecting " +
-//                    "to the remote server. Please make sure that server is up " +
-//                    "and that the right URL is shown in uploader.properties");
-//            fileOperationError.showAndWait();
-//        }
-//        ObservableList<StudentMetaData> students = StudentMetaData.fromCourses(courses);
-//        output.setItems(students);
     }
 
     private void enableForm(boolean enable) {
@@ -306,6 +262,23 @@ public class CourseCreationController {
         yearDropdown.setDisable(!enable);
         browseFiles.setDisable(!enable);
         homeButton.setDisable(!enable);
+    }
+
+    private void clearForm() {
+        instructorDropdown.getItems().clear();
+        loadTeachers();
+        instructorDropdown.getSelectionModel().clearSelection();
+        instructorDropdown.valueProperty().set(null);
+        termDropdown.getSelectionModel().clearSelection();
+        yearDropdown.getSelectionModel().clearSelection();
+        chosenFile.setText("Chosen File");
+    }
+
+    private void loadTeachers() {
+        nameToTeacher = CaseInsensitiveMap.decorate(Maps.uniqueIndex(service.getAllTeachers(), Teacher::getName));
+        instructorDropdown.setPromptText("Instructor...");
+        instructorDropdown.getItems().addAll(nameToTeacher.keySet());
+        instructorDropdown.setEditable(true);
     }
 
     private Optional<String> grabInstructor() {

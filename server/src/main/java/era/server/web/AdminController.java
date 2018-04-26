@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import era.server.common.PageRenderer;
 import era.server.common.UnauthorizedException;
+import era.server.communication.UploaderAuthentication;
 import era.server.data.AdminDAO;
 import era.server.data.AssignmentDAO;
 import era.server.data.model.Admin;
@@ -16,6 +17,7 @@ import spark.Response;
 import spark.Spark;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,10 +52,23 @@ public class AdminController {
                 Map<String, List<Assignment>> assignmentsByCourse = assignmentDAO.fetchAllAssignmentsGroupedByCourse();
                 Collection<CourseTable> courseTables = CourseTable.fromAssignmentGroupings(assignmentsByCourse);
                 List<Map<String, Object>> courseTableViewModels = courseTables.stream()
+                        .sorted(courseTableComparator())
                         .map(CourseTable::toViewModel)
                         .collect(Collectors.toList());
 
-                Map<String, Object> viewModel = ImmutableMap.of("courses", courseTableViewModels);
+                String generatedPassword = request.session().attribute("password");
+                Map<String, Object> viewModel;
+
+                if (generatedPassword != null)
+                {
+                    viewModel = ImmutableMap.of("courses", courseTableViewModels, "password", generatedPassword);
+                }
+                else
+                {
+                    viewModel = ImmutableMap.of("courses", courseTableViewModels);
+                }
+
+
                 return renderer.render(viewModel, "admin.hbs");
             } else {
                 throw Spark.halt(403);
@@ -61,6 +76,31 @@ public class AdminController {
         } catch (UnauthorizedException e) {
             throw Spark.halt(403);
         }
+    }
+
+    private Comparator<CourseTable> courseTableComparator() {
+        return (left, right) -> {
+            if (right.getAssignmentsInCourse().isEmpty() && left.getAssignmentsInCourse().isEmpty()) {
+                return 0;
+            } else if (right.getAssignmentsInCourse().isEmpty() && !left.getAssignmentsInCourse().isEmpty()) {
+                return 1;
+            } else if (!right.getAssignmentsInCourse().isEmpty() && left.getAssignmentsInCourse().isEmpty()) {
+                return -1;
+            } else {
+                // won't IndexOutOfBounds because a CourseTable will only have a AssignmentsTable if the assignment table has an assignment
+                return right.getAssignmentsInCourse()
+                        .get(0)
+                        .getAssignmentsSubmitted()
+                        .get(0)
+                        .getCreatedDateTime()
+                        .compareTo(left.getAssignmentsInCourse()
+                                .get(0)
+                                .getAssignmentsSubmitted()
+                                .get(0)
+                                .getCreatedDateTime()
+                        );
+            }
+        };
     }
 
     /**
@@ -83,11 +123,23 @@ public class AdminController {
 
         boolean success = false;
 
+        String password = UploaderAuthentication.generatePassword();
+        String hashedPassword = "";
+
         if (!Strings.isNullOrEmpty(username)) {
-            success = adminDAO.storeAsAdmin(username);
+            try
+            {
+                hashedPassword = UploaderAuthentication.generateStrongPasswordHash(password);
+            }
+            catch(Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+            success = adminDAO.storeAsAdmin(username, hashedPassword);
         }
 
         if (success && request.session().attribute("user") != null) {
+            request.session().attribute("password", password);
             response.redirect("/admin/" + request.session().attribute("user"));
         } else {
             throw Spark.halt(500, "Couldn't create Admin. See server log for details.");

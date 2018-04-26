@@ -2,6 +2,7 @@ package era.uploader.controller;
 
 import era.uploader.common.GUIUtil;
 import era.uploader.common.UploaderProperties;
+import era.uploader.communication.RESTException;
 import era.uploader.data.model.Course;
 import era.uploader.service.PDFScanningService;
 import era.uploader.service.processing.ScanningProgress;
@@ -30,6 +31,8 @@ import java.util.Map;
 
 public class PDFScanningController {
 
+    private static final String NULL_HOST = null;
+    private final PDFScanningService pdfServ = new PDFScanningService();
     @FXML
     private RadioButton offline;
     @FXML
@@ -48,11 +51,6 @@ public class PDFScanningController {
     private TextField assignmentName;
     @FXML
     private Label modeLabel;
-
-    private static final String NULL_HOST = null;
-
-    private final PDFScanningService pdfServ = new PDFScanningService();
-
     private Path fullPath;
     private String fullFileName;
     //private Course currentCourse;
@@ -99,7 +97,6 @@ public class PDFScanningController {
             List<Course> currentCourses = nameToCourses.get(currCourseName);
 
 
-
             if (fullFileName == null || currCourseName == null || currentAssignment == null || currentAssignment.trim().equals("")) {
 
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
@@ -107,46 +104,50 @@ public class PDFScanningController {
                 errorAlert.setContentText("You must enter an Assignment Name, Choose a course, and Choose a PDF file to Scan.");
                 errorAlert.showAndWait();
 
-            }
-
-            else if (fullFileName != null)
+            } else if (fullFileName != null)
+                // I ran a code formatter on the entire project. The below code IS NOT MINE. - Michael
                 try {
-                boolean uploading = false;
-                if(currentCourses != null && currentAssignment != null) {
-                    if (UploaderProperties.instance().isUploadingEnabled() != null) {
-                        uploading = UploaderProperties.instance().isUploadingEnabled();
+                    boolean uploading = false;
+                    if (currentCourses != null && currentAssignment != null) {
+                        if (UploaderProperties.instance().isUploadingEnabled() != null) {
+                            uploading = UploaderProperties.instance().isUploadingEnabled();
+                        }
+                        if (uploading) {
+
+                            String serverURL = UploaderProperties.instance().getServerURL().orElse(null);
+                            pdfServ.createConflictingCourses(currentCourses);
+                            final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourses, currentAssignment, serverURL);
+                            URL url = getClass().getResource("/gui/pdf-progress.fxml");
+
+                            FXMLLoader fxmlloader = new FXMLLoader();
+                            fxmlloader.setLocation(url);
+                            //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+                            Parent root = fxmlloader.load();
+                            Scene mainScene = scanButton.getScene();
+                            // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
+                            ((PDFProgressController) fxmlloader.getController()).setScanningProgress(scanningProgress);
+                            mainScene.setRoot(root);
+                        } else {
+                            final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourses, currentAssignment, NULL_HOST);
+                            URL url = getClass().getResource("/gui/pdf-progress.fxml");
+
+                            FXMLLoader fxmlloader = new FXMLLoader();
+                            fxmlloader.setLocation(url);
+                            //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+                            Parent root = fxmlloader.load();
+                            Scene mainScene = scanButton.getScene();
+                            // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
+                            ((PDFProgressController) fxmlloader.getController()).setScanningProgress(scanningProgress);
+                            mainScene.setRoot(root);
+                        }
+
                     }
-                    if(uploading) {
 
-                        String serverURL = UploaderProperties.instance().getServerURL().orElse(null);
-                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourses, currentAssignment, serverURL);
-                        URL url = getClass().getResource("/gui/pdf-progress.fxml");
-
-                        FXMLLoader fxmlloader = new FXMLLoader();
-                        fxmlloader.setLocation(url);
-                        //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
-                        Parent root = fxmlloader.load();
-                        Scene mainScene = scanButton.getScene();
-                        // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
-                        ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
-                        mainScene.setRoot(root);
-                    }
-                    else {
-                        final ScanningProgress scanningProgress = pdfServ.scanPDF(fullPath, currentCourses, currentAssignment, NULL_HOST);
-                        URL url = getClass().getResource("/gui/pdf-progress.fxml");
-
-                        FXMLLoader fxmlloader = new FXMLLoader();
-                        fxmlloader.setLocation(url);
-                        //fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
-                        Parent root = fxmlloader.load();
-                        Scene mainScene = scanButton.getScene();
-                        // here we gOOOOOOOOOOOOOOOOOoooooooooooooooooo -Mario
-                        ((PDFProgressController)fxmlloader.getController()).setScanningProgress(scanningProgress);
-                        mainScene.setRoot(root);
-                    }
-
-                }
-
+                } catch (RESTException e) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setHeaderText("Server Error");
+                    errorAlert.setContentText("Can't process Assignments " + e.getMessage());
+                    errorAlert.showAndWait();
                 } catch (IOException | IllegalArgumentException e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                     errorAlert.setHeaderText("File Not Found");

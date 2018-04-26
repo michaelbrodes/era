@@ -6,21 +6,27 @@ import era.uploader.common.UploaderProperties;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.database.AssignmentDAOImpl;
 import era.uploader.data.viewmodel.AssignmentMetaData;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Cursor;
-import javafx.scene.control.Alert;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 
 import javax.annotation.Nonnull;
-import java.awt.Desktop;
-import java.io.*;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -123,7 +129,7 @@ public class FileExplorerController {
      */
     public void changeToOnline() {
         UploaderProperties.instance().setUploadingEnabled(true);
-        if (UploaderProperties.instance().isUploadingEnabled()){
+        if (UploaderProperties.instance().isUploadingEnabled()) {
             modeLabel.setText("Online");
             modeLabel.setTextFill(Color.web("#228b22"));
         }
@@ -134,9 +140,66 @@ public class FileExplorerController {
      */
     public void changeToOffline() {
         UploaderProperties.instance().setUploadingEnabled(false);
-        if (!UploaderProperties.instance().isUploadingEnabled()){
+        if (!UploaderProperties.instance().isUploadingEnabled()) {
             modeLabel.setText("Offline");
             modeLabel.setTextFill(Color.web("#ff0000"));
         }
+    }
+
+    public void enterCredentials(MouseEvent mouseEvent) {
+// Create the custom dialog.
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Login Dialog");
+        dialog.setHeaderText("Enter server Credentials");
+
+// Set the button types.
+        ButtonType loginButtonType = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+// Create the username and password labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField username = new TextField();
+        username.setPromptText("Username");
+        PasswordField password = new PasswordField();
+        password.setPromptText("Password");
+
+        grid.add(new Label("Username:"), 0, 0);
+        grid.add(username, 1, 0);
+        grid.add(new Label("Password:"), 0, 1);
+        grid.add(password, 1, 1);
+
+// Enable/Disable login button depending on whether a username was entered.
+        Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
+        loginButton.setDisable(true);
+
+// Do some validation (using the Java 8 lambda syntax).
+        username.textProperty().addListener((observable, oldValue, newValue) -> {
+            loginButton.setDisable(newValue.trim().isEmpty());
+        });
+
+        dialog.getDialogPane().setContent(grid);
+
+// Request focus on the username field by default.
+        Platform.runLater(() -> username.requestFocus());
+
+// Convert the result to a username-password-pair when the login button is clicked.
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == loginButtonType) {
+                return new Pair<>(username.getText(), password.getText());
+            }
+            return null;
+        });
+
+        Optional<Pair<String, String>> result = dialog.showAndWait();
+
+        result.ifPresent(usernamePassword -> {
+            UploaderProperties uploaderProperties = UploaderProperties.instance();
+            uploaderProperties.setUser(usernamePassword.getKey());
+            uploaderProperties.setPassword(usernamePassword.getValue());
+        });
     }
 }

@@ -1,11 +1,12 @@
 package era.uploader.service.processing;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
-import era.uploader.common.MultimapCollector;
+import era.uploader.communication.AssignmentUploader;
 import era.uploader.communication.FailedAssignment;
+import era.uploader.communication.RESTException;
 import era.uploader.data.AssignmentDAO;
 import era.uploader.data.QRCodeMappingDAO;
 import era.uploader.data.model.Assignment;
@@ -13,7 +14,6 @@ import era.uploader.data.model.Course;
 import era.uploader.data.model.QRCodeMapping;
 import era.uploader.data.model.QRErrorStatus;
 import era.uploader.data.model.Student;
-import era.uploader.communication.AssignmentUploader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
@@ -26,12 +26,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @ParametersAreNonnullByDefault
 public class PDFProcessor {
@@ -69,13 +69,13 @@ public class PDFProcessor {
      * pipeline are Spit a large pdf into pdfInput -> scatter those pdfInput with
      * {@link List#parallelStream()} -> feed them into
      * {@link QRScanner#extractQRCodeInformation(Map.Entry)} to grab uuid ->
-     * match {@link #associateStudentsWithPage(QRCodeMapping)} -> mergeMappings student
+     * match {@link #associateWithExistingQR(QRCodeMapping)} -> mergeMappings student
      * associated Pages into one pdf -> store in either the local database or
      * the remote database.
      *
      * @param pdf            a path to a large pdf filled with multiple student
      *                       assignments, in arbitrary order.
-     * @param courses         the courses this pdf was submitted to.
+     * @param courses        the courses this pdf was submitted to.
      * @param assignmentName the name of the assignment that this pdf was for
      * @return a list of PDFs that have pdfInput that were associated with
      * students.
@@ -136,11 +136,16 @@ public class PDFProcessor {
 
             // scan and match pages in parallel
             QRScanner scanner = new QRScanner(scanningProgress);
-            Multimap<Student, QRCodeMapping> studentsToPages = idToPage.entrySet().parallelStream()
+            Map<Student, List<QRCodeMapping>> studentsToPages = idToPage.entrySet().parallelStream()
                     .map(scanner::extractQRCodeInformation)
                     .filter(Objects::nonNull)
-                    .map(this::associateStudentsWithPage)
-                    .collect(MultimapCollector.toMultimap());
+                    .map(this::associateWithExistingQR)
+                    .filter(Objects::nonNull)
+                    .sorted((left, right) -> ComparisonChain.start()
+                            .compare(left.getStudentId(), right.getStudentId())
+                            .compare(left.getSequenceNumber(), right.getSequenceNumber())
+                            .result())
+                    .collect(Collectors.groupingBy(QRCodeMapping::getStudent));
 
             // group pages into assignments based on their students
             Collection<Assignment> assignments = groupIntoAssignments(studentsToPages);
@@ -150,10 +155,13 @@ public class PDFProcessor {
 
                 try {
                     List<FailedAssignment> failedAssignments = AssignmentUploader.uploadAssignments(assignments, host);
-                    for (FailedAssignment failure: failedAssignments) {
+                    for (FailedAssignment failure : failedAssignments) {
                         scanningProgress.addError(failure.toString());
                     }
-                } catch (IOException e) {
+                } catch(RESTException e){
+                    scanningProgress.addError("Unable to upload: invalid credentials");
+                }
+                  catch (IOException e) {
                     scanningProgress.addError("Unable to upload assignments to server.");
                     e.printStackTrace();
                 }
@@ -174,22 +182,17 @@ public class PDFProcessor {
      * Valid QRCodeMapping. Create multimap object and populate with student
      * associated with the QRCodeMapping in the argument
      */
-    private Multimap<Student, QRCodeMapping> associateStudentsWithPage(QRCodeMapping QRCodeMapping) {
-        Preconditions.checkNotNull(QRCodeMapping);
-        QRCodeMapping QRCodeMappingFromDB;
-        QRCodeMappingFromDB = QRCodeMappingDAO.read(QRCodeMapping.getUuid());
-        if(QRCodeMappingFromDB == null){
-            scanningProgress.addError("Student Does Not Exist");
-            return ArrayListMultimap.create();
-        } else{
-            QRCodeMappingFromDB = mergeMappings(QRCodeMappingFromDB, QRCodeMapping);
-            Multimap<Student, QRCodeMapping> mmap = ArrayListMultimap.create();
-            mmap.put(
-                    QRCodeMappingFromDB.getStudent(),
-                    QRCodeMappingFromDB
-            );
+    private QRCodeMapping associateWithExistingQR(QRCodeMapping qrCodeMapping) {
+        Preconditions.checkNotNull(qrCodeMapping);
 
-            return mmap;
+        QRCodeMapping qrCodeMappingFromDB = QRCodeMappingDAO.read(qrCodeMapping.getUuid());
+        if (qrCodeMappingFromDB == null) {
+            scanningProgress.addError("Student Does Not Exist");
+            return null;
+        } else {
+            qrCodeMappingFromDB.setTempDocumentName(qrCodeMapping.getTempDocumentName());
+            qrCodeMappingFromDB.setDocument(qrCodeMapping.getDocument());
+            return qrCodeMappingFromDB;
         }
     }
 
@@ -211,11 +214,10 @@ public class PDFProcessor {
      * After this is called, we now have a multimap object with each page
      * mapped to a student
      */
-    private Collection<Assignment> groupIntoAssignments(Multimap<Student, QRCodeMapping> mmap) {
-        Set<Assignment> assignments = new HashSet<>();
-        for (Map.Entry<Student, Collection<QRCodeMapping>> pages :
-                mmap.asMap().entrySet()
-                ) {
+    private Collection<Assignment> groupIntoAssignments(Map<Student, List<QRCodeMapping>> studentQRGroupings) {
+        List<Assignment> assignments = new LinkedList<>();
+        for (Map.Entry<Student, List<QRCodeMapping>> pages :
+                studentQRGroupings.entrySet()) {
             Student student = pages.getKey();
             Course studentsCourse = findCourseContainingStudent(student);
             if (student != null && studentsCourse != null) {
@@ -244,7 +246,7 @@ public class PDFProcessor {
         Course studentsCourse = null;
 
         if (student != null) {
-            for (Course  course : courses) {
+            for (Course course : courses) {
                 if (course.getStudentsEnrolled().contains(student)) {
                     studentsCourse = course;
                     break;
@@ -259,10 +261,9 @@ public class PDFProcessor {
      * After this is called, all pdfInput for each student are now merged, and saved at the
      * appropriate location. also stores the assignment file location in the database
      */
-    private void mergeAssignmentPages(Set<Assignment> assignments) {
+    private void mergeAssignmentPages(Collection<Assignment> assignments) {
         PDFMergerUtility merger = new PDFMergerUtility();
-        for (Assignment a : assignments
-                ) {
+        for (Assignment a : assignments) {
             PDDocument allPages = new PDDocument();
             for (QRCodeMapping p : a.getQRCodeMappings()
                     ) {

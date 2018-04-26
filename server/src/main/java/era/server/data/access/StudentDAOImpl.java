@@ -5,17 +5,12 @@ import era.server.api.UUIDGenerator;
 import era.server.data.StudentDAO;
 import era.server.data.database.tables.records.StudentRecord;
 import era.server.data.model.Assignment;
-import era.server.data.database.tables.records.StudentRecord;
-import era.server.data.model.Course;
 import era.server.data.model.Student;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.HashSet;
-import java.util.Set;
-
 import java.util.List;
 import java.util.Optional;
 

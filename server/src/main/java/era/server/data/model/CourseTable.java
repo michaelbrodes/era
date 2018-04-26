@@ -4,22 +4,19 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class CourseTable implements ViewableModel {
     private final String courseName;
-    private final Collection<AssignmentTable> assignmentsInCourse;
+    private final List<AssignmentTable> assignmentsInCourse;
 
-    public CourseTable(String courseName, Collection<AssignmentTable> assignmentsInCourse) {
+    public CourseTable(String courseName, List<AssignmentTable> assignmentsInCourse) {
         this.courseName = courseName;
         this.assignmentsInCourse = assignmentsInCourse;
     }
 
-    public static Collection<CourseTable> fromAssignmentGroupings(Map<String, List<Assignment>> assignmentsByCourse) {
-        Collection<CourseTable> tables = Lists.newArrayList();
+    public static List<CourseTable> fromAssignmentGroupings(Map<String, List<Assignment>> assignmentsByCourse) {
+        List<CourseTable> tables = Lists.newArrayList();
 
         for (Map.Entry<String, List<Assignment>> course : assignmentsByCourse.entrySet()) {
             CourseTable table = new CourseTable(course.getKey(), Lists.newArrayList());
@@ -58,7 +55,7 @@ public class CourseTable implements ViewableModel {
         return courseName;
     }
 
-    public Collection<AssignmentTable> getAssignmentsInCourse() {
+    public List<AssignmentTable> getAssignmentsInCourse() {
         return assignmentsInCourse;
     }
 

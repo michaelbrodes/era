@@ -1,6 +1,10 @@
 package era.uploader.common;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -26,6 +30,10 @@ public class UploaderProperties {
     private static final String SERVER_PROTOCOL = "uploading.server.protocol";
     private static final String PROP_FILE = "uploader.properties";
     private static UploaderProperties INSTANCE;
+    private static final String UPLOADERUSERNAME = "uploading.user";
+    private String user = null;
+    private static final String UPLOADERPASSWORD = "uploading.password";
+    private String password = null;
 
     public static UploaderProperties instance() {
         INSTANCE = Threads.doubleCheck(
@@ -121,6 +129,50 @@ public class UploaderProperties {
         }
 
         return ret;
+    }
+
+    public String getUser()
+    {
+        if(user == null) {
+            if (getProperties().isPresent()) {
+                user = getProperties().get().getProperty(UPLOADERUSERNAME);
+            }
+        }
+            return user;
+    }
+
+    public String getPassword()
+    {
+        if(password == null) {
+            if (getProperties().isPresent()) {
+                password = getProperties().get().getProperty(UPLOADERPASSWORD);
+            }
+        }
+        return password;
+    }
+
+    public void setUser(String user)
+    {
+
+            if (getProperties().isPresent()) {
+                Properties properties = getProperties().get();
+                properties.put(UPLOADERUSERNAME, user);
+               storeProperties(properties);
+            }
+
+        this.user = user;
+    }
+
+    public void setPassword(String password)
+    {
+
+            if (getProperties().isPresent()) {
+                Properties properties = getProperties().get();
+                properties.put(UPLOADERPASSWORD, password);
+                storeProperties(properties);
+            }
+
+        this.password = password;
     }
 
     public File getFile() {
