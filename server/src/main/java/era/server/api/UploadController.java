@@ -47,6 +47,7 @@ public class UploadController {
     private final StudentDAO studentDAO;
     private final AdminDAO adminDAO;
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadController.class);
+    private static final String ASSIGNMENT_DIR = "assignment/";
     private static final int TERM_INDEX = 0;
     private static final int YEAR_INDEX = 1;
     // below are HTTP status codes that this API returns as well as documentation on how to handle them
@@ -316,10 +317,12 @@ public class UploadController {
     }
 
     private boolean storeInFileSystem(InputStream inputStream, Assignment assignment) {
-        Path path = Paths.get(assignment.getImageFilePath());
+        Path inputPath = Paths.get(assignment.getImageFilePath());
+        Path outputPath = Paths.get(ASSIGNMENT_DIR + inputPath.getFileName().toString());
+        assignment.setImageFilePath(outputPath.toAbsolutePath().toString());
 
         try (OutputStream out = new BufferedOutputStream(
-                Files.newOutputStream(path, CREATE, WRITE))) {
+                Files.newOutputStream(outputPath, CREATE, WRITE))) {
             byte[] buffer = new byte[1024]; // Adjust if you want
             int bytesRead;
             while ((bytesRead = inputStream.read(buffer)) != -1) {

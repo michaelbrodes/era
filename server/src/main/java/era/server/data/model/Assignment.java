@@ -107,6 +107,10 @@ public class Assignment implements Model {
         return imageFilePath;
     }
 
+    public void setImageFilePath(String imageFilePath) {
+        this.imageFilePath = imageFilePath;
+    }
+
     @Nonnull
     public String getName() {
         return name;
