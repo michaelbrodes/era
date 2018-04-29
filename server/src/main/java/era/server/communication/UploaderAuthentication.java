@@ -5,8 +5,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -37,7 +35,7 @@ public class UploaderAuthentication {
 
     private static byte[] getSalt() throws NoSuchAlgorithmException
     {
-        SecureRandom sr = SecureRandom.getInstanceStrong();
+        SecureRandom sr = new SecureRandom();
         byte[] salt = new byte[16];
         sr.nextBytes(salt);
         return salt;

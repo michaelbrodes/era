@@ -59,12 +59,9 @@ public class AdminController {
                 String generatedPassword = request.session().attribute("password");
                 Map<String, Object> viewModel;
 
-                if (generatedPassword != null)
-                {
+                if (generatedPassword != null) {
                     viewModel = ImmutableMap.of("courses", courseTableViewModels, "password", generatedPassword);
-                }
-                else
-                {
+                } else {
                     viewModel = ImmutableMap.of("courses", courseTableViewModels);
                 }
 
@@ -114,8 +111,6 @@ public class AdminController {
         String user = request.session().attribute("user");
 
 
-        Optional<Admin> maybeAdmin = adminDAO.fetchByUsername(user);
-
         if (user == null || !adminDAO.fetchByUsername(user).isPresent()) {
             //Not an Admin
             throw Spark.halt(403);
@@ -127,12 +122,9 @@ public class AdminController {
         String hashedPassword = "";
 
         if (!Strings.isNullOrEmpty(username)) {
-            try
-            {
+            try {
                 hashedPassword = UploaderAuthentication.generateStrongPasswordHash(password);
-            }
-            catch(Exception e)
-            {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
             success = adminDAO.storeAsAdmin(username, hashedPassword);
